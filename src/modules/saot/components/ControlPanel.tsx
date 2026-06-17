@@ -1,4 +1,4 @@
-import { useSaotStore, type CameraPreset } from '../store/useSaotStore';
+import { useSaotStore, type CameraPreset, type ScenarioType, SCENARIOS } from '../store/useSaotStore';
 import type { OffsideResult } from '../services/OffsideCalculator';
 
 interface SimulationState {
@@ -38,17 +38,26 @@ const SPEED_OPTIONS = [
   { value: 2, label: '2x' },
 ];
 
+const SCENARIO_LIST: { id: ScenarioType; icon: string }[] = [
+  { id: 'normal-offside', icon: '\u26A0\uFE0F' },
+  { id: 'marginal', icon: '\uD83D\uDD0D' },
+  { id: 'reverse-offside', icon: '\u21BB' },
+  { id: 'no-offside-behind', icon: '\u2705' },
+  { id: 'no-offside-level', icon: '\u2696\uFE0F' },
+];
+
 export default function ControlPanel({ simulation, result }: ControlPanelProps) {
   const {
-    goalkeeper,
+    goalkeeper, activeScenario,
     cameraPreset, setCameraPreset,
     showShadows, toggleShadows,
     showOffsideLine, toggleOffsideLine,
-    reset,
+    loadScenario, reset,
   } = useSaotStore();
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-4 text-sm">
+      {/* Camera */}
       <div className="glass rounded-xl p-4">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
           Camera
@@ -70,6 +79,61 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
         </div>
       </div>
 
+      {/* Cenarios de impedimento */}
+      <div className="glass rounded-xl p-4">
+        <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
+          Cenarios
+        </h3>
+        <div className="space-y-1.5">
+          {SCENARIO_LIST.map((s) => {
+            const scenario = SCENARIOS[s.id as keyof typeof SCENARIOS];
+            const isActive = activeScenario === s.id;
+            return (
+              <button
+                key={s.id}
+                onClick={() => {
+                  loadScenario(s.id);
+                  simulation.reset();
+                }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all ${
+                  isActive
+                    ? 'bg-brand-600/20 border border-brand-500/30 text-brand-300'
+                    : 'bg-surface-800/50 hover:bg-surface-800 text-surface-200/70'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{s.icon}</span>
+                  <span className="font-medium">{scenario.label}</span>
+                </div>
+                <p className="text-[10px] text-surface-200/40 mt-0.5 ml-6">
+                  {scenario.description}
+                </p>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => {
+              loadScenario('custom');
+              simulation.reset();
+            }}
+            className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all ${
+              activeScenario === 'custom'
+                ? 'bg-surface-700 border border-surface-600 text-surface-200/80'
+                : 'bg-surface-800/50 hover:bg-surface-800 text-surface-200/70'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <span>\uD83C\uDFAE</span>
+              <span className="font-medium">Modo Livre</span>
+            </div>
+            <p className="text-[10px] text-surface-200/40 mt-0.5 ml-6">
+              Arraste os jogadores como quiser
+            </p>
+          </button>
+        </div>
+      </div>
+
+      {/* Simulacao */}
       <div className="glass rounded-xl p-4">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
           Simulacao
@@ -137,6 +201,7 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
         </div>
       </div>
 
+      {/* Jogadores */}
       <div className="glass rounded-xl p-4">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
           Jogadores
@@ -148,6 +213,7 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
         </div>
       </div>
 
+      {/* Resultado */}
       <div className="glass rounded-xl p-4">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
           Resultado
@@ -164,6 +230,7 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
         </p>
       </div>
 
+      {/* Opcoes */}
       <div className="glass rounded-xl p-4">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
           Opcoes

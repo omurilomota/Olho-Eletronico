@@ -5,6 +5,8 @@ interface SimulationFrame {
   ballPosition: [number, number, number];
   attackerPosition: { x: number; z: number };
   defenderPosition: { x: number; z: number };
+  attackerAnim: 'idle' | 'running' | 'kicking';
+  defenderAnim: 'idle' | 'running';
 }
 
 interface UseSimulationOptions {
@@ -33,6 +35,8 @@ export function useSimulation(options: UseSimulationOptions) {
     ballPosition: ballStart,
     attackerPosition: attackerStart,
     defenderPosition: defenderStart,
+    attackerAnim: 'idle',
+    defenderAnim: 'idle',
   });
 
   const animRef = useRef<number>(0);
@@ -47,23 +51,43 @@ export function useSimulation(options: UseSimulationOptions) {
         ? 2 * normalizedT * normalizedT
         : 1 - Math.pow(-2 * normalizedT + 2, 2) / 2;
 
+      // Ball trajectory
       const ballX = ballStart[0] + (ballEnd[0] - ballStart[0]) * eased;
       const ballY = ballStart[1] + Math.sin(eased * Math.PI) * 2;
       const ballZ = ballStart[2] + (ballEnd[2] - ballStart[2]) * eased;
 
+      // Attacker runs forward
       const attackerRun = eased * 3;
       const attackerX = attackerStart.x + attackerRun;
       const attackerZ = attackerStart.z + Math.sin(eased * Math.PI * 2) * 0.5;
 
+      // Defender runs too
       const defenderRun = eased * 1.5;
       const defenderX = defenderStart.x + defenderRun;
       const defenderZ = defenderStart.z;
+
+      // Animation states based on timeline
+      let attackerAnim: 'idle' | 'running' | 'kicking' = 'idle';
+      let defenderAnim: 'idle' | 'running' = 'idle';
+
+      if (normalizedT > 0 && normalizedT < 0.7) {
+        attackerAnim = 'running';
+        defenderAnim = 'running';
+      } else if (normalizedT >= 0.7 && normalizedT < 0.85) {
+        attackerAnim = 'kicking';
+        defenderAnim = 'running';
+      } else if (normalizedT >= 0.85) {
+        attackerAnim = 'idle';
+        defenderAnim = 'idle';
+      }
 
       return {
         time: t,
         ballPosition: [ballX, ballY, ballZ],
         attackerPosition: { x: attackerX, z: attackerZ },
         defenderPosition: { x: defenderX, z: defenderZ },
+        attackerAnim,
+        defenderAnim,
       };
     },
     [duration, ballStart, ballEnd, attackerStart, defenderStart],
@@ -111,6 +135,8 @@ export function useSimulation(options: UseSimulationOptions) {
       ballPosition: ballStart,
       attackerPosition: attackerStart,
       defenderPosition: defenderStart,
+      attackerAnim: 'idle',
+      defenderAnim: 'idle',
     });
     if (animRef.current) cancelAnimationFrame(animRef.current);
   }, [ballStart, attackerStart, defenderStart]);

@@ -10,10 +10,14 @@ import Ball from './Ball';
 import OffsideLine from './OffsideLine';
 import CameraController from './CameraController';
 import ControlPanel from './ControlPanel';
+import PlaybookMode from './PlaybookMode';
 import DataOverlay from '../../../shared/components/DataOverlay';
 import { calculateOffside } from '../services/OffsideCalculator';
+import { useState } from 'react';
 
 export default function SAOTLab() {
+  const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
+
   const {
     attacker, defender, goalkeeper,
     cameraPreset,
@@ -39,6 +43,20 @@ export default function SAOTLab() {
 
   const isSimulating = simulation.progress > 0 && simulation.progress < 1;
 
+  const attackerAngle = isSimulating
+    ? Math.atan2(
+        simulation.currentFrame.attackerPosition.z - attacker.z,
+        simulation.currentFrame.attackerPosition.x - attacker.x,
+      )
+    : 0;
+
+  const defenderAngle = isSimulating
+    ? Math.atan2(
+        simulation.currentFrame.defenderPosition.z - defender.z,
+        simulation.currentFrame.defenderPosition.x - defender.x,
+      )
+    : 0;
+
   return (
     <div className="h-[calc(100vh-7rem)] flex">
       <div className="flex-1 relative">
@@ -61,6 +79,8 @@ export default function SAOTLab() {
             number={9}
             onDragEnd={setAttacker}
             highlighted={result.isOffside && showOffsideLine}
+            animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
+            facingAngle={attackerAngle}
           />
           <Player
             position={isSimulating ? simulation.currentFrame.defenderPosition : defender}
@@ -69,6 +89,8 @@ export default function SAOTLab() {
             label="Defensor"
             number={4}
             onDragEnd={setDefender}
+            animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
+            facingAngle={defenderAngle}
           />
           <Player
             position={{ x: goalkeeper.x, z: goalkeeper.z }}
@@ -102,8 +124,40 @@ export default function SAOTLab() {
         </Canvas>
       </div>
 
-      <div className="w-72 border-l border-surface-700/50 glass">
-        <ControlPanel simulation={simulation} result={result} />
+      <div className="w-72 border-l border-surface-700/50 glass flex flex-col">
+        {/* Tab switcher */}
+        <div className="flex border-b border-surface-700/50">
+          <button
+            onClick={() => setActivePanel('controls')}
+            className={`flex-1 px-3 py-2.5 text-xs font-medium transition-colors ${
+              activePanel === 'controls'
+                ? 'text-brand-400 border-b-2 border-brand-400 bg-brand-500/5'
+                : 'text-surface-200/50 hover:text-surface-200/70'
+            }`}
+          >
+            Controles
+          </button>
+          <button
+            onClick={() => setActivePanel('playbook')}
+            className={`flex-1 px-3 py-2.5 text-xs font-medium transition-colors ${
+              activePanel === 'playbook'
+                ? 'text-brand-400 border-b-2 border-brand-400 bg-brand-500/5'
+                : 'text-surface-200/50 hover:text-surface-200/70'
+            }`}
+          >
+            Playbook
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-hidden">
+          {activePanel === 'controls' ? (
+            <ControlPanel simulation={simulation} result={result} />
+          ) : (
+            <div className="h-full overflow-y-auto p-4">
+              <PlaybookMode />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

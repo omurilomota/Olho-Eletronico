@@ -23,7 +23,7 @@ function createGrassTexture(): THREE.CanvasTexture {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(6, 4);
+  texture.repeat.set(8, 6);
   return texture;
 }
 
@@ -144,7 +144,7 @@ export default function Pitch() {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[30, 18]} />
+        <planeGeometry args={[60, 40]} />
         <meshStandardMaterial
           map={grassTexture}
           roughness={0.9}

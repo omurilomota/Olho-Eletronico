@@ -100,8 +100,8 @@ export default function Stadium() {
 
       {/* Chao do estadio */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-        <planeGeometry args={[70, 50]} />
-        <meshStandardMaterial color="#1e293b" roughness={0.95} />
+        <planeGeometry args={[80, 60]} />
+        <meshStandardMaterial color="#1a2e1a" roughness={0.95} />
       </mesh>
     </group>
   );
