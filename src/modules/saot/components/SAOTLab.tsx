@@ -25,7 +25,7 @@ export default function SAOTLab() {
     attackerStart: attacker,
     defenderStart: defender,
     ballStart: [-3, 0.2, 0],
-    ballEnd: [attacker.x + 2, 0.2, attacker.z],
+    ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
   });
 
   const result = calculateOffside(
