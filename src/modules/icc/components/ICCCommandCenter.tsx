@@ -4,6 +4,7 @@ import OpsTicker from './OpsTicker';
 import RiskGauge from './RiskGauge';
 import StatusPanel from './StatusPanel';
 import WeatherWidget from './WeatherWidget';
+import SalesPanel from './SalesPanel';
 
 export default function ICCCommandCenter() {
   return (
@@ -14,21 +15,16 @@ export default function ICCCommandCenter() {
         <div className="lg:col-span-2">
           <DigitalTwinMap />
         </div>
-
         <div className="space-y-4">
           <RiskGauge />
           <WeatherWidget />
+          <StatusPanel />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
-          <AIChat />
-        </div>
-
-        <div>
-          <StatusPanel />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SalesPanel />
+        <AIChat />
       </div>
     </div>
   );

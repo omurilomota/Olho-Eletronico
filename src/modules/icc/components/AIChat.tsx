@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useIccStore } from '../store/useIccStore';
 import { getAIResponse, SUGGESTED_PROMPTS } from '../services/mockAIResponses';
 import {
@@ -12,32 +12,76 @@ import {
 } from 'recharts';
 
 const DEFAULT_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const TYPEWRITER_SPEED = 22;
+
+interface TypingMessage {
+  fullText: string;
+  displayedText: string;
+  chartData?: { label: string; data: number[] };
+  isComplete: boolean;
+}
 
 export default function AIChat() {
   const { messages, addMessage, clearChat } = useIccStore();
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [typingMsg, setTypingMsg] = useState<TypingMessage | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
 
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, typingMsg, scrollToBottom]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   const handleSend = (text?: string) => {
     const msg = text || input.trim();
-    if (!msg) return;
+    if (!msg || isTyping) return;
 
     addMessage({ role: 'user', content: msg });
     setInput('');
     setIsTyping(true);
 
-    const delay = 500 + Math.random() * 1000;
+    const delay = 400 + Math.random() * 600;
     setTimeout(() => {
       const aiMsg = getAIResponse(msg);
-      addMessage(aiMsg);
-      setIsTyping(false);
+      const fullText = aiMsg.content;
+
+      setTypingMsg({
+        fullText,
+        displayedText: '',
+        chartData: aiMsg.chartData,
+        isComplete: false,
+      });
+
+      let charIndex = 0;
+      intervalRef.current = setInterval(() => {
+        charIndex++;
+        if (charIndex <= fullText.length) {
+          setTypingMsg((prev) =>
+            prev
+              ? { ...prev, displayedText: fullText.slice(0, charIndex) }
+              : null,
+          );
+        } else {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          setTypingMsg((prev) => (prev ? { ...prev, isComplete: true } : null));
+          addMessage(aiMsg);
+          setIsTyping(false);
+          setTimeout(() => setTypingMsg(null), 100);
+        }
+      }, TYPEWRITER_SPEED);
     }, delay);
   };
 
@@ -57,7 +101,7 @@ export default function AIChat() {
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 && (
+        {messages.length === 0 && !typingMsg && (
           <div className="text-center py-8">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-brand-500/10 flex items-center justify-center">
               <svg className="w-6 h-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -132,7 +176,62 @@ export default function AIChat() {
           </div>
         ))}
 
-        {isTyping && (
+        {typingMsg && (
+          <div className="animate-slide-up">
+            <div className="max-w-[85%] rounded-xl px-3 py-2.5 bg-surface-700/50 text-surface-200/90 rounded-bl-sm">
+              <p className="text-sm leading-relaxed">
+                {typingMsg.displayedText}
+                {!typingMsg.isComplete && (
+                  <span className="inline-block w-0.5 h-4 bg-brand-400 ml-0.5 animate-pulse align-text-bottom" />
+                )}
+              </p>
+
+              {typingMsg.isComplete && typingMsg.chartData && (
+                <div className="mt-3 h-32 animate-fade-in">
+                  <ResponsiveContainer>
+                    <BarChart
+                      data={typingMsg.chartData.data.map((v, j) => ({
+                        name: `${j + 1}`,
+                        value: v,
+                      }))}
+                    >
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fill: '#94a3b8', fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fill: '#94a3b8', fontSize: 10 }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={30}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1e293b',
+                          border: '1px solid #334155',
+                          borderRadius: '8px',
+                          fontSize: '11px',
+                        }}
+                      />
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                        {typingMsg.chartData.data.map((_, j) => (
+                          <Cell
+                            key={j}
+                            fill={DEFAULT_COLORS[j % DEFAULT_COLORS.length]}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {isTyping && !typingMsg && (
           <div className="flex gap-1 px-4 py-3">
             <div className="w-2 h-2 rounded-full bg-surface-200/40 animate-bounce" style={{ animationDelay: '0ms' }} />
             <div className="w-2 h-2 rounded-full bg-surface-200/40 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -141,7 +240,7 @@ export default function AIChat() {
         )}
       </div>
 
-      {messages.length === 0 && (
+      {messages.length === 0 && !typingMsg && (
         <div className="px-4 pb-3 flex flex-wrap gap-1.5">
           {SUGGESTED_PROMPTS.map((prompt) => (
             <button
@@ -163,6 +262,7 @@ export default function AIChat() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Pergunte sobre o jogo..."
+            disabled={isTyping}
           />
           <button
             onClick={() => handleSend()}
