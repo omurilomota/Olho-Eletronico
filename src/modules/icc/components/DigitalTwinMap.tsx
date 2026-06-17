@@ -1,47 +1,52 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useCrowdSimulation } from '../hooks/useCrowdSimulation';
 
-function drawStadium(ctx: CanvasRenderingContext2D, w: number, h: number) {
+function drawStadium(ctx: CanvasRenderingContext2D, w: number, h: number, field: { x: number; y: number; w: number; h: number }) {
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(0, 0, w, h);
 
-  const fieldX = 100;
-  const fieldY = 60;
-  const fieldW = 400;
-  const fieldH = 280;
-
+  // Arquibancada externa
   ctx.strokeStyle = '#334155';
   ctx.lineWidth = 1;
   ctx.setLineDash([4, 4]);
-  ctx.strokeRect(fieldX - 20, fieldY - 20, fieldW + 40, fieldH + 40);
+  ctx.strokeRect(field.x - 60, field.y - 40, field.w + 120, field.h + 80);
   ctx.setLineDash([]);
 
-  ctx.fillStyle = '#1e293b';
-  ctx.fillRect(fieldX, fieldY, fieldW, fieldH);
+  // Zona do campo (área protegida)
+  ctx.fillStyle = '#1a2744';
+  ctx.fillRect(field.x, field.y, field.w, field.h);
 
+  // Borda do campo
   ctx.strokeStyle = '#475569';
   ctx.lineWidth = 2;
-  ctx.strokeRect(fieldX, fieldY, fieldW, fieldH);
+  ctx.strokeRect(field.x, field.y, field.w, field.h);
 
+  // Linha central
   ctx.beginPath();
-  ctx.moveTo(fieldX + fieldW / 2, fieldY);
-  ctx.lineTo(fieldX + fieldW / 2, fieldY + fieldH);
+  ctx.moveTo(field.x + field.w / 2, field.y);
+  ctx.lineTo(field.x + field.w / 2, field.y + field.h);
   ctx.stroke();
 
+  // Círculo central
   ctx.beginPath();
-  ctx.arc(fieldX + fieldW / 2, fieldY + fieldH / 2, 40, 0, Math.PI * 2);
+  ctx.arc(field.x + field.w / 2, field.y + field.h / 2, 35, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = 'bold 14px Inter, sans-serif';
+  // Label do campo
+  ctx.fillStyle = '#64748b';
+  ctx.font = 'bold 13px Inter, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('CAMPO', w / 2, fieldY + fieldH / 2 + 5);
+  ctx.fillText('CAMPO', field.x + field.w / 2, field.y + field.h / 2 - 8);
+  ctx.font = '10px Inter, sans-serif';
+  ctx.fillStyle = '#475569';
+  ctx.fillText('Zona de Exclusao', field.x + field.w / 2, field.y + field.h / 2 + 8);
 
+  // Túneis de entrada
   ctx.fillStyle = '#1e293b';
-  ctx.fillRect(fieldX - 30, fieldY + 80, 25, 120);
-  ctx.fillRect(fieldX + fieldW + 5, fieldY + 80, 25, 120);
-  ctx.fillRect(fieldX + 150, fieldY - 25, 100, 20);
-  ctx.fillRect(fieldX + 150, fieldY + fieldH + 5, 100, 20);
+  ctx.fillRect(field.x - 30, field.y + 80, 20, 60);
+  ctx.fillRect(field.x + field.w + 10, field.y + 80, 20, 60);
+  ctx.fillRect(field.x + 120, field.y - 25, 60, 20);
+  ctx.fillRect(field.x + 120, field.y + field.h + 5, 60, 20);
 }
 
 function drawHeatmapOverlay(ctx: CanvasRenderingContext2D, points: { x: number; y: number }[], w: number, h: number) {
@@ -80,11 +85,15 @@ function drawHeatmapOverlay(ctx: CanvasRenderingContext2D, points: { x: number; 
   }
 }
 
+function hueToColor(hue: number, alpha: number): string {
+  return `hsla(${hue}, 80%, 55%, ${alpha})`;
+}
+
 export default function DigitalTwinMap() {
   const [timeLeft, setTimeLeft] = useState(120);
   const [isPaused, setIsPaused] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(true);
-  const { points, alert, stats, gates, reset } = useCrowdSimulation(timeLeft, isPaused);
+  const { points, alert, stats, gates, reset, field } = useCrowdSimulation(timeLeft, isPaused);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const draw = useCallback(() => {
@@ -102,20 +111,19 @@ export default function DigitalTwinMap() {
     const w = rect.width;
     const h = rect.height;
 
-    drawStadium(ctx, w, h);
+    drawStadium(ctx, w, h, field);
 
     if (showHeatmap) {
       drawHeatmapOverlay(ctx, points, w, h);
     }
 
+    // Portões
     for (const g of gates) {
       const isCongested = stats.congestedGates.some((cg) => cg.id === g.id);
 
       ctx.beginPath();
       ctx.arc(g.x, g.y, g.radius, 0, Math.PI * 2);
-      ctx.fillStyle = isCongested
-        ? 'rgba(239, 68, 68, 0.15)'
-        : `${g.color}15`;
+      ctx.fillStyle = isCongested ? 'rgba(239, 68, 68, 0.15)' : `${g.color}15`;
       ctx.fill();
 
       ctx.beginPath();
@@ -140,16 +148,15 @@ export default function DigitalTwinMap() {
       ctx.fillText(`${gateCount}`, g.x, g.y + 10);
     }
 
-    ctx.fillStyle = '#60a5fa';
+    // Torcedores — coloridos por velocidade (hue)
     for (const p of points) {
       const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-      const size = Math.min(1 + speed * 0.5, 3);
-      ctx.globalAlpha = 0.6 + speed * 0.1;
+      const size = Math.min(1.5 + speed * 0.4, 3.5);
+      ctx.fillStyle = hueToColor(p.hue, 0.7 + speed * 0.05);
       ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
     }
-    ctx.globalAlpha = 1;
 
-  }, [points, gates, stats, showHeatmap]);
+  }, [points, gates, stats, showHeatmap, field]);
 
   useEffect(() => {
     const id = requestAnimationFrame(draw);

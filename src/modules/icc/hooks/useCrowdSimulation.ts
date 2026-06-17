@@ -25,24 +25,41 @@ export interface CrowdStats {
 }
 
 const GATES: Gate[] = [
-  { id: 1, x: 120, y: 40, radius: 35, label: 'Norte A', color: '#f59e0b' },
-  { id: 2, x: 480, y: 40, radius: 35, label: 'Norte B', color: '#f59e0b' },
-  { id: 3, x: 120, y: 360, radius: 35, label: 'Sul A', color: '#3b82f6' },
-  { id: 4, x: 480, y: 360, radius: 35, label: 'Sul B', color: '#3b82f6' },
-  { id: 5, x: 300, y: 200, radius: 30, label: 'Central', color: '#8b5cf6' },
+  { id: 1, x: 80, y: 30, radius: 35, label: 'Norte A', color: '#f59e0b' },
+  { id: 2, x: 520, y: 30, radius: 35, label: 'Norte B', color: '#f59e0b' },
+  { id: 3, x: 80, y: 370, radius: 35, label: 'Sul A', color: '#3b82f6' },
+  { id: 4, x: 520, y: 370, radius: 35, label: 'Sul B', color: '#3b82f6' },
 ];
+
+// Campo de jogo: retângulo central onde torcedores NÃO devem entrar
+const FIELD = { x: 180, y: 100, w: 240, h: 200 };
 
 const CONGESTION_THRESHOLD = 80;
 
+function isInField(x: number, y: number): boolean {
+  return x > FIELD.x && x < FIELD.x + FIELD.w && y > FIELD.y && y < FIELD.y + FIELD.h;
+}
+
 function createInitialPoints(): CrowdPoint[] {
-  return Array.from({ length: 600 }, () => ({
-    x: Math.random() * 600,
-    y: Math.random() * 400,
-    vx: 0,
-    vy: 0,
-    speed: 0.5 + Math.random() * 1.5,
-    hue: 200 + Math.random() * 40,
-  }));
+  const points: CrowdPoint[] = [];
+  for (let i = 0; i < 600; i++) {
+    let x = Math.random() * 600;
+    let y = Math.random() * 400;
+    // Garante que nenhum ponto comece dentro do campo
+    while (isInField(x, y)) {
+      x = Math.random() * 600;
+      y = Math.random() * 400;
+    }
+    points.push({
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      speed: 0.5 + Math.random() * 1.5,
+      hue: 200 + Math.random() * 40,
+    });
+  }
+  return points;
 }
 
 function findClosestGate(p: CrowdPoint): Gate {
@@ -60,25 +77,60 @@ function findClosestGate(p: CrowdPoint): Gate {
   return target;
 }
 
+function pushOutOfField(x: number, y: number): { x: number; y: number } {
+  // Empurra o ponto para fora do retângulo do campo
+  const cx = FIELD.x + FIELD.w / 2;
+  const cy = FIELD.y + FIELD.h / 2;
+  const dx = x - cx;
+  const dy = y - cy;
+
+  // Escala para sair do campo
+  const scaleX = dx !== 0 ? (FIELD.w / 2 + 5) / Math.abs(dx) : 2;
+  const scaleY = dy !== 0 ? (FIELD.h / 2 + 5) / Math.abs(dy) : 2;
+  const scale = Math.min(scaleX, scaleY);
+
+  return { x: cx + dx * scale, y: cy + dy * scale };
+}
+
 function updatePoint(p: CrowdPoint, speedFactor: number): CrowdPoint {
   const target = findClosestGate(p);
-  const dx = target.x - p.x;
-  const dy = target.y - p.y;
+  let dx = target.x - p.x;
+  let dy = target.y - p.y;
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
   const speed = p.speed * speedFactor;
-  const noiseX = (Math.random() - 0.5) * 0.3;
-  const noiseY = (Math.random() - 0.5) * 0.3;
+  const noiseX = (Math.random() - 0.5) * 0.4;
+  const noiseY = (Math.random() - 0.5) * 0.4;
 
-  const newVx = (dx / len) * speed + noiseX;
-  const newVy = (dy / len) * speed + noiseY;
+  let newVx = (dx / len) * speed + noiseX;
+  let newVy = (dy / len) * speed + noiseY;
+
+  let newX = p.x + newVx;
+  let newY = p.y + newVy;
+
+  // Se entrou no campo, empurra para fora
+  if (isInField(newX, newY)) {
+    const pushed = pushOutOfField(newX, newY);
+    newX = pushed.x;
+    newY = pushed.y;
+    // Redireciona a velocidade para longe do campo
+    const pushDx = newX - (FIELD.x + FIELD.w / 2);
+    const pushDy = newY - (FIELD.y + FIELD.h / 2);
+    const pushLen = Math.sqrt(pushDx * pushDx + pushDy * pushDy) || 1;
+    newVx = (pushDx / pushLen) * speed;
+    newVy = (pushDy / pushLen) * speed;
+  }
+
+  // Mantém dentro dos limites do canvas
+  newX = Math.max(5, Math.min(595, newX));
+  newY = Math.max(5, Math.min(395, newY));
+
   const actualSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
-
-  const hue = actualSpeed > 2 ? 0 : actualSpeed > 1 ? 40 : 200;
+  const hue = actualSpeed > 2.5 ? 0 : actualSpeed > 1.5 ? 40 : 200;
 
   return {
-    x: p.x + newVx,
-    y: p.y + newVy,
+    x: newX,
+    y: newY,
     vx: newVx,
     vy: newVy,
     speed: p.speed,
@@ -172,5 +224,5 @@ export function useCrowdSimulation(timeLeftMinutes: number, paused = false) {
     setAlert(null);
   }, []);
 
-  return { points, alert, stats, gates: GATES, reset };
+  return { points, alert, stats, gates: GATES, reset, field: FIELD };
 }
