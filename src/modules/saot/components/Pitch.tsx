@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import * as THREE from 'three';
 
 function createGrassTexture(): THREE.CanvasTexture {
@@ -31,40 +31,59 @@ function PitchMarkings() {
   const W = 30;
   const H = 18;
   const lineY = 0.02;
-  const lineWidth = 0.06;
+  const LW = 0.12;
   const halfW = W / 2;
   const halfH = H / 2;
 
-  const penaltyW = 6.75;
-  const penaltyH = 12;
-  const goalAreaW = 3;
-  const goalAreaH = 6;
+  const penaltyDist = 6.75;
+  const penaltyHalfH = 6;
+  const goalAreaDist = 3;
+  const goalAreaHalfH = 3;
   const centerR = 3;
+  const penaltyArcR = 9.15;
 
   const lines = useMemo(() => {
-    const result: { pos: [number, number, number]; scale: [number, number, number] }[] = [];
+    const r: { pos: [number, number, number]; scale: [number, number, number] }[] = [];
 
-    // Limites do campo
-    result.push({ pos: [0, lineY, -halfH], scale: [W, lineWidth, lineWidth] });
-    result.push({ pos: [0, lineY, halfH], scale: [W, lineWidth, lineWidth] });
-    result.push({ pos: [-halfW, lineY, 0], scale: [lineWidth, lineWidth, H] });
-    result.push({ pos: [halfW, lineY, 0], scale: [lineWidth, lineWidth, H] });
+    // Limites do campo (bordas)
+    r.push({ pos: [0, lineY, -halfH], scale: [W, LW, LW] });
+    r.push({ pos: [0, lineY, halfH], scale: [W, LW, LW] });
+    r.push({ pos: [-halfW, lineY, 0], scale: [LW, LW, H] });
+    r.push({ pos: [halfW, lineY, 0], scale: [LW, LW, H] });
 
     // Linha central
-    result.push({ pos: [0, lineY, 0], scale: [lineWidth, lineWidth, H] });
+    r.push({ pos: [0, lineY, 0], scale: [LW, LW, H] });
 
-    // Areas de penalty
-    result.push({ pos: [-halfW + penaltyW / 2, lineY, 0], scale: [penaltyW, lineWidth, penaltyH] });
-    result.push({ pos: [halfW - penaltyW / 2, lineY, 0], scale: [penaltyW, lineWidth, penaltyH] });
+    // === Areas de penalty (contorno: 3 linhas cada — a 4a e a borda do campo) ===
+    // Gol esquerdo (x = -halfW)
+    const pL = -halfW + penaltyDist;
+    r.push({ pos: [pL, lineY, 0], scale: [LW, LW, penaltyHalfH * 2] }); // linha interna (paralela a lateral)
+    r.push({ pos: [-halfW + penaltyDist / 2, lineY, -penaltyHalfH], scale: [penaltyDist, LW, LW] }); // topo
+    r.push({ pos: [-halfW + penaltyDist / 2, lineY, penaltyHalfH], scale: [penaltyDist, LW, LW] }); // base
 
-    // Areas menores
-    result.push({ pos: [-halfW + goalAreaW / 2, lineY, 0], scale: [goalAreaW, lineWidth, goalAreaH] });
-    result.push({ pos: [halfW - goalAreaW / 2, lineY, 0], scale: [goalAreaW, lineWidth, goalAreaH] });
+    // Gol direito (x = +halfW)
+    const pR = halfW - penaltyDist;
+    r.push({ pos: [pR, lineY, 0], scale: [LW, LW, penaltyHalfH * 2] });
+    r.push({ pos: [halfW - penaltyDist / 2, lineY, -penaltyHalfH], scale: [penaltyDist, LW, LW] });
+    r.push({ pos: [halfW - penaltyDist / 2, lineY, penaltyHalfH], scale: [penaltyDist, LW, LW] });
 
-    // Arcos de escanteio (simplificados)
+    // === Areas de gol (contorno: 3 linhas cada) ===
+    // Gol esquerdo
+    const gL = -halfW + goalAreaDist;
+    r.push({ pos: [gL, lineY, 0], scale: [LW, LW, goalAreaHalfH * 2] });
+    r.push({ pos: [-halfW + goalAreaDist / 2, lineY, -goalAreaHalfH], scale: [goalAreaDist, LW, LW] });
+    r.push({ pos: [-halfW + goalAreaDist / 2, lineY, goalAreaHalfH], scale: [goalAreaDist, LW, LW] });
+
+    // Gol direito
+    const gR = halfW - goalAreaDist;
+    r.push({ pos: [gR, lineY, 0], scale: [LW, LW, goalAreaHalfH * 2] });
+    r.push({ pos: [halfW - goalAreaDist / 2, lineY, -goalAreaHalfH], scale: [goalAreaDist, LW, LW] });
+    r.push({ pos: [halfW - goalAreaDist / 2, lineY, goalAreaHalfH], scale: [goalAreaDist, LW, LW] });
+
+    // Arcos de escanteio
     const cornerSegments = 12;
     const cornerR = 1;
-    const corners = [
+    const corners: [number, number][] = [
       [-halfW, -halfH],
       [halfW, -halfH],
       [-halfW, halfH],
@@ -79,13 +98,83 @@ function PitchMarkings() {
         const z1 = cz + Math.sin(a1) * cornerR * (cz > 0 ? -1 : 1);
         const x2 = cx + Math.cos(a2) * cornerR * (cx > 0 ? -1 : 1);
         const z2 = cz + Math.sin(a2) * cornerR * (cz > 0 ? -1 : 1);
-        result.push({
+        r.push({
           pos: [(x1 + x2) / 2, lineY, (z1 + z2) / 2],
-          scale: [lineWidth, lineWidth, cornerR * Math.PI * 0.5 / cornerSegments + 0.02],
+          scale: [LW, LW, cornerR * Math.PI * 0.5 / cornerSegments + 0.02],
         });
       }
     });
 
+    return r;
+  }, []);
+
+  // Arcos de penalty (o "D" na borda da area)
+  const penaltyArcSegments = 20;
+  const penaltyArc = useMemo(() => {
+    const result: ReactNode[] = [];
+    const arcY = lineY + 0.001;
+
+    // Gol esquerdo — arco no topo da area (x = -halfW + penaltyDist)
+    const arcCxL = -halfW + penaltyDist;
+    for (let i = 0; i < penaltyArcSegments; i++) {
+      const a1 = (i / penaltyArcSegments) * Math.PI * 2;
+      const a2 = ((i + 1) / penaltyArcSegments) * Math.PI * 2;
+      // So desenhar fora da area (|z| > penaltyHalfH)
+      const z1 = Math.sin(a1) * penaltyArcR;
+      const z2 = Math.sin(a2) * penaltyArcR;
+      if (Math.abs(z1) <= penaltyHalfH && Math.abs(z2) <= penaltyHalfH) continue;
+      const x1 = arcCxL + Math.cos(a1) * penaltyArcR;
+      const x2 = arcCxL + Math.cos(a2) * penaltyArcR;
+      // So desenhar dentro do campo
+      if (x1 < -halfW || x1 > halfW) continue;
+      result.push(
+        <mesh key={`parcL-${i}`} position={[(x1 + x2) / 2, arcY, (z1 + z2) / 2]}>
+          <boxGeometry args={[LW, LW, penaltyArcR * Math.abs(a2 - a1) + 0.02]} />
+          <meshStandardMaterial color="white" roughness={0.8} />
+        </mesh>
+      );
+    }
+
+    // Gol direito — espelhado
+    const arcCxR = halfW - penaltyDist;
+    for (let i = 0; i < penaltyArcSegments; i++) {
+      const a1 = (i / penaltyArcSegments) * Math.PI * 2;
+      const a2 = ((i + 1) / penaltyArcSegments) * Math.PI * 2;
+      const z1 = Math.sin(a1) * penaltyArcR;
+      const z2 = Math.sin(a2) * penaltyArcR;
+      if (Math.abs(z1) <= penaltyHalfH && Math.abs(z2) <= penaltyHalfH) continue;
+      const x1 = arcCxR + Math.cos(a1) * penaltyArcR;
+      const x2 = arcCxR + Math.cos(a2) * penaltyArcR;
+      if (x1 < -halfW || x1 > halfW) continue;
+      result.push(
+        <mesh key={`parcR-${i}`} position={[(x1 + x2) / 2, arcY, (z1 + z2) / 2]}>
+          <boxGeometry args={[LW, LW, penaltyArcR * Math.abs(a2 - a1) + 0.02]} />
+          <meshStandardMaterial color="white" roughness={0.8} />
+        </mesh>
+      );
+    }
+
+    return result;
+  }, []);
+
+  // Circulo central
+  const centerCircle = useMemo(() => {
+    const segments = 64;
+    const result: ReactNode[] = [];
+    for (let i = 0; i < segments; i++) {
+      const a1 = (i / segments) * Math.PI * 2;
+      const a2 = ((i + 1) / segments) * Math.PI * 2;
+      const x1 = Math.cos(a1) * centerR;
+      const z1 = Math.sin(a1) * centerR;
+      const x2 = Math.cos(a2) * centerR;
+      const z2 = Math.sin(a2) * centerR;
+      result.push(
+        <mesh key={`cc-${i}`} position={[(x1 + x2) / 2, lineY, (z1 + z2) / 2]}>
+          <boxGeometry args={[LW, LW, centerR * 2 * Math.PI / segments + 0.02]} />
+          <meshStandardMaterial color="white" roughness={0.8} />
+        </mesh>
+      );
+    }
     return result;
   }, []);
 
@@ -98,40 +187,23 @@ function PitchMarkings() {
         </mesh>
       ))}
 
-      {/* Circulo central */}
-      {(() => {
-        const segments = 64;
-        const centerLine: any[] = [];
-        for (let i = 0; i < segments; i++) {
-          const a1 = (i / segments) * Math.PI * 2;
-          const a2 = ((i + 1) / segments) * Math.PI * 2;
-          const x1 = Math.cos(a1) * centerR;
-          const z1 = Math.sin(a1) * centerR;
-          const x2 = Math.cos(a2) * centerR;
-          const z2 = Math.sin(a2) * centerR;
-          centerLine.push(
-            <mesh key={`center-${i}`} position={[(x1 + x2) / 2, lineY, (z1 + z2) / 2]}>
-              <boxGeometry args={[lineWidth, lineWidth, centerR * 2 * Math.PI / segments + 0.02]} />
-              <meshStandardMaterial color="white" roughness={0.8} />
-            </mesh>
-          );
-        }
-        return centerLine;
-      })()}
+      {centerCircle}
+
+      {penaltyArc}
 
       {/* Macadores de penalty */}
       <mesh position={[-halfW + 6.5, lineY + 0.01, 0]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial color="white" roughness={0.6} />
       </mesh>
       <mesh position={[halfW - 6.5, lineY + 0.01, 0]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial color="white" roughness={0.6} />
       </mesh>
 
       {/* Centro */}
       <mesh position={[0, lineY + 0.01, 0]}>
-        <sphereGeometry args={[0.08, 16, 16]} />
+        <sphereGeometry args={[0.1, 16, 16]} />
         <meshStandardMaterial color="white" roughness={0.6} />
       </mesh>
     </group>
@@ -143,6 +215,13 @@ export default function Pitch() {
 
   return (
     <group>
+      {/* Borda branca ao redor da grama */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.015, 0]}>
+        <planeGeometry args={[31, 19]} />
+        <meshStandardMaterial color="white" roughness={0.9} />
+      </mesh>
+
+      {/* Gramado */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[30, 18]} />
         <meshStandardMaterial
