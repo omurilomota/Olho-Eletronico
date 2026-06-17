@@ -13,23 +13,23 @@ interface CameraControllerProps {
 
 const PRESETS: Record<CameraPreset, { position: THREE.Vector3; target: THREE.Vector3 }> = {
   broadcast: {
-    position: new THREE.Vector3(0, 12, 18),
+    position: new THREE.Vector3(0, 14, 22),
     target: new THREE.Vector3(0, 0, 0),
   },
   tactical: {
-    position: new THREE.Vector3(0, 25, 0.1),
+    position: new THREE.Vector3(0, 30, 0.1),
     target: new THREE.Vector3(0, 0, 0),
   },
   'goal-left': {
-    position: new THREE.Vector3(-14, 3, 0),
+    position: new THREE.Vector3(-19, 3, 0),
     target: new THREE.Vector3(0, 1, 0),
   },
   'goal-right': {
-    position: new THREE.Vector3(14, 3, 0),
+    position: new THREE.Vector3(19, 3, 0),
     target: new THREE.Vector3(0, 1, 0),
   },
   free: {
-    position: new THREE.Vector3(0, 12, 18),
+    position: new THREE.Vector3(0, 14, 22),
     target: new THREE.Vector3(0, 0, 0),
   },
 };
@@ -81,7 +81,7 @@ export default function CameraController({ preset, followBall = false, ballPosit
       enableDamping
       dampingFactor={0.1}
       minDistance={5}
-      maxDistance={40}
+      maxDistance={50}
       maxPolarAngle={Math.PI / 2.1}
       minPolarAngle={0.1}
     />

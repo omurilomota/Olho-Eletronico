@@ -17,7 +17,7 @@ function Goal({ position, rotation }: { position: [number, number, number]; rota
     for (let i = 0; i <= cols; i++) {
       for (let j = 0; j <= rows; j++) {
         const x = (i / cols) * goalWidth - halfWidth;
-        const y = (j / rows) * crossbarHeight;
+        const y = 0.1 + (j / rows) * (crossbarHeight - 0.1);
         const z = -(i / cols) * goalDepth * 0.3;
         points.push(new THREE.Vector3(x, y, z));
       }
@@ -49,7 +49,7 @@ function Goal({ position, rotation }: { position: [number, number, number]; rota
     for (let i = 0; i <= cols; i++) {
       for (let j = 0; j <= rows; j++) {
         const z = -(i / cols) * goalDepth;
-        const y = (j / rows) * crossbarHeight;
+        const y = 0.1 + (j / rows) * (crossbarHeight - 0.1);
         points.push(new THREE.Vector3(0, y, z));
       }
     }
@@ -79,7 +79,7 @@ function Goal({ position, rotation }: { position: [number, number, number]; rota
     <meshStandardMaterial
       color="#ffffff"
       transparent
-      opacity={0.3}
+      opacity={0.25}
       side={THREE.DoubleSide}
       wireframe
       roughness={0.5}
@@ -88,36 +88,37 @@ function Goal({ position, rotation }: { position: [number, number, number]; rota
 
   return (
     <group position={position} rotation={rotation}>
+      {/* Trave esquerda */}
       <mesh position={[-halfWidth, crossbarHeight / 2, 0]} castShadow>
         <cylinderGeometry args={[postRadius, postRadius, crossbarHeight, 12]} />
         {postMaterial}
       </mesh>
 
+      {/* Trave direita */}
       <mesh position={[halfWidth, crossbarHeight / 2, 0]} castShadow>
         <cylinderGeometry args={[postRadius, postRadius, crossbarHeight, 12]} />
         {postMaterial}
       </mesh>
 
+      {/* Travessao */}
       <mesh position={[0, crossbarHeight, -goalDepth / 2]} castShadow>
         <boxGeometry args={[goalWidth + postRadius * 2, postRadius * 2, postRadius * 2]} />
         {postMaterial}
       </mesh>
 
+      {/* Rede traseira */}
       <mesh geometry={netGeometry}>
         {netMaterial}
       </mesh>
 
+      {/* Rede lateral esquerda */}
       <mesh position={[-halfWidth, 0, -goalDepth / 2]} geometry={sideNetGeometry.clone()}>
         {netMaterial}
       </mesh>
 
+      {/* Rede lateral direita */}
       <mesh position={[halfWidth, 0, -goalDepth / 2]} rotation={[0, Math.PI, 0]} geometry={sideNetGeometry.clone()}>
         {netMaterial}
-      </mesh>
-
-      <mesh position={[0, 0.01, -goalDepth / 2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[goalWidth, goalDepth]} />
-        <meshStandardMaterial color="#1a1a2e" roughness={0.9} />
       </mesh>
     </group>
   );
@@ -126,8 +127,8 @@ function Goal({ position, rotation }: { position: [number, number, number]; rota
 export default function Goals() {
   return (
     <group>
-      <Goal position={[-10, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
-      <Goal position={[10, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
+      <Goal position={[-15, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
+      <Goal position={[15, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
     </group>
   );
 }

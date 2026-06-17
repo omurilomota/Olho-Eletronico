@@ -28,7 +28,7 @@ export interface SAOTState {
 const initialState = {
   attacker: { x: 3, z: 1 },
   defender: { x: 1, z: -1 },
-  goalkeeper: { x: -8, z: 0 },
+  goalkeeper: { x: -5, z: 0 },
   ballPosition: [-3, 0.2, 0] as [number, number, number],
   cameraPreset: 'broadcast' as CameraPreset,
   showShadows: true,

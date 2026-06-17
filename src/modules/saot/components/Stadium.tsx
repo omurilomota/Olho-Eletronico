@@ -71,7 +71,7 @@ function LightTower({ position }: { position: [number, number, number] }) {
         angle={0.6}
         penumbra={0.5}
         intensity={3}
-        distance={30}
+        distance={35}
         color="#fff8e7"
         castShadow
         shadow-mapSize-width={1024}
@@ -84,18 +84,23 @@ function LightTower({ position }: { position: [number, number, number] }) {
 export default function Stadium() {
   return (
     <group>
-      <Stand position={[-12, 0, 0]} rotation={[0, Math.PI / 2, 0]} width={12} depth={4} rows={6} />
-      <Stand position={[12, 0, 0]} rotation={[0, -Math.PI / 2, 0]} width={12} depth={4} rows={6} />
-      <Stand position={[0, 0, -8]} rotation={[0, 0, 0]} width={20} depth={4} rows={6} />
-      <Stand position={[0, 0, 8]} rotation={[0, Math.PI, 0]} width={20} depth={4} rows={6} />
+      {/* Arquibancadas laterais (esquerda e direita) */}
+      <Stand position={[-17, 0, 0]} rotation={[0, Math.PI / 2, 0]} width={18} depth={4} rows={6} />
+      <Stand position={[17, 0, 0]} rotation={[0, -Math.PI / 2, 0]} width={18} depth={4} rows={6} />
 
-      <LightTower position={[-14, 0, -9]} />
-      <LightTower position={[14, 0, -9]} />
-      <LightTower position={[-14, 0, 9]} />
-      <LightTower position={[14, 0, 9]} />
+      {/* Arquibancadas de fundo (topo e base) */}
+      <Stand position={[0, 0, -11]} rotation={[0, 0, 0]} width={30} depth={4} rows={6} />
+      <Stand position={[0, 0, 11]} rotation={[0, Math.PI, 0]} width={30} depth={4} rows={6} />
 
+      {/* Torres de iluminacao */}
+      <LightTower position={[-19, 0, -12]} />
+      <LightTower position={[19, 0, -12]} />
+      <LightTower position={[-19, 0, 12]} />
+      <LightTower position={[19, 0, 12]} />
+
+      {/* Chao do estadio */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]}>
-        <planeGeometry args={[60, 40]} />
+        <planeGeometry args={[70, 50]} />
         <meshStandardMaterial color="#1e293b" roughness={0.95} />
       </mesh>
     </group>
