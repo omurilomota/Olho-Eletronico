@@ -184,7 +184,7 @@ export default function DigitalTwinMap() {
             onClick={reset}
             className="px-3 py-1 rounded-lg text-xs font-medium bg-surface-700 text-surface-200/70 hover:bg-surface-600 transition-colors"
           >
-            \u21BA Reset
+            {'↻'} Reset
           </button>
         </div>
       </div>

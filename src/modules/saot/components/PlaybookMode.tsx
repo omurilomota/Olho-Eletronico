@@ -157,20 +157,20 @@ export default function PlaybookMode() {
           disabled={currentStep === 0}
           className="flex-1 px-3 py-2 rounded-lg text-xs font-medium bg-surface-700 hover:bg-surface-600 disabled:opacity-30 disabled:cursor-not-allowed text-surface-200/80 transition-colors"
         >
-          \u25C0 Anterior
+          {'◄'} Anterior
         </button>
         <button
           onClick={handleReset}
           className="px-3 py-2 rounded-lg text-xs font-medium bg-surface-700 hover:bg-surface-600 text-surface-200/80 transition-colors"
         >
-          \u21BA
+          {'↻'}
         </button>
         <button
           onClick={handleNextStep}
           disabled={currentStep === (currentPlay?.steps.length ?? 1) - 1}
           className="flex-1 px-3 py-2 rounded-lg text-xs font-medium bg-brand-600 hover:bg-brand-700 disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors"
         >
-          Proximo \u25B6
+          Proximo {'▶'}
         </button>
       </div>
 

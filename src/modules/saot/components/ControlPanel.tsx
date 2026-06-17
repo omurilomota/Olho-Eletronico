@@ -123,7 +123,7 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
             }`}
           >
             <div className="flex items-center gap-2">
-              <span>\uD83C\uDFAE</span>
+              <span>{'🎮'}</span>
               <span className="font-medium">Modo Livre</span>
             </div>
             <p className="text-[10px] text-surface-200/40 mt-0.5 ml-6">
@@ -148,13 +148,13 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
                 : 'bg-emerald-600 hover:bg-emerald-700 text-white'
             }`}
           >
-            {simulation.isPlaying ? '\u23F8 Pausar' : '\u25B6 Iniciar'}
+            {simulation.isPlaying ? '⏸ Pausar' : '▶ Iniciar'}
           </button>
           <button
             onClick={simulation.reset}
             className="px-4 py-2.5 rounded-lg font-medium text-sm bg-surface-700 hover:bg-surface-600 text-surface-200/80 transition-colors"
           >
-            \u21BA Reset
+            {'↻'} Reset
           </button>
         </div>
 

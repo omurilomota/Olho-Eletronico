@@ -26,6 +26,17 @@ export function useSimulation(options: UseSimulationOptions) {
     ballEnd,
   } = options;
 
+  // Use refs so reset() always uses the latest positions from the store
+  const attackerStartRef = useRef(attackerStart);
+  const defenderStartRef = useRef(defenderStart);
+  const ballStartRef = useRef(ballStart);
+  const ballEndRef = useRef(ballEnd);
+
+  attackerStartRef.current = attackerStart;
+  defenderStartRef.current = defenderStart;
+  ballStartRef.current = ballStart;
+  ballEndRef.current = ballEnd;
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -51,22 +62,23 @@ export function useSimulation(options: UseSimulationOptions) {
         ? 2 * normalizedT * normalizedT
         : 1 - Math.pow(-2 * normalizedT + 2, 2) / 2;
 
-      // Ball trajectory
-      const ballX = ballStart[0] + (ballEnd[0] - ballStart[0]) * eased;
-      const ballY = ballStart[1] + Math.sin(eased * Math.PI) * 2;
-      const ballZ = ballStart[2] + (ballEnd[2] - ballStart[2]) * eased;
+      const bS = ballStartRef.current;
+      const bE = ballEndRef.current;
+      const aS = attackerStartRef.current;
+      const dS = defenderStartRef.current;
 
-      // Attacker runs forward
+      const ballX = bS[0] + (bE[0] - bS[0]) * eased;
+      const ballY = bS[1] + Math.sin(eased * Math.PI) * 2;
+      const ballZ = bS[2] + (bE[2] - bS[2]) * eased;
+
       const attackerRun = eased * 3;
-      const attackerX = attackerStart.x + attackerRun;
-      const attackerZ = attackerStart.z + Math.sin(eased * Math.PI * 2) * 0.5;
+      const attackerX = aS.x + attackerRun;
+      const attackerZ = aS.z + Math.sin(eased * Math.PI * 2) * 0.5;
 
-      // Defender runs too
       const defenderRun = eased * 1.5;
-      const defenderX = defenderStart.x + defenderRun;
-      const defenderZ = defenderStart.z;
+      const defenderX = dS.x + defenderRun;
+      const defenderZ = dS.z;
 
-      // Animation states based on timeline
       let attackerAnim: 'idle' | 'running' | 'kicking' = 'idle';
       let defenderAnim: 'idle' | 'running' = 'idle';
 
@@ -90,7 +102,7 @@ export function useSimulation(options: UseSimulationOptions) {
         defenderAnim,
       };
     },
-    [duration, ballStart, ballEnd, attackerStart, defenderStart],
+    [duration],
   );
 
   const animate = useCallback(() => {
@@ -132,14 +144,14 @@ export function useSimulation(options: UseSimulationOptions) {
     setCurrentTime(0);
     setCurrentFrame({
       time: 0,
-      ballPosition: ballStart,
-      attackerPosition: attackerStart,
-      defenderPosition: defenderStart,
+      ballPosition: ballStartRef.current,
+      attackerPosition: attackerStartRef.current,
+      defenderPosition: defenderStartRef.current,
       attackerAnim: 'idle',
       defenderAnim: 'idle',
     });
     if (animRef.current) cancelAnimationFrame(animRef.current);
-  }, [ballStart, attackerStart, defenderStart]);
+  }, []);
 
   const seek = useCallback(
     (t: number) => {

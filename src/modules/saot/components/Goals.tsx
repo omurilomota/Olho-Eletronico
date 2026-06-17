@@ -141,8 +141,10 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
 export default function Goals() {
   return (
     <group>
-      <Goal x={-16} netDirection={-1} />
-      <Goal x={16} netDirection={1} />
+      {/* Gol esquerdo: na linha de fundo x=-15, rede vai para x=-17 (para fora) */}
+      <Goal x={-15} netDirection={-1} />
+      {/* Gol direito: na linha de fundo x=+15, rede vai para x=+17 (para fora) */}
+      <Goal x={15} netDirection={1} />
     </group>
   );
 }
