@@ -103,7 +103,7 @@ export default function SAOTLab() {
       </div>
 
       <div className="w-72 border-l border-surface-700/50 glass">
-        <ControlPanel />
+        <ControlPanel simulation={simulation} result={result} />
       </div>
     </div>
   );

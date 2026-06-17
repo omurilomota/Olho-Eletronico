@@ -1,12 +1,34 @@
 import { useSaotStore, type CameraPreset } from '../store/useSaotStore';
-import { useSimulation } from '../hooks/useSimulation';
-import { calculateOffside } from '../services/OffsideCalculator';
+import type { OffsideResult } from '../services/OffsideCalculator';
+
+interface SimulationState {
+  isPlaying: boolean;
+  progress: number;
+  currentTime: number;
+  duration: number;
+  speed: number;
+  currentFrame: {
+    attackerPosition: { x: number; z: number };
+    defenderPosition: { x: number; z: number };
+    ballPosition: [number, number, number];
+  };
+  play: () => void;
+  pause: () => void;
+  reset: () => void;
+  seek: (t: number) => void;
+  setSpeed: (s: number) => void;
+}
+
+interface ControlPanelProps {
+  simulation: SimulationState;
+  result: OffsideResult;
+}
 
 const CAMERA_PRESETS: { id: CameraPreset; label: string; icon: string }[] = [
   { id: 'broadcast', label: 'Broadcast', icon: '\uD83C\uDFAC' },
   { id: 'tactical', label: 'Tatico', icon: '\uD83D\uDCCA' },
-  { id: 'goal-left', label: ' Gol Esq.', icon: '\u2618' },
-  { id: 'goal-right', label: ' Gol Dir.', icon: '\u2618' },
+  { id: 'goal-left', label: 'Gol Esq.', icon: '\u2618' },
+  { id: 'goal-right', label: 'Gol Dir.', icon: '\u2618' },
   { id: 'free', label: 'Livre', icon: '\uD83E\uDDF1' },
 ];
 
@@ -16,27 +38,14 @@ const SPEED_OPTIONS = [
   { value: 2, label: '2x' },
 ];
 
-export default function ControlPanel() {
+export default function ControlPanel({ simulation, result }: ControlPanelProps) {
   const {
-    attacker, defender, goalkeeper,
+    goalkeeper,
     cameraPreset, setCameraPreset,
     showShadows, toggleShadows,
     showOffsideLine, toggleOffsideLine,
     reset,
   } = useSaotStore();
-
-  const simulation = useSimulation({
-    attackerStart: attacker,
-    defenderStart: defender,
-    ballStart: [-3, 0.2, 0],
-    ballEnd: [attacker.x + 2, 0.2, attacker.z],
-  });
-
-  const result = calculateOffside(
-    simulation.currentFrame.attackerPosition,
-    simulation.currentFrame.defenderPosition,
-    goalkeeper,
-  );
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-4 text-sm">
