@@ -84,15 +84,15 @@ export default function Environment() {
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
-        shadow-camera-far={60}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={15}
-        shadow-camera-bottom={-15}
+        shadow-camera-far={80}
+        shadow-camera-left={-40}
+        shadow-camera-right={40}
+        shadow-camera-top={30}
+        shadow-camera-bottom={-30}
         shadow-bias={-0.0005}
       />
 
-      <fog attach="fog" args={['#1a237e', 30, 60]} />
+      <fog attach="fog" args={['#1a237e', 50, 100]} />
     </group>
   );
 }
