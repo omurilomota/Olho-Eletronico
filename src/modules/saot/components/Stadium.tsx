@@ -82,29 +82,27 @@ function LightTower({ position }: { position: [number, number, number] }) {
 }
 
 export default function Stadium() {
-  const STAND_Y = 1.5;
-
   return (
     <group>
       {/* Arquibancadas laterais (esquerda e direita) — atras dos gols em x=±15 */}
-      <Stand position={[-20, STAND_Y, 0]} rotation={[0, Math.PI / 2, 0]} width={18} depth={4} rows={6} />
-      <Stand position={[20, STAND_Y, 0]} rotation={[0, -Math.PI / 2, 0]} width={18} depth={4} rows={6} />
+      <Stand position={[-20, 0, 0]} rotation={[0, Math.PI / 2, 0]} width={26} depth={4} rows={6} />
+      <Stand position={[20, 0, 0]} rotation={[0, -Math.PI / 2, 0]} width={26} depth={4} rows={6} />
 
-      {/* Arquibancadas de fundo (topo e base) */}
-      <Stand position={[0, STAND_Y, -13]} rotation={[0, 0, 0]} width={30} depth={4} rows={6} />
-      <Stand position={[0, STAND_Y, 13]} rotation={[0, Math.PI, 0]} width={30} depth={4} rows={6} />
-
-      {/* Cantos — conectam as arquibancadas laterais e de fundo */}
-      <Stand position={[-20, STAND_Y, -13]} rotation={[0, Math.PI / 4, 0]} width={8} depth={4} rows={4} />
-      <Stand position={[20, STAND_Y, -13]} rotation={[0, -Math.PI / 4, 0]} width={8} depth={4} rows={4} />
-      <Stand position={[-20, STAND_Y, 13]} rotation={[0, -Math.PI / 4, 0]} width={8} depth={4} rows={4} />
-      <Stand position={[20, STAND_Y, 13]} rotation={[0, Math.PI / 4, 0]} width={8} depth={4} rows={4} />
+      {/* Arquibancadas de fundo (topo e base) — alargadas para fechar os cantos */}
+      <Stand position={[0, 0, -13]} rotation={[0, 0, 0]} width={40} depth={4} rows={6} />
+      <Stand position={[0, 0, 13]} rotation={[0, Math.PI, 0]} width={40} depth={4} rows={6} />
 
       {/* Torres de iluminacao */}
       <LightTower position={[-22, 0, -14]} />
       <LightTower position={[22, 0, -14]} />
       <LightTower position={[-22, 0, 14]} />
       <LightTower position={[22, 0, 14]} />
+
+      {/* Chao do estadio — preenche a area alem do campo */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
+        <planeGeometry args={[80, 60]} />
+        <meshStandardMaterial color="#1a2e1a" roughness={0.95} />
+      </mesh>
     </group>
   );
 }
