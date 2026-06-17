@@ -144,7 +144,7 @@ export default function Pitch() {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[60, 40]} />
+        <planeGeometry args={[30, 18]} />
         <meshStandardMaterial
           map={grassTexture}
           roughness={0.9}

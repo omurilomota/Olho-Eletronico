@@ -103,8 +103,8 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
       </mesh>
 
       {/* Travessao */}
-      <mesh position={[netDirection * GOAL_DEPTH / 2, CROSSBAR_HEIGHT, 0]} castShadow>
-        <boxGeometry args={[GOAL_DEPTH, POST_RADIUS * 2, POST_RADIUS * 2]} />
+      <mesh position={[0, CROSSBAR_HEIGHT, 0]} castShadow>
+        <boxGeometry args={[POST_RADIUS * 2, POST_RADIUS * 2, GOAL_WIDTH]} />
         {postMaterial}
       </mesh>
 
