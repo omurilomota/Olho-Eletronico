@@ -6,19 +6,20 @@ Sistema de simulacao e monitoramento para a Copa do Mundo FIFA 2026, com dois mo
 
 ### SAOT Lab
 
-- Cena 3D interativa com campo, goles, estadio e cidade procedural ao redor
+- Cena 3D interativa com campo (37x22), goles e estadio completo
 - Jogadores humanos com animacao articulada (corpo, bracos, pernas, cabeca)
+- Goleiro chuta a bola para o atacante na simulacao
 - Calculo de impedimento milimetrico (margem em cm)
 - 5 cenarios pre-definidos (impedimento normal, marginal, reverso, legal atras, legal nivel)
 - Modo livre para arrastar jogadores e configurar posicoes
 - Motor de simulacao com play/pause/reset/seek/velocidade ajustavel
-- 5 presets de camera (Broadcast, Tatical, Gol Esquerda, Gol Direita, Livre)
+- 5 presets de camera (Broadcast, Tactical, Gol Esquerda, Gol Direita, Livre)
 - Modo Playbook com 5 jogadas pre-definidas e navegacao passo a passo
 - Visualizacao da linha de impedimento com preenchimento de zona, linha tracejada e margem
 
 ### ICC Command Center
 
-- Mapa de Gêmeos Digitais com simulacao de 600 torcedores e deteccao de congestamento
+- Mapa de Gemeos Digitais com simulacao de 600 torcedores e deteccao de congestamento
 - Assistente tatico IA com efeito typewriter e graficos de resposta
 - Indicador de risco circular (0-100)
 - Widget de clima com 3 abas (Agora, Semanal, Mensal)
@@ -32,6 +33,14 @@ Sistema de simulacao e monitoramento para a Copa do Mundo FIFA 2026, com dois mo
 - Design system com efeitos glass, gradientes, animacoes customizadas
 - Error Boundary com retry por modulo
 - Data Overlay com FPS, triangles e draw calls em tempo real
+
+## Branches
+
+| Branch | Descricao |
+|--------|-----------|
+| `main` | Versao estable do projeto |
+| `develop` | Integracao de features |
+| `feat/city-background` | Cidade procedural ao redor do estadio (feature futura) |
 
 ## Stack Tecnico
 
@@ -59,6 +68,9 @@ npm run dev
 # Build para producao
 npm run build
 
+# Testes
+npm run test
+
 # Preview da build
 npm run preview
 ```
@@ -71,7 +83,7 @@ Acesse `http://localhost:5173`.
 src/
 ├── modules/
 │   ├── saot/               # Modulo SAOT Lab (3D + Engine)
-│   │   ├── components/     # Player, Ball, Pitch, Goals, Stadium, CityBackground, etc.
+│   │   ├── components/     # Player, Ball, Pitch, Goals, Stadium, etc.
 │   │   ├── hooks/          # useSimulation, useDragPlayer
 │   │   ├── services/       # OffsideCalculator
 │   │   ├── store/          # useSaotStore, usePlaybookStore
@@ -86,6 +98,7 @@ src/
 │   ├── hooks/              # useDebounce, usePerformance
 │   ├── types/              # Position, Vector3, etc.
 │   └── utils/              # formatCm, clamp, lerp, constants
+├── __tests__/              # Testes unitarios (vitest)
 ├── App.tsx
 └── main.tsx
 ```
@@ -95,3 +108,7 @@ src/
 | Usuario | Senha |
 |---------|-------|
 | funcionario | func123 |
+
+## Gitflow
+
+Este projeto segue **Gitflow** com **Gitmoji**. Consulte `GITFLOW.md` para o guia completo.
