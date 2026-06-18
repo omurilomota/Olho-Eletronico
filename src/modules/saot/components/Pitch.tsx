@@ -9,14 +9,14 @@ function createGrassTexture(): THREE.CanvasTexture {
 
   const stripeWidth = 512 / 14;
   for (let i = 0; i < 14; i++) {
-    ctx.fillStyle = i % 2 === 0 ? '#2d8a4e' : '#34a058';
+    ctx.fillStyle = i % 2 === 0 ? '#1a6b2a' : '#22783a';
     ctx.fillRect(i * stripeWidth, 0, stripeWidth, 512);
   }
 
   for (let i = 0; i < 3000; i++) {
     const x = Math.random() * 512;
     const y = Math.random() * 512;
-    ctx.fillStyle = `rgba(${30 + Math.random() * 20}, ${120 + Math.random() * 30}, ${60 + Math.random() * 20}, 0.3)`;
+    ctx.fillStyle = `rgba(${20 + Math.random() * 20}, ${90 + Math.random() * 30}, ${30 + Math.random() * 20}, 0.4)`;
     ctx.fillRect(x, y, 1, 2);
   }
 
@@ -28,7 +28,7 @@ function createGrassTexture(): THREE.CanvasTexture {
 }
 
 function PitchMarkings() {
-  const W = 30;
+  const W = 28;
   const H = 18;
   const lineY = 0.02;
   const LW = 0.12;
@@ -164,12 +164,12 @@ export default function Pitch() {
     <group>
       {/* Gramado */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[30, 18]} />
+        <planeGeometry args={[28, 18]} />
         <meshStandardMaterial
           map={grassTexture}
           roughness={0.9}
           metalness={0.0}
-          color="#3aaa5c"
+          color="#1e7a30"
         />
       </mesh>
 
