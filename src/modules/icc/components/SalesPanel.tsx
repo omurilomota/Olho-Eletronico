@@ -13,6 +13,13 @@ interface StoreData {
   name: string;
   revenue: number;
   category: string;
+  itemsSold: number;
+}
+
+interface MostSoldItem {
+  name: string;
+  category: string;
+  quantity: number;
 }
 
 const CATEGORIES = [
@@ -23,11 +30,19 @@ const CATEGORIES = [
 ];
 
 const TOP_STORES: StoreData[] = [
-  { name: 'Food Court Central', revenue: 45200, category: 'alimentacao' },
-  { name: 'Merch Oficial FIFA', revenue: 38700, category: 'merchandise' },
-  { name: 'Bar do Estadio', revenue: 29100, category: 'bebidas' },
-  { name: 'Concessionaria Norte', revenue: 22400, category: 'alimentacao' },
-  { name: 'Loja Camisas', revenue: 18900, category: 'merchandise' },
+  { name: 'Food Court Central', revenue: 45200, category: 'alimentacao', itemsSold: 3200 },
+  { name: 'Merch Oficial FIFA', revenue: 38700, category: 'merchandise', itemsSold: 2100 },
+  { name: 'Bar do Estadio', revenue: 29100, category: 'bebidas', itemsSold: 4500 },
+  { name: 'Ingressos Online', revenue: 22400, category: 'ingressos', itemsSold: 1800 },
+  { name: 'Loja Camisas', revenue: 18900, category: 'merchandise', itemsSold: 950 },
+];
+
+const MOST_SOLD_ITEMS: MostSoldItem[] = [
+  { name: 'Hamburger Artesanal', category: 'alimentacao', quantity: 1240 },
+  { name: 'Cerveja Pilsen 500ml', category: 'bebidas', quantity: 1180 },
+  { name: 'Camisa Selecao III', category: 'merchandise', quantity: 420 },
+  { name: 'Ingresso Arquibancada', category: 'ingressos', quantity: 380 },
+  { name: 'Combo Familie', category: 'alimentacao', quantity: 310 },
 ];
 
 function formatCurrency(value: number): string {
@@ -48,24 +63,34 @@ export default function SalesPanel() {
   const [totalRevenue, setTotalRevenue] = useState(185400);
   const [occupancy, setOccupancy] = useState(78);
   const [stores, setStores] = useState(TOP_STORES);
+  const [mostSold, setMostSold] = useState(MOST_SOLD_ITEMS);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCategoryRevenue((prev) =>
         prev.map((c) => ({
           ...c,
-          value: Math.max(5000, c.value + Math.round((Math.random() - 0.4) * 800)),
+          value: Math.max(8000, c.value + Math.round((Math.random() - 0.45) * 600)),
         })),
       );
-      setTotalRevenue((prev) => prev + Math.round((Math.random() - 0.3) * 500));
-      setOccupancy((prev) => Math.max(40, Math.min(98, prev + (Math.random() - 0.5) * 3)));
+      setTotalRevenue((prev) => prev + Math.round((Math.random() - 0.3) * 400));
+      setOccupancy((prev) =>
+        Math.max(40, Math.min(98, prev + (Math.random() - 0.5) * 2)),
+      );
       setStores((prev) =>
         prev
           .map((s) => ({
             ...s,
-            revenue: Math.max(5000, s.revenue + Math.round((Math.random() - 0.4) * 400)),
+            revenue: Math.max(8000, s.revenue + Math.round((Math.random() - 0.42) * 300)),
+            itemsSold: Math.max(200, s.itemsSold + Math.round((Math.random() - 0.45) * 50)),
           }))
           .sort((a, b) => b.revenue - a.revenue),
+      );
+      setMostSold((prev) =>
+        prev.map((item) => ({
+          ...item,
+          quantity: Math.max(50, item.quantity + Math.round((Math.random() - 0.4) * 30)),
+        })),
       );
     }, 3000);
     return () => clearInterval(interval);
@@ -77,13 +102,14 @@ export default function SalesPanel() {
     color: c.color,
   }));
 
+  const topCategory = [...categoryRevenue].sort((a, b) => b.value - a.value)[0];
+
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <h3 className="text-sm font-semibold text-surface-200/80 mb-3">
         Vendas & Estabelecimentos
       </h3>
 
-      {/* Receita total */}
       <div className="bg-surface-900/50 rounded-lg p-3 mb-3">
         <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-1">Receita Total</p>
         <p className="text-2xl font-black text-emerald-400 font-mono">
@@ -91,7 +117,6 @@ export default function SalesPanel() {
         </p>
       </div>
 
-      {/* Ocupacao */}
       <div className="mb-3">
         <div className="flex justify-between text-[10px] text-surface-200/50 mb-1">
           <span>Ocupacao do Estadio</span>
@@ -107,7 +132,6 @@ export default function SalesPanel() {
         </div>
       </div>
 
-      {/* Barras por categoria */}
       <div className="mb-3">
         <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">Por Categoria</p>
         <div className="h-36">
@@ -147,7 +171,26 @@ export default function SalesPanel() {
         </div>
       </div>
 
-      {/* Top 3 lojas */}
+      <div className="mb-3">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] text-surface-200/40 uppercase tracking-wider">Mais Vendido</p>
+          <span className="text-[9px] text-surface-200/30">por categoria: {topCategory?.icon}</span>
+        </div>
+        <div className="bg-surface-900/50 rounded-lg px-2.5 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{topCategory?.icon}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-emerald-400 truncate">
+                {mostSold[0]?.name}
+              </p>
+              <p className="text-[10px] text-surface-200/40">
+                {mostSold[0]?.quantity.toLocaleString('pt-BR')} unidades
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div>
         <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">Top 3 Lojas</p>
         <div className="space-y-1.5">

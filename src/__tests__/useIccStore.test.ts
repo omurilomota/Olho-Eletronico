@@ -36,6 +36,18 @@ describe('useIccStore', () => {
     expect(msg.chartData).toEqual({ label: 'Test', data: [1, 2, 3] });
   });
 
+  it('addMessage preserves reasoning and model', () => {
+    useIccStore.getState().addMessage({
+      role: 'ai',
+      content: 'Test response',
+      reasoning: 'Analyzing data...',
+      model: 'tatico',
+    });
+    const msg = useIccStore.getState().messages[0];
+    expect(msg.reasoning).toBe('Analyzing data...');
+    expect(msg.model).toBe('tatico');
+  });
+
   it('clearChat empties messages', () => {
     useIccStore.getState().addMessage({ role: 'user', content: 'Hello' });
     useIccStore.getState().addMessage({ role: 'ai', content: 'Hi' });
