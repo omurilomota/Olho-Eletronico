@@ -154,14 +154,14 @@ export default function Goals() {
   return (
     <group>
       {/* Grama sob o gol esquerdo */}
-      <GoalGrass x={-10} direction={-1} />
-      {/* Gol esquerdo: na linha de fundo x=-10, rede vai para x=-12 (para fora) */}
-      <Goal x={-10} netDirection={-1} />
+      <GoalGrass x={-12} direction={-1} />
+      {/* Gol esquerdo: na linha de fundo x=-12, rede vai para x=-14 (para fora) */}
+      <Goal x={-12} netDirection={-1} />
 
       {/* Grama sob o gol direito */}
-      <GoalGrass x={10} direction={1} />
-      {/* Gol direito: na linha de fundo x=+10, rede vai para x=+12 (para fora) */}
-      <Goal x={10} netDirection={1} />
+      <GoalGrass x={12} direction={1} />
+      {/* Gol direito: na linha de fundo x=+12, rede vai para x=+14 (para fora) */}
+      <Goal x={12} netDirection={1} />
     </group>
   );
 }
