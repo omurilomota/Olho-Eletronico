@@ -89,14 +89,14 @@ export default function Stadium() {
       <Stand position={[26, 0, 0]} rotation={[0, -Math.PI / 2, 0]} width={28} depth={4} rows={6} />
 
       {/* Arquibancadas de fundo */}
-      <Stand position={[0, 0, -15]} rotation={[0, 0, 0]} width={52} depth={4} rows={6} />
-      <Stand position={[0, 0, 15]} rotation={[0, Math.PI, 0]} width={52} depth={4} rows={6} />
+      <Stand position={[0, 0, -17]} rotation={[0, 0, 0]} width={52} depth={4} rows={6} />
+      <Stand position={[0, 0, 17]} rotation={[0, Math.PI, 0]} width={52} depth={4} rows={6} />
 
       {/* Torres de iluminacao */}
-      <LightTower position={[-28, 0, -16]} />
-      <LightTower position={[28, 0, -16]} />
-      <LightTower position={[-28, 0, 16]} />
-      <LightTower position={[28, 0, 16]} />
+      <LightTower position={[-28, 0, -18]} />
+      <LightTower position={[28, 0, -18]} />
+      <LightTower position={[-28, 0, 18]} />
+      <LightTower position={[28, 0, 18]} />
 
       {/* Chao do estadio — preenche a area alem do campo */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
