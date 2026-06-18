@@ -164,7 +164,7 @@ export default function Pitch() {
     <group>
       {/* Borda branca ao redor da grama */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.015, 0]}>
-        <planeGeometry args={[31, 19]} />
+        <planeGeometry args={[30.4, 18.4]} />
         <meshStandardMaterial color="white" roughness={0.9} />
       </mesh>
 
