@@ -40,8 +40,6 @@ function PitchMarkings() {
   const goalAreaDist = 3;
   const goalAreaHalfH = 3;
   const centerR = 3;
-  const penaltyArcR = 9.15;
-
   const lines = useMemo(() => {
     const r: { pos: [number, number, number]; scale: [number, number, number] }[] = [];
 
@@ -108,55 +106,6 @@ function PitchMarkings() {
     return r;
   }, []);
 
-  // Arcos de penalty (o "D" na borda da area)
-  const penaltyArcSegments = 20;
-  const penaltyArc = useMemo(() => {
-    const result: ReactNode[] = [];
-    const arcY = lineY + 0.001;
-
-    // Gol esquerdo — arco no topo da area (x = -halfW + penaltyDist)
-    const arcCxL = -halfW + penaltyDist;
-    for (let i = 0; i < penaltyArcSegments; i++) {
-      const a1 = (i / penaltyArcSegments) * Math.PI * 2;
-      const a2 = ((i + 1) / penaltyArcSegments) * Math.PI * 2;
-      // So desenhar fora da area (|z| > penaltyHalfH)
-      const z1 = Math.sin(a1) * penaltyArcR;
-      const z2 = Math.sin(a2) * penaltyArcR;
-      if (Math.abs(z1) <= penaltyHalfH && Math.abs(z2) <= penaltyHalfH) continue;
-      const x1 = arcCxL + Math.cos(a1) * penaltyArcR;
-      const x2 = arcCxL + Math.cos(a2) * penaltyArcR;
-      // So desenhar dentro do campo
-      if (x1 < -halfW || x1 > halfW) continue;
-      result.push(
-        <mesh key={`parcL-${i}`} position={[(x1 + x2) / 2, arcY, (z1 + z2) / 2]}>
-          <boxGeometry args={[LW, LW, penaltyArcR * Math.abs(a2 - a1) + 0.02]} />
-          <meshStandardMaterial color="white" roughness={0.8} />
-        </mesh>
-      );
-    }
-
-    // Gol direito — espelhado
-    const arcCxR = halfW - penaltyDist;
-    for (let i = 0; i < penaltyArcSegments; i++) {
-      const a1 = (i / penaltyArcSegments) * Math.PI * 2;
-      const a2 = ((i + 1) / penaltyArcSegments) * Math.PI * 2;
-      const z1 = Math.sin(a1) * penaltyArcR;
-      const z2 = Math.sin(a2) * penaltyArcR;
-      if (Math.abs(z1) <= penaltyHalfH && Math.abs(z2) <= penaltyHalfH) continue;
-      const x1 = arcCxR + Math.cos(a1) * penaltyArcR;
-      const x2 = arcCxR + Math.cos(a2) * penaltyArcR;
-      if (x1 < -halfW || x1 > halfW) continue;
-      result.push(
-        <mesh key={`parcR-${i}`} position={[(x1 + x2) / 2, arcY, (z1 + z2) / 2]}>
-          <boxGeometry args={[LW, LW, penaltyArcR * Math.abs(a2 - a1) + 0.02]} />
-          <meshStandardMaterial color="white" roughness={0.8} />
-        </mesh>
-      );
-    }
-
-    return result;
-  }, []);
-
   // Circulo central
   const centerCircle = useMemo(() => {
     const segments = 64;
@@ -188,8 +137,6 @@ function PitchMarkings() {
       ))}
 
       {centerCircle}
-
-      {penaltyArc}
 
       {/* Macadores de penalty */}
       <mesh position={[-halfW + 6.5, lineY + 0.01, 0]}>

@@ -7,6 +7,18 @@ const GOAL_WIDTH = 7.32;
 const GOAL_DEPTH = 2;
 const HALF_WIDTH = GOAL_WIDTH / 2;
 
+function GoalGrass({ x, direction }: { x: number; direction: 1 | -1 }) {
+  return (
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[x + direction * GOAL_DEPTH / 2, -0.005, 0]}
+    >
+      <planeGeometry args={[GOAL_DEPTH, GOAL_WIDTH]} />
+      <meshStandardMaterial color="#2d8a4e" roughness={0.9} />
+    </mesh>
+  );
+}
+
 function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
   const postMaterial = (
     <meshStandardMaterial color="#e8e8e8" roughness={0.3} metalness={0.6} />
@@ -141,8 +153,13 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
 export default function Goals() {
   return (
     <group>
+      {/* Grama sob o gol esquerdo */}
+      <GoalGrass x={-15} direction={-1} />
       {/* Gol esquerdo: na linha de fundo x=-15, rede vai para x=-17 (para fora) */}
       <Goal x={-15} netDirection={-1} />
+
+      {/* Grama sob o gol direito */}
+      <GoalGrass x={15} direction={1} />
       {/* Gol direito: na linha de fundo x=+15, rede vai para x=+17 (para fora) */}
       <Goal x={15} netDirection={1} />
     </group>
