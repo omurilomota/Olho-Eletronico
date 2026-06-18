@@ -7,16 +7,15 @@ export interface OffsideResult {
 
 /**
  * Calculates offside by comparing attacker X position with the
- * second-last defender (considering goalkeeper and defender).
+ * defender (second-last opponent — goalkeeper is last).
  * Rule: 1 unit = 1 meter = 100 cm.
  */
 export function calculateOffside(
   attacker: Position,
   defender: Position,
-  goalkeeper: Position,
+  _goalkeeper: Position,
 ): OffsideResult {
-  const defenders = [defender, goalkeeper].sort((a, b) => b.x - a.x);
-  const secondLastX = defenders[1].x;
+  const secondLastX = defender.x;
 
   const marginCm = (attacker.x - secondLastX) * 100;
   return {
