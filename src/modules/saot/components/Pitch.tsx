@@ -9,14 +9,14 @@ function createGrassTexture(): THREE.CanvasTexture {
 
   const stripeWidth = 512 / 14;
   for (let i = 0; i < 14; i++) {
-    ctx.fillStyle = i % 2 === 0 ? '#1a6b2a' : '#22783a';
+    ctx.fillStyle = i % 2 === 0 ? '#2d8b4e' : '#36a558';
     ctx.fillRect(i * stripeWidth, 0, stripeWidth, 512);
   }
 
   for (let i = 0; i < 3000; i++) {
     const x = Math.random() * 512;
     const y = Math.random() * 512;
-    ctx.fillStyle = `rgba(${20 + Math.random() * 20}, ${90 + Math.random() * 30}, ${30 + Math.random() * 20}, 0.4)`;
+    ctx.fillStyle = `rgba(${30 + Math.random() * 20}, ${120 + Math.random() * 30}, ${40 + Math.random() * 30}, 0.4)`;
     ctx.fillRect(x, y, 1, 2);
   }
 
@@ -169,7 +169,7 @@ export default function Pitch() {
           map={grassTexture}
           roughness={0.9}
           metalness={0.0}
-          color="#1e7a30"
+          color="#3cb043"
         />
       </mesh>
 
