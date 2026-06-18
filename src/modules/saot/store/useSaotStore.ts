@@ -34,36 +34,36 @@ interface Scenario {
 
 export const SCENARIOS: Record<Exclude<ScenarioType, 'custom'>, Scenario> = {
   'normal-offside': {
-    attacker: { x: 5, z: 1 },
-    defender: { x: 2, z: -1 },
+    attacker: { x: 5, z: 0 },
+    defender: { x: 2, z: 0 },
     goalkeeper: { x: -5, z: 0 },
     label: 'Impedimento Classico',
     description: 'Atacante posicionado a frente do penultimo defensor',
   },
   'marginal': {
-    attacker: { x: 3.05, z: 0.5 },
-    defender: { x: 3, z: -1 },
+    attacker: { x: 3.05, z: 0 },
+    defender: { x: 3, z: 0 },
     goalkeeper: { x: -5, z: 0 },
     label: 'Impedimento Marginal',
     description: 'Diferenca de apenas 5cm — decisao apertada',
   },
   'reverse-offside': {
-    attacker: { x: 2, z: 1 },
-    defender: { x: 5, z: -1 },
+    attacker: { x: 2, z: 0 },
+    defender: { x: 5, z: 0 },
     goalkeeper: { x: -5, z: 0 },
     label: 'Impedimento Reverso',
     description: 'Atacante recua mas defensor avanca para criar a linha',
   },
   'no-offside-behind': {
-    attacker: { x: -2, z: 1 },
-    defender: { x: 3, z: -1 },
+    attacker: { x: -2, z: 0 },
+    defender: { x: 3, z: 0 },
     goalkeeper: { x: -5, z: 0 },
     label: 'Bola Por Tras',
     description: 'Atacante comeca atras do defensor — posicao legal',
   },
   'no-offside-level': {
-    attacker: { x: 3, z: 1 },
-    defender: { x: 3, z: -1 },
+    attacker: { x: 3, z: 0 },
+    defender: { x: 3, z: 0 },
     goalkeeper: { x: -5, z: 0 },
     label: 'Posicao Legal',
     description: 'Atacante na mesma linha do defensor — sem impedimento',
@@ -91,8 +91,8 @@ export interface SAOTState {
 }
 
 const defaultState = {
-  attacker: { x: 3, z: 1 },
-  defender: { x: -3, z: -1 },
+  attacker: { x: 3, z: 0 },
+  defender: { x: -3, z: 0 },
   goalkeeper: { x: -5, z: 0 },
   ballPosition: [-3, 0.2, 0] as [number, number, number],
   cameraPreset: 'broadcast' as CameraPreset,

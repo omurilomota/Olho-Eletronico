@@ -98,10 +98,10 @@ export function useSimulation(options: UseSimulationOptions) {
       const ballY = bS[1] + Math.sin(eased * Math.PI) * 2; // arco de 2m
       const ballZ = bS[2] + (bE[2] - bS[2]) * eased;
 
-      // Atacante: corre 3m para frente, com balanco lateral de 0.5m
-      const attackerRun = eased * 3; // 3 metros de distancia de corrida
+      // Atacante: corre 3m para frente na mesma linha lateral
+      const attackerRun = eased * 3;
       const attackerX = aS.x + attackerRun;
-      const attackerZ = aS.z + Math.sin(eased * Math.PI * 2) * 0.5; // balanco lateral
+      const attackerZ = aS.z;
 
       // Defensor: corre 1.5m (metade da velocidade do atacante)
       const defenderRun = eased * 1.5; // 1.5 metros de distancia de corrida
