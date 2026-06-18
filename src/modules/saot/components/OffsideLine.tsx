@@ -1,118 +1,135 @@
 import * as THREE from 'three';
 import { Html } from '@react-three/drei';
 
+/** Props do componente de linhas de impedimento. */
 interface OffsideLineProps {
-  x: number;
-  isOffside: boolean;
-  marginCm: number;
+  /** Posicao X do defensor (linha vermelha = impedimento). */
+  defenderX: number;
+  /** Posicao X do atacante (linha azul). */
   attackerX: number;
+  /** Se o atacante esta impedido. */
+  isOffside: boolean;
+  /** Distancia em cm entre atacante e linha do defensor. */
+  marginCm: number;
+  /** Se as linhas devem ser renderizadas. */
   visible: boolean;
 }
 
-export default function OffsideLine({ x, isOffside, marginCm, attackerX, visible }: OffsideLineProps) {
-  const lineColor = isOffside ? '#ef4444' : '#22c55e';
-  const zoneColor = isOffside ? '#ef4444' : '#22c55e';
+const DEFENDER_COLOR = '#ef4444';
+const ATTACKER_COLOR = '#3b82f6';
+const LEGAL_COLOR = '#22c55e';
 
+/**
+ * Renderiza as linhas de impedimento no campo 3D.
+ * - Linha vermelha na posicao do defensor (linha de impedimento)
+ * - Linha azul na posicao do atacante
+ * - Zona vermelha transparente atras da linha do defensor
+ * - Conector visual mostrando a distancia entre as duas linhas
+ */
+export default function OffsideLine({
+  defenderX,
+  attackerX,
+  isOffside,
+  marginCm,
+  visible,
+}: OffsideLineProps) {
   if (!visible) return null;
 
+  const resultColor = isOffside ? DEFENDER_COLOR : LEGAL_COLOR;
   const absMargin = Math.abs(marginCm);
-  const midpointX = (attackerX + x) / 2;
+  const midpointX = (attackerX + defenderX) / 2;
 
   return (
     <group>
-      {/* Zona de impedimento preenchida (do penúltimo defensor até o gol) */}
-      <mesh position={[x - 5, 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* === ZONA DE IMPEDIMENTO === */}
+      {/* Preenchimento vermelho atras da linha do defensor (lado do gol) */}
+      <mesh position={[defenderX - 5, 0.012, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[10, 12]} />
         <meshBasicMaterial
-          color={zoneColor}
+          color={DEFENDER_COLOR}
           transparent
-          opacity={isOffside ? 0.12 : 0.06}
+          opacity={isOffside ? 0.12 : 0.04}
           side={THREE.DoubleSide}
         />
       </mesh>
 
-      {/* Linha principal da impedimento — mais larga e com brilho */}
-      <mesh position={[x, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* === LINHA DO DEFENSOR (VERMELHA) === */}
+      {/* Linha principal no chao */}
+      <mesh position={[defenderX, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.18, 12]} />
-        <meshBasicMaterial
-          color={lineColor}
-          transparent
-          opacity={0.85}
-          side={THREE.DoubleSide}
-        />
+        <meshBasicMaterial color={DEFENDER_COLOR} transparent opacity={0.85} side={THREE.DoubleSide} />
       </mesh>
-
-      {/* Tracejado da linha */}
+      {/* Tracejado da linha do defensor */}
       {[...Array(24)].map((_, i) => (
-        <mesh key={i} position={[x, 0.02, (i - 12) * 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh key={`def-dash-${i}`} position={[defenderX, 0.02, (i - 12) * 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[0.12, 0.25]} />
-          <meshBasicMaterial color={lineColor} transparent opacity={0.95} />
+          <meshBasicMaterial color={DEFENDER_COLOR} transparent opacity={0.95} />
         </mesh>
       ))}
-
-      {/* Poste vertical da linha */}
-      <mesh position={[x, 1.2, 0]}>
+      {/* Poste vertical da linha do defensor */}
+      <mesh position={[defenderX, 1.2, 0]}>
         <boxGeometry args={[0.06, 2.4, 0.06]} />
-        <meshBasicMaterial color={lineColor} transparent opacity={0.5} />
+        <meshBasicMaterial color={DEFENDER_COLOR} transparent opacity={0.5} />
       </mesh>
-      <mesh position={[x, 2.5, 0]}>
+      <mesh position={[defenderX, 2.5, 0]}>
         <sphereGeometry args={[0.1, 12, 12]} />
-        <meshBasicMaterial color={lineColor} />
+        <meshBasicMaterial color={DEFENDER_COLOR} />
       </mesh>
 
-      {/* Anel ao redor do atacante */}
-      <group position={[attackerX, 0.03, 0]}>
-        {[...Array(20)].map((_, i) => {
-          const angle = (i / 20) * Math.PI * 2;
-          const radius = 0.5;
-          return (
-            <mesh
-              key={i}
-              position={[Math.cos(angle) * radius, 0, Math.sin(angle) * radius]}
-              rotation={[-Math.PI / 2, 0, 0]}
-            >
-              <planeGeometry args={[0.08, 0.08]} />
-              <meshBasicMaterial
-                color={isOffside ? '#ef4444' : '#22c55e'}
-                transparent
-                opacity={0.9}
-              />
-            </mesh>
-          );
-        })}
-      </group>
+      {/* === LINHA DO ATACANTE (AZUL) === */}
+      {/* Linha principal no chao */}
+      <mesh position={[attackerX, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.18, 12]} />
+        <meshBasicMaterial color={ATTACKER_COLOR} transparent opacity={0.85} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Tracejado da linha do atacante */}
+      {[...Array(24)].map((_, i) => (
+        <mesh key={`atk-dash-${i}`} position={[attackerX, 0.02, (i - 12) * 0.5]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.12, 0.25]} />
+          <meshBasicMaterial color={ATTACKER_COLOR} transparent opacity={0.95} />
+        </mesh>
+      ))}
+      {/* Poste vertical da linha do atacante */}
+      <mesh position={[attackerX, 1.2, 0]}>
+        <boxGeometry args={[0.06, 2.4, 0.06]} />
+        <meshBasicMaterial color={ATTACKER_COLOR} transparent opacity={0.5} />
+      </mesh>
+      <mesh position={[attackerX, 2.5, 0]}>
+        <sphereGeometry args={[0.1, 12, 12]} />
+        <meshBasicMaterial color={ATTACKER_COLOR} />
+      </mesh>
 
-      {/* Seta horizontal mostrando a distância no chão */}
+      {/* === CONECTOR VISUAL (distancia no chao) === */}
       {/* Marcador do atacante */}
       <mesh position={[attackerX, 0.01, 6.8]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.6, 0.1]} />
-        <meshBasicMaterial color={lineColor} transparent opacity={0.7} />
+        <meshBasicMaterial color={ATTACKER_COLOR} transparent opacity={0.7} />
       </mesh>
-      {/* Marcador da linha */}
-      <mesh position={[x, 0.01, 6.8]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Marcador da linha do defensor */}
+      <mesh position={[defenderX, 0.01, 6.8]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.6, 0.1]} />
-        <meshBasicMaterial color={lineColor} transparent opacity={0.7} />
+        <meshBasicMaterial color={DEFENDER_COLOR} transparent opacity={0.7} />
       </mesh>
-      {/* Linha conectando atacante ↔ linha */}
+      {/* Linha conectando atacante <-> defensor */}
       <mesh position={[midpointX, 0.015, 6.8]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[Math.abs(attackerX - x), 0.05]} />
-        <meshBasicMaterial color={lineColor} transparent opacity={0.5} />
+        <planeGeometry args={[Math.abs(attackerX - defenderX), 0.05]} />
+        <meshBasicMaterial color={resultColor} transparent opacity={0.5} />
       </mesh>
-
-      {/* Seta dupla apontando para a distância */}
-      <mesh position={[midpointX, 0.02, 6.8]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Diamond no meio do conector */}
+      <mesh position={[midpointX, 0.02, 6.8]} rotation={[-Math.PI / 2, 0, Math.PI / 4]}>
         <planeGeometry args={[0.15, 0.15]} />
-        <meshBasicMaterial color={lineColor} transparent opacity={0.8} />
+        <meshBasicMaterial color={resultColor} transparent opacity={0.8} />
       </mesh>
 
-      {/* Label da linha de impedimento */}
-      <Html position={[x, 3.2, 0]} center distanceFactor={10}>
+      {/* === LABELS === */}
+      {/* Label da linha do defensor */}
+      <Html position={[defenderX, 3.2, 0]} center distanceFactor={10}>
         <div className="pointer-events-none select-none">
           <div
             className="px-4 py-2 rounded-xl text-sm font-black text-white text-center whitespace-nowrap"
             style={{
-              backgroundColor: lineColor,
-              boxShadow: `0 0 30px ${lineColor}88, 0 0 60px ${lineColor}44`,
+              backgroundColor: DEFENDER_COLOR,
+              boxShadow: `0 0 30px ${DEFENDER_COLOR}88, 0 0 60px ${DEFENDER_COLOR}44`,
             }}
           >
             LINHA DE IMPEDIMENTO
@@ -120,14 +137,29 @@ export default function OffsideLine({ x, isOffside, marginCm, attackerX, visible
         </div>
       </Html>
 
+      {/* Label da linha do atacante */}
+      <Html position={[attackerX, 3.2, 0]} center distanceFactor={10}>
+        <div className="pointer-events-none select-none">
+          <div
+            className="px-4 py-2 rounded-xl text-sm font-black text-white text-center whitespace-nowrap"
+            style={{
+              backgroundColor: ATTACKER_COLOR,
+              boxShadow: `0 0 30px ${ATTACKER_COLOR}88, 0 0 60px ${ATTACKER_COLOR}44`,
+            }}
+          >
+            POSICAO DO ATACANTE
+          </div>
+        </div>
+      </Html>
+
       {/* Label do resultado */}
-      <Html position={[x, 2.3, 0]} center distanceFactor={10}>
+      <Html position={[defenderX, 2.3, 0]} center distanceFactor={10}>
         <div className="pointer-events-none select-none">
           <div
             className="px-3 py-1.5 rounded-lg text-lg font-black text-white text-center whitespace-nowrap"
             style={{
-              backgroundColor: isOffside ? '#ef4444' : '#22c55e',
-              boxShadow: `0 0 20px ${isOffside ? '#ef444466' : '#22c55e66'}`,
+              backgroundColor: resultColor,
+              boxShadow: `0 0 20px ${resultColor}66`,
             }}
           >
             {isOffside ? '⚠ IMPEDIDO' : '✓ LEGAL'}
@@ -135,7 +167,7 @@ export default function OffsideLine({ x, isOffside, marginCm, attackerX, visible
         </div>
       </Html>
 
-      {/* Distância atacante ↔ linha */}
+      {/* Distancia entre as linhas */}
       <Html position={[midpointX, 0.5, 6.8]} center distanceFactor={10}>
         <div className="pointer-events-none select-none">
           <div className="px-2 py-1 rounded-md bg-black/80 text-xs font-bold text-white text-center whitespace-nowrap border border-white/20">
@@ -148,7 +180,7 @@ export default function OffsideLine({ x, isOffside, marginCm, attackerX, visible
         </div>
       </Html>
 
-      {/* Sinal de advertência se impedido */}
+      {/* Sinal de advertencia se impedido */}
       {isOffside && (
         <Html position={[attackerX, 2.8, 0]} center distanceFactor={10}>
           <div className="pointer-events-none select-none">
