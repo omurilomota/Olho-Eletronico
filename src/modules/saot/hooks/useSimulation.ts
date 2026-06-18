@@ -1,18 +1,21 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-interface SimulationFrame {
+export interface SimulationFrame {
   time: number;
   ballPosition: [number, number, number];
   attackerPosition: { x: number; z: number };
   defenderPosition: { x: number; z: number };
+  goalkeeperPosition: { x: number; z: number };
   attackerAnim: 'idle' | 'running' | 'kicking';
   defenderAnim: 'idle' | 'running';
+  goalkeeperAnim: 'idle' | 'running' | 'kicking';
 }
 
 interface UseSimulationOptions {
   duration?: number;
   attackerStart: { x: number; z: number };
   defenderStart: { x: number; z: number };
+  goalkeeperStart: { x: number; z: number };
   ballStart: [number, number, number];
   ballEnd: [number, number, number];
 }
@@ -22,18 +25,20 @@ export function useSimulation(options: UseSimulationOptions) {
     duration = 3000,
     attackerStart,
     defenderStart,
+    goalkeeperStart,
     ballStart,
     ballEnd,
   } = options;
 
-  // Use refs so reset() always uses the latest positions from the store
   const attackerStartRef = useRef(attackerStart);
   const defenderStartRef = useRef(defenderStart);
+  const goalkeeperStartRef = useRef(goalkeeperStart);
   const ballStartRef = useRef(ballStart);
   const ballEndRef = useRef(ballEnd);
 
   attackerStartRef.current = attackerStart;
   defenderStartRef.current = defenderStart;
+  goalkeeperStartRef.current = goalkeeperStart;
   ballStartRef.current = ballStart;
   ballEndRef.current = ballEnd;
 
@@ -46,8 +51,10 @@ export function useSimulation(options: UseSimulationOptions) {
     ballPosition: ballStart,
     attackerPosition: attackerStart,
     defenderPosition: defenderStart,
+    goalkeeperPosition: goalkeeperStart,
     attackerAnim: 'idle',
     defenderAnim: 'idle',
+    goalkeeperAnim: 'idle',
   });
 
   const animRef = useRef<number>(0);
@@ -66,29 +73,46 @@ export function useSimulation(options: UseSimulationOptions) {
       const bE = ballEndRef.current;
       const aS = attackerStartRef.current;
       const dS = defenderStartRef.current;
+      const gS = goalkeeperStartRef.current;
 
+      // Ball: starts at goalkeeper, arcs toward attacker
       const ballX = bS[0] + (bE[0] - bS[0]) * eased;
       const ballY = bS[1] + Math.sin(eased * Math.PI) * 2;
       const ballZ = bS[2] + (bE[2] - bS[2]) * eased;
 
+      // Attacker: runs forward to receive the pass
       const attackerRun = eased * 3;
       const attackerX = aS.x + attackerRun;
       const attackerZ = aS.z + Math.sin(eased * Math.PI * 2) * 0.5;
 
+      // Defender: runs forward to track attacker
       const defenderRun = eased * 1.5;
       const defenderX = dS.x + defenderRun;
       const defenderZ = dS.z;
 
+      // Goalkeeper: stays at position, kicks the ball early
+      const goalkeeperX = gS.x;
+      const goalkeeperZ = gS.z;
+
       let attackerAnim: 'idle' | 'running' | 'kicking' = 'idle';
       let defenderAnim: 'idle' | 'running' = 'idle';
+      let goalkeeperAnim: 'idle' | 'running' | 'kicking' = 'idle';
 
-      if (normalizedT > 0 && normalizedT < 0.7) {
+      // Goalkeeper kicks at the start
+      if (normalizedT > 0 && normalizedT < 0.1) {
+        goalkeeperAnim = 'kicking';
+        attackerAnim = 'idle';
+        defenderAnim = 'idle';
+      } else if (normalizedT >= 0.1 && normalizedT < 0.7) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'running';
         defenderAnim = 'running';
       } else if (normalizedT >= 0.7 && normalizedT < 0.85) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'kicking';
         defenderAnim = 'running';
       } else if (normalizedT >= 0.85) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'idle';
         defenderAnim = 'idle';
       }
@@ -98,8 +122,10 @@ export function useSimulation(options: UseSimulationOptions) {
         ballPosition: [ballX, ballY, ballZ],
         attackerPosition: { x: attackerX, z: attackerZ },
         defenderPosition: { x: defenderX, z: defenderZ },
+        goalkeeperPosition: { x: goalkeeperX, z: goalkeeperZ },
         attackerAnim,
         defenderAnim,
+        goalkeeperAnim,
       };
     },
     [duration],
@@ -147,8 +173,10 @@ export function useSimulation(options: UseSimulationOptions) {
       ballPosition: ballStartRef.current,
       attackerPosition: attackerStartRef.current,
       defenderPosition: defenderStartRef.current,
+      goalkeeperPosition: goalkeeperStartRef.current,
       attackerAnim: 'idle',
       defenderAnim: 'idle',
+      goalkeeperAnim: 'idle',
     });
     if (animRef.current) cancelAnimationFrame(animRef.current);
   }, []);

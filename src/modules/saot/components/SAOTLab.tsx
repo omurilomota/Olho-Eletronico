@@ -25,10 +25,13 @@ export default function SAOTLab() {
     setAttacker, setDefender, setGoalkeeper,
   } = useSaotStore();
 
+  const ballStart: [number, number, number] = [goalkeeper.x, 0.2, goalkeeper.z];
+
   const simulation = useSimulation({
     attackerStart: attacker,
     defenderStart: defender,
-    ballStart: [-3, 0.2, 0],
+    goalkeeperStart: goalkeeper,
+    ballStart,
     ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
   });
 
@@ -93,16 +96,17 @@ export default function SAOTLab() {
             facingAngle={defenderAngle}
           />
           <Player
-            position={{ x: goalkeeper.x, z: goalkeeper.z }}
+            position={isSimulating ? simulation.currentFrame.goalkeeperPosition : goalkeeper}
             color="#eab308"
             secondaryColor="#1a1a1a"
             label="Goleiro"
             number={1}
             onDragEnd={setGoalkeeper}
+            animationState={isSimulating ? simulation.currentFrame.goalkeeperAnim : 'idle'}
           />
 
           <Ball
-            position={isSimulating ? simulation.currentFrame.ballPosition : [-3, 0.2, 0]}
+            position={isSimulating ? simulation.currentFrame.ballPosition : ballStart}
             spinning={isSimulating}
           />
 
@@ -119,7 +123,7 @@ export default function SAOTLab() {
           <CameraController
             preset={cameraPreset}
             followBall={isSimulating}
-            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-3, 0.2, 0]}
+            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : ballStart}
           />
         </Canvas>
       </div>
