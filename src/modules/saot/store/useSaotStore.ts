@@ -1,12 +1,20 @@
 import { create } from 'zustand';
 
+/**
+ * Posicao 2D no plano do campo 3D.
+ * X = comprimento do campo (positivo = gol adversario, negativo = proprio gol)
+ * Z = largura do campo
+ * 1 unidade = 1 metro
+ */
 export interface Position {
   x: number;
   z: number;
 }
 
+/** Presets de camera disponiveis para visualizacao do campo. */
 export type CameraPreset = 'broadcast' | 'tactical' | 'goal-left' | 'goal-right' | 'free';
 
+/** Tipos de cenarios pre-definidos para testes de impedimento. */
 export type ScenarioType =
   | 'custom'
   | 'normal-offside'
@@ -15,6 +23,7 @@ export type ScenarioType =
   | 'no-offside-behind'
   | 'no-offside-level';
 
+/** Cenario pre-definido com posicoes dos jogadores e descricao. */
 interface Scenario {
   attacker: Position;
   defender: Position;
