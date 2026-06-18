@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+/**
+ * Portao de entrada/saida do estadio no mapa 2D.
+ * Posicoes baseadas em um canvas de 600x400 pixels.
+ */
 interface Gate {
   id: number;
   x: number;
@@ -9,6 +13,11 @@ interface Gate {
   color: string;
 }
 
+/**
+ * Ponto individual de um torcedor na simulacao de multidao.
+ * Cada ponto se move em direcao ao portao mais proximo.
+ * @property hue - Cor baseada na velocidade: 0=vermelho (lento), 40=amarelo (medio), 200=azul (rapido)
+ */
 export interface CrowdPoint {
   x: number;
   y: number;
@@ -18,12 +27,14 @@ export interface CrowdPoint {
   hue: number;
 }
 
+/** Estatisticas agregadas da simulacao de multidao. */
 export interface CrowdStats {
   totalPoints: number;
   congestedGates: { id: number; label: string; count: number }[];
   avgSpeed: number;
 }
 
+// Portoes distribuidos nos 4 cantos do estadio (canvas 600x400)
 const GATES: Gate[] = [
   { id: 1, x: 80, y: 30, radius: 35, label: 'Norte A', color: '#f59e0b' },
   { id: 2, x: 520, y: 30, radius: 35, label: 'Norte B', color: '#f59e0b' },
@@ -31,9 +42,10 @@ const GATES: Gate[] = [
   { id: 4, x: 520, y: 370, radius: 35, label: 'Sul B', color: '#3b82f6' },
 ];
 
-// Campo de jogo: retângulo central onde torcedores NÃO devem entrar
+// Campo de jogo: retangulo central onde torcedores NAO devem entrar
 const FIELD = { x: 180, y: 100, w: 240, h: 200 };
 
+// Limite de torcedores por portao para considerar congestamento
 const CONGESTION_THRESHOLD = 80;
 
 function isInField(x: number, y: number): boolean {
@@ -99,6 +111,7 @@ function updatePoint(p: CrowdPoint, speedFactor: number): CrowdPoint {
   const len = Math.sqrt(dx * dx + dy * dy) || 1;
 
   const speed = p.speed * speedFactor;
+  // Ruido aleatorio para movimento mais natural (±0.2)
   const noiseX = (Math.random() - 0.5) * 0.4;
   const noiseY = (Math.random() - 0.5) * 0.4;
 
@@ -126,6 +139,10 @@ function updatePoint(p: CrowdPoint, speedFactor: number): CrowdPoint {
   newY = Math.max(5, Math.min(395, newY));
 
   const actualSpeed = Math.sqrt(newVx * newVx + newVy * newVy);
+  // Mapeamento de velocidade para cor (HSL hue):
+  // > 2.5 px/frame = vermelho (0) = congestionado
+  // > 1.5 px/frame = amarelo (40) = medio
+  // <= 1.5 px/frame = azul (200) = fluxo livre
   const hue = actualSpeed > 2.5 ? 0 : actualSpeed > 1.5 ? 40 : 200;
 
   return {
@@ -183,6 +200,9 @@ export function useCrowdSimulation(timeLeftMinutes: number, paused = false) {
       return;
     }
 
+    // speedFactor: quanto menor o tempo restante, mais rapido os torcedores se movem
+    // timeLeft = 120min → factor = 1.0 → speedFactor = 0.3 (lento, jogo comecando)
+    // timeLeft = 0min → factor = 0.1 → speedFactor = 2.1 (rapido, jogo acabando)
     const factor = Math.max(0.1, timeRef.current / 120);
     const speedFactor = (1 - factor) * 2 + 0.3;
 

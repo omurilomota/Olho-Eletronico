@@ -9,8 +9,8 @@ import {
 
 describe('constants', () => {
   it('has correct pitch dimensions', () => {
-    expect(PITCH_WIDTH).toBe(20);
-    expect(PITCH_HEIGHT).toBe(12);
+    expect(PITCH_WIDTH).toBe(37);
+    expect(PITCH_HEIGHT).toBe(22);
   });
 
   it('has correct goal dimensions', () => {
@@ -19,6 +19,6 @@ describe('constants', () => {
   });
 
   it('has correct center circle radius', () => {
-    expect(CENTER_CIRCLE_RADIUS).toBe(9.15);
+    expect(CENTER_CIRCLE_RADIUS).toBe(3);
   });
 });
