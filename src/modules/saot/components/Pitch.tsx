@@ -28,7 +28,7 @@ function createGrassTexture(): THREE.CanvasTexture {
 }
 
 function PitchMarkings() {
-  const W = 32;
+  const W = 37;
   const H = 22;
   const lineY = 0.02;
   const LW = 0.12;
@@ -164,7 +164,7 @@ export default function Pitch() {
     <group>
       {/* Gramado */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[32, 22]} />
+        <planeGeometry args={[37, 22]} />
         <meshStandardMaterial
           map={grassTexture}
           roughness={0.9}
