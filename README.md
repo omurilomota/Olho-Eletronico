@@ -2,6 +2,49 @@
 
 Sistema de simulacao e monitoramento para a Copa do Mundo FIFA 2026, com dois modulos principais: **SAOT Lab** (analise de impedimento 3D) e **ICC Command Center** (centro de comando operacional).
 
+## Pre-requisitos
+
+- [Node.js](https://nodejs.org/) >= 18
+- npm >= 9
+
+## Como Rodar
+
+```bash
+# Instalar dependencias
+npm install
+
+# Desenvolvimento
+npm run dev
+
+# Build para producao
+npm run build
+
+# Preview da build
+npm run preview
+
+# Testes
+npm test
+```
+
+Acesse `http://localhost:5173`.
+
+## Sistema de Coordenadas 3D
+
+O campo 3D usa o sistema de coordenadas do Three.js com a seguinte convencao:
+
+| Eixo | Direcao | Unidade |
+|------|---------|---------|
+| **X** | Comprimento do campo (lado esquerdo → direito) | 1 unidade = 1 metro |
+| **Y** | Altura (chao → cima) | 1 unidade = 1 metro |
+| **Z** | Largura do campo (fundo → frente) | 1 unidade = 1 metro |
+
+- **Campo**: 37m de comprimento × 22m de largura
+- **Gol esquerdo**: x = -16.5
+- **Gol direito**: x = +16.5
+- **Linha central**: x = 0
+- **Atacante com bola**: x positivo (avanca em direcao ao gol adversario)
+- **Goleiro**: comeca com a bola e chuta para o atacante
+
 ## Funcionalidades
 
 ### SAOT Lab
@@ -15,7 +58,7 @@ Sistema de simulacao e monitoramento para a Copa do Mundo FIFA 2026, com dois mo
 - Motor de simulacao com play/pause/reset/seek/velocidade ajustavel
 - 5 presets de camera (Broadcast, Tactical, Gol Esquerda, Gol Direita, Livre)
 - Modo Playbook com 5 jogadas pre-definidas e navegacao passo a passo
-- Visualizacao da linha de impedimento com preenchimento de zona, linha tracejada e margem
+- Linha de impedimento: vermelha no defensor + azul no atacante
 
 ### ICC Command Center
 
@@ -56,38 +99,16 @@ Sistema de simulacao e monitoramento para a Copa do Mundo FIFA 2026, com dois mo
 | Recharts | 3 |
 | Tailwind CSS | 4 |
 
-## Como Rodar
-
-```bash
-# Instalar dependencias
-npm install
-
-# Desenvolvimento
-npm run dev
-
-# Build para producao
-npm run build
-
-# Testes
-npm run test
-
-# Preview da build
-npm run preview
-```
-
-Acesse `http://localhost:5173`.
-
 ## Estrutura do Projeto
 
 ```
 src/
 ├── modules/
 │   ├── saot/               # Modulo SAOT Lab (3D + Engine)
-│   │   ├── components/     # Player, Ball, Pitch, Goals, Stadium, etc.
+│   │   ├── components/     # Player, Ball, Pitch, Goals, Stadium, OffsideLine, etc.
 │   │   ├── hooks/          # useSimulation, useDragPlayer
 │   │   ├── services/       # OffsideCalculator
-│   │   ├── store/          # useSaotStore, usePlaybookStore
-│   │   └── types/          # Tipos do modulo
+│   │   └── store/          # useSaotStore, usePlaybookStore
 │   └── icc/                # Modulo ICC Command Center
 │       ├── components/     # DigitalTwinMap, AIChat, SalesPanel, etc.
 │       ├── hooks/          # useCrowdSimulation
@@ -95,9 +116,7 @@ src/
 │       └── store/          # useIccStore
 ├── shared/                 # Codigo compartilhado
 │   ├── components/         # Layout, LoginScreen, ErrorBoundary, DataOverlay
-│   ├── hooks/              # useDebounce, usePerformance
-│   ├── types/              # Position, Vector3, etc.
-│   └── utils/              # formatCm, clamp, lerp, constants
+│   ├── utils/              # formatCm, clamp, lerp, constants
 ├── __tests__/              # Testes unitarios (vitest)
 ├── App.tsx
 └── main.tsx
@@ -111,4 +130,4 @@ src/
 
 ## Gitflow
 
-Este projeto segue **Gitflow** com **Gitmoji**. Consulte `GITFLOW.md` para o guia completo.
+Consulte [GITFLOW.md](./GITFLOW.md) para o guia completo de branching strategy e commits.

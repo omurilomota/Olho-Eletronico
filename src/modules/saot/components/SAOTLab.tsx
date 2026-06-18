@@ -41,8 +41,7 @@ export default function SAOTLab() {
     goalkeeper,
   );
 
-  const activeDefenders = [defender, goalkeeper].sort((a, b) => b.x - a.x);
-  const offsideLineX = activeDefenders[1].x;
+  const offsideLineX = defender.x;
 
   const isSimulating = simulation.progress > 0 && simulation.progress < 1;
 
@@ -112,10 +111,10 @@ export default function SAOTLab() {
 
           {showOffsideLine && (
             <OffsideLine
-              x={offsideLineX}
+              defenderX={offsideLineX}
+              attackerX={isSimulating ? simulation.currentFrame.attackerPosition.x : attacker.x}
               isOffside={result.isOffside}
               marginCm={result.marginCm}
-              attackerX={isSimulating ? simulation.currentFrame.attackerPosition.x : attacker.x}
               visible={simulation.progress > 0}
             />
           )}
