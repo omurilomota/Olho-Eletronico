@@ -5,6 +5,7 @@ import Pitch from './Pitch';
 import Goals from './Goals';
 import Stadium from './Stadium';
 import Environment from './Environment';
+import CityBackground from './CityBackground';
 import Player from './Player';
 import Ball from './Ball';
 import OffsideLine from './OffsideLine';
@@ -67,6 +68,7 @@ export default function SAOTLab() {
           className="w-full h-full"
         >
           <Environment />
+          <CityBackground />
           <Pitch />
           <Goals />
           <Stadium />
