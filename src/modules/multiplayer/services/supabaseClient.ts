@@ -1,14 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 function validateEnv(): { url: string; key: string } {
   if (!supabaseUrl || supabaseUrl.includes('SEU_PROJETO')) {
     throw new Error('[Multiplayer] VITE_SUPABASE_URL not configured in .env.local');
   }
   if (!supabaseKey || supabaseKey === 'sua_chave_aqui') {
-    throw new Error('[Multiplayer] VITE_SUPABASE_ANON_KEY not configured in .env.local');
+    throw new Error('[Multiplayer] VITE_SUPABASE_PUBLISHABLE_KEY not configured in .env.local');
   }
   return { url: supabaseUrl, key: supabaseKey };
 }
