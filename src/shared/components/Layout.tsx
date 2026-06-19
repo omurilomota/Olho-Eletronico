@@ -1,4 +1,6 @@
 import { type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 type Props = {
   children: ReactNode;
@@ -32,6 +34,8 @@ function IccIcon({ className }: { className?: string }) {
 }
 
 export default function Layout({ children, activeTab, onTabChange }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-surface-950 text-white flex flex-col font-sans">
       <header className="glass border-b border-surface-700/50 sticky top-0 z-50">
@@ -42,40 +46,39 @@ export default function Layout({ children, activeTab, onTabChange }: Props) {
               <div className="absolute inset-0 w-8 h-8 bg-brand-400/20 rounded-full blur-md" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight gradient-text truncate">
-                OLHO ELETRONICO
-              </h1>
-              <p className="text-[10px] sm:text-xs text-surface-200/50 tracking-widest uppercase hidden sm:block">
-                Impedimento Milimetrico 4.0
-              </p>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight gradient-text truncate">{t('app.title')}</h1>
+              <p className="text-[10px] sm:text-xs text-surface-200/50 tracking-widest uppercase hidden sm:block">{t('app.subtitle')}</p>
             </div>
           </div>
 
-          <nav className="flex gap-1 bg-surface-900/50 rounded-lg p-1">
-            <button
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                activeTab === 'saot'
-                  ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
-                  : 'text-surface-200/70 hover:text-white hover:bg-surface-700/50'
-              }`}
-              onClick={() => onTabChange('saot')}
-            >
-              <SaotIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">SAOT Lab</span>
-              <span className="sm:hidden">3D</span>
-            </button>
-            <button
-              className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                activeTab === 'icc'
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-                  : 'text-surface-200/70 hover:text-white hover:bg-surface-700/50'
-              }`}
-              onClick={() => onTabChange('icc')}
-            >
-              <IccIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">ICC Center</span>
-              <span className="sm:hidden">ICC</span>
-            </button>
+          <nav className="flex items-center gap-2">
+            <div className="flex gap-1 bg-surface-900/50 rounded-lg p-1">
+              <button
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  activeTab === 'saot'
+                    ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
+                    : 'text-surface-200/70 hover:text-white hover:bg-surface-700/50'
+                }`}
+                onClick={() => onTabChange('saot')}
+              >
+                <SaotIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('nav.saot')}</span>
+                <span className="sm:hidden">3D</span>
+              </button>
+              <button
+                className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  activeTab === 'icc'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
+                    : 'text-surface-200/70 hover:text-white hover:bg-surface-700/50'
+                }`}
+                onClick={() => onTabChange('icc')}
+              >
+                <IccIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('nav.icc')}</span>
+                <span className="sm:hidden">ICC</span>
+              </button>
+            </div>
+            <LanguageSwitcher />
           </nav>
         </div>
       </header>
@@ -88,11 +91,11 @@ export default function Layout({ children, activeTab, onTabChange }: Props) {
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow" />
-            Sistema Operacional
+            {t('app.system_status')}
           </span>
           <span className="hidden sm:inline">v1.0.0</span>
         </div>
-        <span className="font-mono text-[10px]">COPA FIFA 2026</span>
+        <span className="font-mono text-[10px]">{t('app.copa')}</span>
       </footer>
     </div>
   );

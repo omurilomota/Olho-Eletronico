@@ -1,0 +1,187 @@
+{
+  "app": {
+    "title": "ELECTRONIC EYE",
+    "subtitle": "Millimetric Offside 4.0",
+    "system_status": "Operational System",
+    "copa": "FIFA WORLD CUP 2026"
+  },
+  "nav": {
+    "saot": "SAOT Lab",
+    "icc": "ICC Center"
+  },
+  "login": {
+    "username": "Username",
+    "username_placeholder": "Enter your username",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "error": "Incorrect username or password",
+    "submit": "Sign In",
+    "footer": "FIFA WORLD CUP 2026 — Authorized System"
+  },
+  "saot": {
+    "tabs": {
+      "controls": "Controls",
+      "playbook": "Playbook"
+    },
+    "camera": "Camera",
+    "camera_presets": {
+      "broadcast": "Broadcast",
+      "tactical": "Tactical",
+      "goal-left": "Goal L",
+      "goal-right": "Goal R",
+      "free": "Free"
+    },
+    "scenarios": "Scenarios",
+    "free_mode": "Free Mode",
+    "free_mode_hint": "Drag players wherever you want",
+    "simulation": "Simulation",
+    "play": "Play",
+    "pause": "Pause",
+    "reset": "Reset",
+    "progress": "Progress",
+    "speed": "Speed",
+    "players": "Players",
+    "attacker": "Attacker",
+    "defender": "Defender",
+    "goalkeeper": "Goalkeeper",
+    "result": "Result",
+    "offside": "OFFSIDE",
+    "legal": "LEGAL",
+    "margin": "Margin:",
+    "options": "Options",
+    "shadows": "Shadows",
+    "offside_line": "Offside line",
+    "reset_positions": "Reset positions",
+    "playbook_title": "Playbook — Pass Simulator",
+    "playbook_hint": "Choose a play to simulate different offside situations.",
+    "steps": "steps",
+    "step": "STEP",
+    "ball": "Ball:",
+    "prev": "Previous",
+    "next": "Next",
+    "back": "Back",
+    "above_line": "above the line",
+    "below_line": "below the line",
+    "offside_line_label": "OFFSIDE LINE",
+    "attacker_position": "ATTACKER POSITION"
+  },
+  "icc": {
+    "chat": {
+      "title": "FIFA AI Pro",
+      "clear": "Clear",
+      "empty_title": "How can I help?",
+      "empty_hint": "Ask about tactics, stats, stadium, predictions...",
+      "placeholder": "Ask about the match...",
+      "send": "Send",
+      "search_phases": [
+        "Searching relevant data",
+        "Analyzing statistics",
+        "Cross-referencing information",
+        "Generating response"
+      ],
+      "models": {
+        "tatico": "Tactical Model",
+        "estatistico": "Statistical Model",
+        "operacional": "Operational Model",
+        "preditivo": "Predictive Model"
+      }
+    },
+    "risk": {
+      "title": "Risk Level",
+      "low": "LOW",
+      "medium": "MEDIUM",
+      "high": "HIGH"
+    },
+    "sales": {
+      "title": "Sales & Establishments",
+      "total_revenue": "Total Revenue",
+      "occupancy": "Stadium Occupancy",
+      "by_category": "By Category",
+      "most_sold": "Best Seller",
+      "by_category_label": "by category:",
+      "units": "units",
+      "top_stores": "Top 3 Stores",
+      "revenue": "Revenue",
+      "categories": {
+        "alimentacao": "Food",
+        "merchandise": "Merchandise",
+        "bebidas": "Beverages",
+        "ingressos": "Tickets"
+      }
+    },
+    "weather": {
+      "title": "Weather",
+      "now": "Now",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "humidity": "Humidity",
+      "wind": "Wind",
+      "avg_temp": "Avg Temp",
+      "precipitation": "Precipitation",
+      "sunny": "Sunny",
+      "cloudy": "Cloudy",
+      "rainy": "Rainy",
+      "rainy_days": "Rainy days in month",
+      "sunny_label": "Sunny",
+      "cloudy_label": "Cloudy",
+      "rainy_label": "Rainy"
+    },
+    "status": {
+      "title": "System Status",
+      "cameras": "HD Cameras",
+      "iot": "IoT Sensors",
+      "five_g": "5G Network",
+      "ai": "Tactical AI",
+      "backup": "Backup Power",
+      "gps": "GPS Tracking",
+      "warning": "Warning",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "digital_twin": {
+      "title": "Digital Twins — Fan Flow",
+      "resume": "Resume",
+      "pause": "Pause",
+      "reset": "Reset",
+      "time_to_start": "Time to kickoff:",
+      "heatmap": "Heatmap",
+      "fans": "Fans",
+      "avg_speed": "Avg Speed",
+      "congested": "Congested"
+    },
+    "ticker": {
+      "title": "Live Operations",
+      "events": "events",
+      "events_list": [
+        "Brazil delegation arrived at stadium",
+        "Checkpoint 3 cleared successfully",
+        "Sector B food restocking completed",
+        "IPTV signal 100% stable",
+        "Medical team positioned at gate 2",
+        "Security sweep completed",
+        "Congestion detected at North Gate A",
+        "Internal temperature: 28C — above ideal",
+        "Camera 7 intermittent — maintenance requested",
+        "Smoke detector sector C triggered — inspection underway",
+        "Incident at South Gate B — security team dispatched",
+        "Alert: irregular fan flow in East stands",
+        "Field lighting system: backup activated",
+        "Argentina delegation en route — ETA 15 min",
+        "Sector D concession: low water stock",
+        "VIP check-in: 85% of invitations confirmed",
+        "Inspection drone completed stadium circuit",
+        "Radio communication: channel 7 interference"
+      ]
+    },
+    "crowd": {
+      "gate_norte_a": "North A",
+      "gate_norte_b": "North B",
+      "gate_sul_a": "South A",
+      "gate_sul_b": "South B",
+      "alert_prefix": "Alert:"
+    }
+  },
+  "overlay": {
+    "title": "Telemetry"
+  }
+}

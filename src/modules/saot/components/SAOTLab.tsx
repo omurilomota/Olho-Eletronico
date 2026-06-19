@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber';
+import { useTranslation } from 'react-i18next';
 import { useSaotStore } from '../store/useSaotStore';
 import { useSimulation } from '../hooks/useSimulation';
 import Pitch from './Pitch';
@@ -16,6 +17,7 @@ import { calculateOffside } from '../services/OffsideCalculator';
 import { useState } from 'react';
 
 export default function SAOTLab() {
+  const { t } = useTranslation();
   const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
 
   const {
@@ -134,7 +136,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            Controles
+            {t('saot.controls', 'Controles')}
           </button>
           <button
             onClick={() => setActivePanel('playbook')}
@@ -144,7 +146,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            Playbook
+            {t('saot.playbook', 'Playbook')}
           </button>
         </div>
 

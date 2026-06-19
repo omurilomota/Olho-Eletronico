@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SystemStatus {
   name: string;
@@ -8,6 +9,7 @@ interface SystemStatus {
 }
 
 export default function StatusPanel() {
+  const { t } = useTranslation();
   const [systems, setSystems] = useState<SystemStatus[]>([
     { name: 'Cameras HD', status: 'online', latency: 12, icon: '\uD83D\uDCF9' },
     { name: 'Sensores IoT', status: 'online', latency: 8, icon: '\uD83D\uDCE1' },
@@ -37,15 +39,15 @@ export default function StatusPanel() {
   };
 
   const statusText = {
-    online: 'Online',
-    warning: 'Alerta',
-    offline: 'Offline',
+    online: t('icc.status.online'),
+    warning: t('icc.status.warning'),
+    offline: t('icc.status.offline'),
   };
 
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
-        Status dos Sistemas
+        {t('icc.status.title')}
       </h3>
       <div className="grid grid-cols-2 gap-2">
         {systems.map((sys) => (

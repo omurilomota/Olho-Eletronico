@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCrowdSimulation } from '../hooks/useCrowdSimulation';
 
 function drawStadium(ctx: CanvasRenderingContext2D, w: number, h: number, field: { x: number; y: number; w: number; h: number }) {
@@ -90,6 +91,7 @@ function hueToColor(hue: number, alpha: number): string {
 }
 
 export default function DigitalTwinMap() {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(120);
   const [isPaused, setIsPaused] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(true);
@@ -167,7 +169,7 @@ export default function DigitalTwinMap() {
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-surface-200/80">
-          Gemeos Digitais - Fluxo de Torcedores
+          {t('icc.digital_twin.title')}
         </h3>
         <div className="flex items-center gap-2">
           <button
@@ -178,7 +180,7 @@ export default function DigitalTwinMap() {
                 : 'bg-amber-500/20 text-amber-400'
             }`}
           >
-            {isPaused ? '\u25B6 Retomar' : '\u23F8 Pausar'}
+            {isPaused ? `\u25B6 ${t('icc.digital_twin.resume')}` : `\u23F8 ${t('icc.digital_twin.pause')}`}
           </button>
           <button
             onClick={reset}
@@ -191,7 +193,7 @@ export default function DigitalTwinMap() {
 
       <div className="flex items-center gap-4 mb-3 text-xs text-surface-200/50">
         <label className="flex items-center gap-2">
-          Tempo p/ inicio:
+          {t('icc.digital_twin.time_to_start')}:
           <input
             type="range"
             min="0"
@@ -209,7 +211,7 @@ export default function DigitalTwinMap() {
             onChange={(e) => setShowHeatmap(e.target.checked)}
             className="accent-brand-500"
           />
-          Heatmap
+          {t('icc.digital_twin.heatmap')}
         </label>
       </div>
 
@@ -228,17 +230,17 @@ export default function DigitalTwinMap() {
       <div className="mt-3 grid grid-cols-3 gap-2 text-center">
         <div className="bg-surface-800/50 rounded-lg p-2">
           <p className="text-lg font-bold text-surface-200/80">{stats.totalPoints}</p>
-          <p className="text-[10px] text-surface-200/40">Torcedores</p>
+          <p className="text-[10px] text-surface-200/40">{t('icc.digital_twin.fans')}</p>
         </div>
         <div className="bg-surface-800/50 rounded-lg p-2">
           <p className="text-lg font-bold text-surface-200/80">{stats.avgSpeed.toFixed(1)}</p>
-          <p className="text-[10px] text-surface-200/40">Vel. Media</p>
+          <p className="text-[10px] text-surface-200/40">{t('icc.digital_twin.avg_speed')}</p>
         </div>
         <div className="bg-surface-800/50 rounded-lg p-2">
           <p className={`text-lg font-bold ${stats.congestedGates.length > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
             {stats.congestedGates.length}
           </p>
-          <p className="text-[10px] text-surface-200/40">Congestionados</p>
+          <p className="text-[10px] text-surface-200/40">{t('icc.digital_twin.congested')}</p>
         </div>
       </div>
     </div>

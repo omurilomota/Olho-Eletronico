@@ -1,0 +1,187 @@
+{
+  "app": {
+    "title": "OJO ELECTRONICO",
+    "subtitle": "Impedimento Milimetrico 4.0",
+    "system_status": "Sistema Operativo",
+    "copa": "COPA MUNDIAL FIFA 2026"
+  },
+  "nav": {
+    "saot": "Laboratorio SAOT",
+    "icc": "Centro ICC"
+  },
+  "login": {
+    "username": "Usuario",
+    "username_placeholder": "Ingrese su usuario",
+    "password": "Contrasena",
+    "password_placeholder": "Ingrese su contrasena",
+    "error": "Usuario o contrasena incorrectos",
+    "submit": "Ingresar",
+    "footer": "COPA MUNDIAL FIFA 2026 — Sistema Autorizado"
+  },
+  "saot": {
+    "tabs": {
+      "controls": "Controles",
+      "playbook": "Libro de Jugadas"
+    },
+    "camera": "Camara",
+    "camera_presets": {
+      "broadcast": "Transmision",
+      "tactical": "Tactico",
+      "goal-left": "Gol Izq",
+      "goal-right": "Gol Der",
+      "free": "Libre"
+    },
+    "scenarios": "Escenarios",
+    "free_mode": "Modo Libre",
+    "free_mode_hint": "Arrastra los jugadores como quieras",
+    "simulation": "Simulacion",
+    "play": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Reiniciar",
+    "progress": "Progreso",
+    "speed": "Velocidad",
+    "players": "Jugadores",
+    "attacker": "Atacante",
+    "defender": "Defensor",
+    "goalkeeper": "Portero",
+    "result": "Resultado",
+    "offside": "FUERA DE JUEGO",
+    "legal": "LEGAL",
+    "margin": "Margen:",
+    "options": "Opciones",
+    "shadows": "Sombras",
+    "offside_line": "Linea de fuera de juego",
+    "reset_positions": "Reiniciar posiciones",
+    "playbook_title": "Libro de Jugadas — Simulador de Pases",
+    "playbook_hint": "Elige una jugada para simular diferentes situaciones de fuera de juego.",
+    "steps": "pasos",
+    "step": "PASO",
+    "ball": "Balon:",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "back": "Volver",
+    "above_line": "arriba de la linea",
+    "below_line": "abajo de la linea",
+    "offside_line_label": "LINEA DE FUERA DE JUEGO",
+    "attacker_position": "POSICION DEL ATACANTE"
+  },
+  "icc": {
+    "chat": {
+      "title": "FIFA AI Pro",
+      "clear": "Limpiar",
+      "empty_title": "Como puedo ayudar?",
+      "empty_hint": "Pregunta sobre tacticas, estadisticas, estadio, predicciones...",
+      "placeholder": "Pregunta sobre el partido...",
+      "send": "Enviar",
+      "search_phases": [
+        "Buscando datos relevantes",
+        "Analizando estadisticas",
+        "Cruzando informacion",
+        "Generando respuesta"
+      ],
+      "models": {
+        "tatico": "Modelo Tactico",
+        "estatistico": "Modelo Estadistico",
+        "operacional": "Modelo Operacional",
+        "preditivo": "Modelo Predictivo"
+      }
+    },
+    "risk": {
+      "title": "Nivel de Riesgo",
+      "low": "BAJO",
+      "medium": "MEDIO",
+      "high": "ALTO"
+    },
+    "sales": {
+      "title": "Ventas y Establecimientos",
+      "total_revenue": "Ingresos Totales",
+      "occupancy": "Ocupacion del Estadio",
+      "by_category": "Por Categoria",
+      "most_sold": "Mas Vendido",
+      "by_category_label": "por categoria:",
+      "units": "unidades",
+      "top_stores": "Top 3 Tiendas",
+      "revenue": "Ingresos",
+      "categories": {
+        "alimentacao": "Alimentos",
+        "merchandise": "Merchandise",
+        "bebidas": "Bebidas",
+        "ingressos": "Entradas"
+      }
+    },
+    "weather": {
+      "title": "Clima",
+      "now": "Ahora",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "humidity": "Humedad",
+      "wind": "Viento",
+      "avg_temp": "Temp Prom",
+      "precipitation": "Precipitacion",
+      "sunny": "Soleados",
+      "cloudy": "Nublados",
+      "rainy": "Lluviosos",
+      "rainy_days": "Dias de lluvia en el mes",
+      "sunny_label": "Soleado",
+      "cloudy_label": "Nublado",
+      "rainy_label": "Lluvioso"
+    },
+    "status": {
+      "title": "Estado de los Sistemas",
+      "cameras": "Camaras HD",
+      "iot": "Sensores IoT",
+      "five_g": "Red 5G",
+      "ai": "IA Tactica",
+      "backup": "Energia de Respaldo",
+      "gps": "Rastreo GPS",
+      "warning": "Advertencia",
+      "online": "En linea",
+      "offline": "Fuera de linea"
+    },
+    "digital_twin": {
+      "title": "Gemelos Digitales — Flujo de Hinchas",
+      "resume": "Reanudar",
+      "pause": "Pausar",
+      "reset": "Reiniciar",
+      "time_to_start": "Tiempo para el inicio:",
+      "heatmap": "Mapa de calor",
+      "fans": "Hinchas",
+      "avg_speed": "Vel. Prom",
+      "congested": "Congestionados"
+    },
+    "ticker": {
+      "title": "Operaciones en Vivo",
+      "events": "eventos",
+      "events_list": [
+        "Delegacion de Brasil llego al estadio",
+        "Puesto de control 3 liberado con exito",
+        "Reabastecimiento de alimentos en sector B completado",
+        "Senal de IPTV 100% estable",
+        "Equipo medico posicionado en puerta 2",
+        "Rastreo de seguridad completado",
+        "Congestion detectada en puerta Norte A",
+        "Temperatura interna: 28C — por encima de lo ideal",
+        "Camara 7 con intermitencia — mantenimiento solicitado",
+        "Detector de humo sector C activado — inspeccion en curso",
+        "Incidente en puerta Sur B — equipo de seguridad despachado",
+        "Alerta: flujo irregular de hinchas en tribuna Este",
+        "Sistema de iluminacion del campo: respaldo activado",
+        "Delegacion de Argentina en desplazamiento — ETA 15 min",
+        "Concesionaria sector D: bajo stock de agua",
+        "Check-in VIP: 85% de invitaciones confirmadas",
+        "Dron de inspeccion completo circuito del estadio",
+        "Comunicacion por radio: canal 7 con interferencia"
+      ]
+    },
+    "crowd": {
+      "gate_norte_a": "Norte A",
+      "gate_norte_b": "Norte B",
+      "gate_sul_a": "Sur A",
+      "gate_sul_b": "Sur B",
+      "alert_prefix": "Alerta:"
+    }
+  },
+  "overlay": {
+    "title": "Telemetria"
+  }
+}

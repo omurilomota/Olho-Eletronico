@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface LoginScreenProps {
   onLogin: () => void;
 }
 
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
@@ -23,20 +26,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
   return (
     <div className="min-h-screen bg-surface-950 flex items-center justify-center px-4">
-      {/* Background effects */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
       </div>
 
-      <div
-        className={`relative w-full max-w-md animate-fade-in ${
-          shake ? 'animate-[shake_0.5s_ease-in-out]' : ''
-        }`}
-      >
-        {/* Card */}
+      <div className={`relative w-full max-w-md animate-fade-in ${shake ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}>
+        <div className="absolute top-4 right-4 z-10">
+          <LanguageSwitcher />
+        </div>
+
         <div className="glass rounded-2xl border border-surface-700/50 p-8 shadow-2xl">
-          {/* Logo */}
           <div className="text-center mb-8">
             <div className="relative inline-block mb-4">
               <svg className="w-16 h-16 text-brand-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -45,20 +45,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               </svg>
               <div className="absolute inset-0 w-16 h-16 bg-brand-400/20 rounded-full blur-xl" />
             </div>
-            <h1 className="text-2xl font-black gradient-text tracking-tight">
-              OLHO ELETRONICO
-            </h1>
-            <p className="text-xs text-surface-200/40 mt-1 tracking-widest uppercase">
-              Impedimento Milimetrico 4.0
-            </p>
+            <h1 className="text-2xl font-black gradient-text tracking-tight">{t('app.title')}</h1>
+            <p className="text-xs text-surface-200/40 mt-1 tracking-widest uppercase">{t('app.subtitle')}</p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs text-surface-200/50 mb-1.5 uppercase tracking-wider">
-                Usuario
-              </label>
+              <label className="block text-xs text-surface-200/50 mb-1.5 uppercase tracking-wider">{t('login.username')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-200/30">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -70,15 +63,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); setError(false); }}
                   className="w-full bg-surface-900/80 border border-surface-700/50 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-surface-200/30 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all"
-                  placeholder="Digite seu usuario"
+                  placeholder={t('login.username_placeholder')}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs text-surface-200/50 mb-1.5 uppercase tracking-wider">
-                Senha
-              </label>
+              <label className="block text-xs text-surface-200/50 mb-1.5 uppercase tracking-wider">{t('login.password')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-200/30">
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
@@ -90,14 +81,14 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(false); }}
                   className="w-full bg-surface-900/80 border border-surface-700/50 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-surface-200/30 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition-all"
-                  placeholder="Digite sua senha"
+                  placeholder={t('login.password_placeholder')}
                 />
               </div>
             </div>
 
             {error && (
               <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-2 rounded-lg text-xs font-medium animate-slide-down">
-                Usuario ou senha incorretos
+                {t('login.error')}
               </div>
             )}
 
@@ -105,14 +96,12 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               type="submit"
               className="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-600/40 mt-2"
             >
-              Entrar
+              {t('login.submit')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-[10px] text-surface-200/30">
-              COPA FIFA 2026 — Sistema Autorizado
-            </p>
+            <p className="text-[10px] text-surface-200/30">{t('login.footer')}</p>
           </div>
         </div>
       </div>
