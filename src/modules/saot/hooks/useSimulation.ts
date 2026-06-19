@@ -9,8 +9,10 @@ interface SimulationFrame {
   ballPosition: [number, number, number];
   attackerPosition: { x: number; z: number };
   defenderPosition: { x: number; z: number };
+  goalkeeperPosition: { x: number; z: number };
   attackerAnim: 'idle' | 'running' | 'kicking';
   defenderAnim: 'idle' | 'running';
+  goalkeeperAnim: 'idle' | 'running' | 'kicking';
 }
 
 /**
@@ -18,6 +20,7 @@ interface SimulationFrame {
  * @property duration - Duracao total em ms (default: 3000ms = 3s)
  * @property attackerStart - Posicao inicial do atacante
  * @property defenderStart - Posicao inicial do defensor
+ * @property goalkeeperStart - Posicao inicial do goleiro
  * @property ballStart - Posicao inicial da bola [x, y, z]
  * @property ballEnd - Posicao final da bola [x, y, z]
  */
@@ -25,6 +28,7 @@ interface UseSimulationOptions {
   duration?: number;
   attackerStart: { x: number; z: number };
   defenderStart: { x: number; z: number };
+  goalkeeperStart: { x: number; z: number };
   ballStart: [number, number, number];
   ballEnd: [number, number, number];
 }
@@ -33,9 +37,10 @@ interface UseSimulationOptions {
  * Hook de simulacao de jogada de futebol.
  *
  * Timeline da animacao (3 segundos default):
- * - 0% a 70%: goleiro chuta, atacante e defensor correm
- * - 70% a 85%: atacante chuta a bola
- * - 85% a 100%: todos em posicao final (idle)
+ * - 0% - 10%: goleiro chuta a bola
+ * - 10% - 70%: atacante e defensor correm
+ * - 70% - 85%: atacante chuta a bola
+ * - 85% - 100%: todos em posicao final (idle)
  *
  * Easing: quadratic ease-in-out para movimento natural.
  *
@@ -47,18 +52,20 @@ export function useSimulation(options: UseSimulationOptions) {
     duration = 3000, // 3 segundos para a jogada completa
     attackerStart,
     defenderStart,
+    goalkeeperStart,
     ballStart,
     ballEnd,
   } = options;
 
-  // Use refs so reset() always uses the latest positions from the store
   const attackerStartRef = useRef(attackerStart);
   const defenderStartRef = useRef(defenderStart);
+  const goalkeeperStartRef = useRef(goalkeeperStart);
   const ballStartRef = useRef(ballStart);
   const ballEndRef = useRef(ballEnd);
 
   attackerStartRef.current = attackerStart;
   defenderStartRef.current = defenderStart;
+  goalkeeperStartRef.current = goalkeeperStart;
   ballStartRef.current = ballStart;
   ballEndRef.current = ballEnd;
 
@@ -71,8 +78,10 @@ export function useSimulation(options: UseSimulationOptions) {
     ballPosition: ballStart,
     attackerPosition: attackerStart,
     defenderPosition: defenderStart,
+    goalkeeperPosition: goalkeeperStart,
     attackerAnim: 'idle',
     defenderAnim: 'idle',
+    goalkeeperAnim: 'idle',
   });
 
   const animRef = useRef<number>(0);
@@ -92,6 +101,7 @@ export function useSimulation(options: UseSimulationOptions) {
       const bE = ballEndRef.current;
       const aS = attackerStartRef.current;
       const dS = defenderStartRef.current;
+      const gS = goalkeeperStartRef.current;
 
       // Bola: vai do goleiro ate o atacante com arco de 2m de altura
       const ballX = bS[0] + (bE[0] - bS[0]) * eased;
@@ -108,20 +118,33 @@ export function useSimulation(options: UseSimulationOptions) {
       const defenderX = dS.x + defenderRun;
       const defenderZ = dS.z;
 
+      // Goleiro: fica na posicao e chuta a bola no inicio
+      const goalkeeperX = gS.x;
+      const goalkeeperZ = gS.z;
+
       let attackerAnim: 'idle' | 'running' | 'kicking' = 'idle';
       let defenderAnim: 'idle' | 'running' = 'idle';
+      let goalkeeperAnim: 'idle' | 'running' | 'kicking' = 'idle';
 
       // Fases da animacao:
-      // 0% - 70%: ambos correm (atacante vai na bola, defensor acompanha)
+      // 0% - 10%: goleiro chuta a bola
+      // 10% - 70%: ambos correm (atacante vai na bola, defensor acompanha)
       // 70% - 85%: atacante chuta a bola
       // 85% - 100%: todos em posicao final (idle)
-      if (normalizedT > 0 && normalizedT < 0.7) {
+      if (normalizedT > 0 && normalizedT < 0.1) {
+        goalkeeperAnim = 'kicking';
+        attackerAnim = 'idle';
+        defenderAnim = 'idle';
+      } else if (normalizedT >= 0.1 && normalizedT < 0.7) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'running';
         defenderAnim = 'running';
       } else if (normalizedT >= 0.7 && normalizedT < 0.85) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'kicking';
         defenderAnim = 'running';
       } else if (normalizedT >= 0.85) {
+        goalkeeperAnim = 'idle';
         attackerAnim = 'idle';
         defenderAnim = 'idle';
       }
@@ -131,8 +154,10 @@ export function useSimulation(options: UseSimulationOptions) {
         ballPosition: [ballX, ballY, ballZ],
         attackerPosition: { x: attackerX, z: attackerZ },
         defenderPosition: { x: defenderX, z: defenderZ },
+        goalkeeperPosition: { x: goalkeeperX, z: goalkeeperZ },
         attackerAnim,
         defenderAnim,
+        goalkeeperAnim,
       };
     },
     [duration],
@@ -180,8 +205,10 @@ export function useSimulation(options: UseSimulationOptions) {
       ballPosition: ballStartRef.current,
       attackerPosition: attackerStartRef.current,
       defenderPosition: defenderStartRef.current,
+      goalkeeperPosition: goalkeeperStartRef.current,
       attackerAnim: 'idle',
       defenderAnim: 'idle',
+      goalkeeperAnim: 'idle',
     });
     if (animRef.current) cancelAnimationFrame(animRef.current);
   }, []);

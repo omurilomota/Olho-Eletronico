@@ -49,19 +49,20 @@ O campo 3D usa o sistema de coordenadas do Three.js com a seguinte convencao:
 
 ### SAOT Lab
 
-- Cena 3D interativa com campo, goles, estadio e cidade procedural ao redor
+- Cena 3D interativa com campo (37x22), goles e estadio completo
 - Jogadores humanos com animacao articulada (corpo, bracos, pernas, cabeca)
+- Goleiro chuta a bola para o atacante na simulacao
 - Calculo de impedimento milimetrico (margem em cm)
 - 5 cenarios pre-definidos (impedimento normal, marginal, reverso, legal atras, legal nivel)
 - Modo livre para arrastar jogadores e configurar posicoes
 - Motor de simulacao com play/pause/reset/seek/velocidade ajustavel
-- 5 presets de camera (Broadcast, Tatical, Gol Esquerda, Gol Direita, Livre)
+- 5 presets de camera (Broadcast, Tactical, Gol Esquerda, Gol Direita, Livre)
 - Modo Playbook com 5 jogadas pre-definidas e navegacao passo a passo
 - Linha de impedimento: vermelha no defensor + azul no atacante
 
 ### ICC Command Center
 
-- Mapa de Geamais Digitais com simulacao de 600 torcedores e deteccao de congestamento
+- Mapa de Gemeos Digitais com simulacao de 600 torcedores e deteccao de congestamento
 - Assistente tatico IA com efeito typewriter e graficos de resposta
 - Indicador de risco circular (0-100)
 - Widget de clima com 3 abas (Agora, Semanal, Mensal)
@@ -75,6 +76,14 @@ O campo 3D usa o sistema de coordenadas do Three.js com a seguinte convencao:
 - Design system com efeitos glass, gradientes, animacoes customizadas
 - Error Boundary com retry por modulo
 - Data Overlay com FPS, triangles e draw calls em tempo real
+
+## Branches
+
+| Branch | Descricao |
+|--------|-----------|
+| `main` | Versao estable do projeto |
+| `develop` | Integracao de features |
+| `feat/city-background` | Cidade procedural ao redor do estadio (feature futura) |
 
 ## Stack Tecnico
 
@@ -108,6 +117,7 @@ src/
 ├── shared/                 # Codigo compartilhado
 │   ├── components/         # Layout, LoginScreen, ErrorBoundary, DataOverlay
 │   ├── utils/              # formatCm, clamp, lerp, constants
+├── __tests__/              # Testes unitarios (vitest)
 ├── App.tsx
 └── main.tsx
 ```

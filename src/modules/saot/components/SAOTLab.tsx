@@ -30,6 +30,7 @@ export default function SAOTLab() {
   const simulation = useSimulation({
     attackerStart: attacker,
     defenderStart: defender,
+    goalkeeperStart: { x: goalkeeper.x, z: goalkeeper.z },
     ballStart: [-15, 0.2, 0],
     ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
   });
