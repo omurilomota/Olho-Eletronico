@@ -63,7 +63,85 @@
     "above_line": "above the line",
     "below_line": "below the line",
     "offside_line_label": "OFFSIDE LINE",
-    "attacker_position": "ATTACKER POSITION"
+    "attacker_position": "ATTACKER POSITION",
+    "drag_hint": "Drag the players",
+    "controls": "Controls",
+    "difficulty": {
+      "facil": "Easy",
+      "medio": "Medium",
+      "dificil": "Hard"
+    },
+    "scenarios_data": {
+      "normal-offside": {
+        "label": "Classic Offside",
+        "description": "Attacker positioned ahead of the second-to-last defender"
+      },
+      "marginal": {
+        "label": "Marginal Offside",
+        "description": "Difference of only 5cm — tight call"
+      },
+      "reverse-offside": {
+        "label": "Reverse Offside",
+        "description": "Attacker moves back but defender advances to create the line"
+      },
+      "no-offside-behind": {
+        "label": "Ball Behind",
+        "description": "Attacker starts behind the defender — legal position"
+      },
+      "no-offside-level": {
+        "label": "Legal Position",
+        "description": "Attacker level with the defender — no offside"
+      }
+    },
+    "plays": {
+      "passe-longo": {
+        "name": "Classic Long Ball",
+        "description": "Midfielder plays over the defense. Attacker enters the box."
+      },
+      "linha-fundo": {
+        "name": "Reversed End Line",
+        "description": "Attacker drops back to receive in a legal position."
+      },
+      "bola-curta": {
+        "name": "Short Midfield Ball",
+        "description": "Short passes in midfield. Marginal finish."
+      },
+      "contra-ataque": {
+        "name": "Quick Counterattack",
+        "description": "Ball recovery and counterattack. Legal position."
+      },
+      "tiro-livre": {
+        "name": "Indirect Free Kick",
+        "description": "Free kick. Subtle touch and finish."
+      },
+      "steps": {
+        "passe-longo": [
+          "Midfielder lifts the ball",
+          "Ball drops into the box",
+          "Attacker finishes — OFFSIDE"
+        ],
+        "linha-fundo": [
+          "Attacker drops to receive",
+          "First-time touch to the middle",
+          "Finish — LEGAL"
+        ],
+        "bola-curta": [
+          "First short pass",
+          "Second pass — attacker advances",
+          "Finish — OFFSIDE by 10cm"
+        ],
+        "contra-ataque": [
+          "Ball recovery in midfield",
+          "Attacker sprints with the ball",
+          "Goal — LEGAL, defender behind"
+        ],
+        "tiro-livre": [
+          "Short free kick taken",
+          "Header flicked backwards",
+          "Finish — OFFSIDE"
+        ]
+      }
+    }
   },
   "icc": {
     "chat": {
@@ -84,7 +162,16 @@
         "estatistico": "Statistical Model",
         "operacional": "Operational Model",
         "preditivo": "Predictive Model"
-      }
+      },
+      "suggested_prompts": [
+        "Attack analysis",
+        "Defensive vulnerabilities",
+        "Recommended formation",
+        "Match strategy",
+        "Result prediction",
+        "Stadium status",
+        "Commercial analysis"
+      ]
     },
     "risk": {
       "title": "Risk Level",
@@ -121,10 +208,11 @@
       "sunny": "Sunny",
       "cloudy": "Cloudy",
       "rainy": "Rainy",
-      "rainy_days": "Rainy days in month",
       "sunny_label": "Sunny",
       "cloudy_label": "Cloudy",
-      "rainy_label": "Rainy"
+      "rainy_label": "Rainy",
+      "rainy_days": "Rainy days in month",
+      "day_names": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     },
     "status": {
       "title": "System Status",
@@ -200,7 +288,21 @@
       "gate_sul_a": "South A",
       "gate_sul_b": "South B",
       "alert_prefix": "Alert:"
-    }
+    },
+    "notifications_pool": [
+      {"title": "Check-in completed", "message": "Brazil delegation checked in at main gate"},
+      {"title": "Camera recalibrated", "message": "Camera 12 repositioned successfully"},
+      {"title": "Congestion detected", "message": "North Gate A reached 85% capacity"},
+      {"title": "High temperature", "message": "Sector C recorded 32°C — above recommended limit"},
+      {"title": "Security sensor", "message": "South Gate B sensor triggered — immediate inspection"},
+      {"title": "Simulation completed", "message": "Evacuation test finished without incidents"},
+      {"title": "System update", "message": "Camera firmware updated to v3.2.1"},
+      {"title": "Low stock", "message": "Sector D concession critically low on water"},
+      {"title": "Connection failure", "message": "Camera 7 offline for 30 seconds"},
+      {"title": "Backup completed", "message": "First half data saved successfully"},
+      {"title": "VIP detected", "message": "FIFA delegation entered through VIP gate"},
+      {"title": "Irregular flow", "message": "Abnormal movement detected in East stands"}
+    ]
   },
   "overlay": {
     "title": "Telemetry",
@@ -208,5 +310,11 @@
       "pdf": "Export PDF",
       "success": "PDF exported!"
     }
+  },
+  "error_boundary": {
+    "module_error": "Module error",
+    "unknown": "unknown",
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "retry": "Try again"
   }
 }

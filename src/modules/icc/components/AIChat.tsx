@@ -4,7 +4,7 @@ import { useIccStore, type AIModel } from '../store/useIccStore';
 import {
   getAIResponse,
   SUGGESTED_PROMPTS,
-  MODEL_LABELS,
+  getModelLabels,
   MODEL_COLORS,
 } from '../services/mockAIResponses';
 
@@ -155,17 +155,20 @@ export default function AIChat() {
     }, 350);
   };
 
-  const renderModelBadge = (model: AIModel) => (
-    <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium"
-      style={{
-        backgroundColor: `${MODEL_COLORS[model]}20`,
-        color: MODEL_COLORS[model],
-      }}
-    >
-      {MODEL_LABELS[model]}
-    </span>
-  );
+  const renderModelBadge = (model: AIModel) => {
+    const labels = getModelLabels();
+    return (
+      <span
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium"
+        style={{
+          backgroundColor: `${MODEL_COLORS[model]}20`,
+          color: MODEL_COLORS[model],
+        }}
+      >
+        {labels[model]}
+      </span>
+    );
+  };
 
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 flex flex-col h-[500px]">

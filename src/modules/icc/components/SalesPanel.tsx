@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart,
@@ -23,13 +23,6 @@ interface MostSoldItem {
   quantity: number;
 }
 
-const CATEGORIES = [
-  { key: 'alimentacao', label: 'Alimentacao', color: '#f59e0b', icon: '\uD83C\uDF54' },
-  { key: 'merchandise', label: 'Merchandise', color: '#3b82f6', icon: '\uD83C\uDFAE' },
-  { key: 'bebidas', label: 'Bebidas', color: '#22c55e', icon: '\uD83C\uDF7A' },
-  { key: 'ingressos', label: 'Ingressos', color: '#8b5cf6', icon: '\uD83C\uDFAB' },
-];
-
 const TOP_STORES: StoreData[] = [
   { name: 'Food Court Central', revenue: 45200, category: 'alimentacao', itemsSold: 3200 },
   { name: 'Merch Oficial FIFA', revenue: 38700, category: 'merchandise', itemsSold: 2100 },
@@ -46,8 +39,8 @@ const MOST_SOLD_ITEMS: MostSoldItem[] = [
   { name: 'Combo Familie', category: 'alimentacao', quantity: 310 },
 ];
 
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('pt-BR', {
+function formatCurrency(value: number, locale: string): string {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 0,
@@ -55,7 +48,16 @@ function formatCurrency(value: number): string {
 }
 
 export default function SalesPanel() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'pt-BR' ? 'pt-BR' : i18n.language === 'es' ? 'es-ES' : 'en-US';
+
+  const CATEGORIES = useMemo(() => [
+    { key: 'alimentacao', label: t('icc.sales.categories.alimentacao'), color: '#f59e0b', icon: '\uD83C\uDF54' },
+    { key: 'merchandise', label: t('icc.sales.categories.merchandise'), color: '#3b82f6', icon: '\uD83C\uDFAE' },
+    { key: 'bebidas', label: t('icc.sales.categories.bebidas'), color: '#22c55e', icon: '\uD83C\uDF7A' },
+    { key: 'ingressos', label: t('icc.sales.categories.ingressos'), color: '#8b5cf6', icon: '\uD83C\uDFAB' },
+  ], [t]);
+
   const [categoryRevenue, setCategoryRevenue] = useState(() =>
     CATEGORIES.map((c) => ({
       ...c,
@@ -115,7 +117,7 @@ export default function SalesPanel() {
       <div className="bg-surface-900/50 rounded-lg p-3 mb-3">
         <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-1">{t('icc.sales.total_revenue')}</p>
         <p className="text-2xl font-black text-emerald-400 font-mono">
-          {formatCurrency(totalRevenue)}
+          {formatCurrency(totalRevenue, locale)}
         </p>
       </div>
 
@@ -161,7 +163,7 @@ export default function SalesPanel() {
                   borderRadius: '8px',
                   fontSize: '11px',
                 }}
-                formatter={(value) => [formatCurrency(Number(value)), t('icc.sales.revenue')]}
+                formatter={(value) => [formatCurrency(Number(value), locale), t('icc.sales.revenue')]}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16}>
                 {chartData.map((entry, i) => (
@@ -210,7 +212,7 @@ export default function SalesPanel() {
                   <p className="text-xs font-medium text-surface-200/80 truncate">{store.name}</p>
                 </div>
                 <span className="text-xs font-mono text-surface-200/60">
-                  {formatCurrency(store.revenue)}
+                  {formatCurrency(store.revenue, locale)}
                 </span>
               </div>
             );

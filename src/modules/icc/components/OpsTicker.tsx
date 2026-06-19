@@ -8,37 +8,25 @@ interface TickerEvent {
   time: Date;
 }
 
-const EVENTS: Omit<TickerEvent, 'id' | 'time'>[] = [
-  { text: 'Delegacao do Brasil chegou ao estadio', severity: 'info' },
-  { text: 'Checkpoint 3 liberado com sucesso', severity: 'info' },
-  { text: 'Reabastecimento de alimentos no setor B concluido', severity: 'info' },
-  { text: 'Sinal de IPTV 100% estavel', severity: 'info' },
-  { text: 'Equipe medica posicionada no portao 2', severity: 'info' },
-  { text: 'Varredura de seguranca concluida', severity: 'info' },
-  { text: ' congestionamento detectado no portao Norte A', severity: 'warning' },
-  { text: 'Temperatura interna: 28C - acima do ideal', severity: 'warning' },
-  { text: 'Camara 7 com intermitencia - manutencao solicitada', severity: 'warning' },
-  { text: 'Sensor de fumaca setor C disparou - verificacao em andamento', severity: 'critical' },
-  { text: 'Incidente no portao Sul B - equipe de seguranca acionada', severity: 'critical' },
-  { text: 'Alerta: fluxo irregular de torcedores na arquibancada Leste', severity: 'critical' },
-  { text: 'Sistema de iluminacao do campo: backup ativado', severity: 'warning' },
-  { text: 'Delegacao da Argentina em deslocamento - ETA 15 min', severity: 'info' },
-  { text: 'Concessionaria setor D: estoque baixo de agua', severity: 'warning' },
-  { text: 'Check-in VIP: 85% dos convites confirmados', severity: 'info' },
-  { text: 'Drone de inspecao concluiu volta ao estadio', severity: 'info' },
-  { text: 'Radio comunicacao: canal 7 com interferencia', severity: 'warning' },
+const SEVERITIES: ('info' | 'warning' | 'critical')[] = [
+  'info', 'info', 'info', 'info', 'info', 'info',
+  'warning', 'warning', 'warning', 'critical', 'critical', 'critical',
+  'warning', 'info', 'warning', 'info', 'info', 'warning',
 ];
-
-const severityConfig = {
-  info: { color: 'text-blue-400', bg: 'bg-blue-500/10', dot: 'bg-blue-400' },
-  warning: { color: 'text-amber-400', bg: 'bg-amber-500/10', dot: 'bg-amber-400' },
-  critical: { color: 'text-red-400', bg: 'bg-red-500/10', dot: 'bg-red-400' },
-};
 
 export default function OpsTicker() {
   const { t } = useTranslation();
+
+  const getEvents = (): Omit<TickerEvent, 'id' | 'time'>[] => {
+    const texts = t('icc.ticker.events_list', { returnObjects: true }) as string[];
+    return texts.map((text, i) => ({
+      text,
+      severity: SEVERITIES[i] ?? 'info',
+    }));
+  };
+
   const [events, setEvents] = useState<TickerEvent[]>(() =>
-    EVENTS.slice(0, 6).map((e, i) => ({
+    getEvents().slice(0, 6).map((e, i) => ({
       ...e,
       id: i,
       time: new Date(Date.now() - (5 - i) * 180000),
@@ -46,11 +34,12 @@ export default function OpsTicker() {
   );
 
   useEffect(() => {
+    const allEvents = getEvents();
     const interval = setInterval(() => {
       setEvents((prev) => {
         const next = [...prev];
         next.shift();
-        const newEvent = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+        const newEvent = allEvents[Math.floor(Math.random() * allEvents.length)];
         next.push({
           ...newEvent,
           id: Date.now(),
@@ -61,7 +50,13 @@ export default function OpsTicker() {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [t]);
+
+  const severityConfig = {
+    info: { color: 'text-blue-400', bg: 'bg-blue-500/10', dot: 'bg-blue-400' },
+    warning: { color: 'text-amber-400', bg: 'bg-amber-500/10', dot: 'bg-amber-400' },
+    critical: { color: 'text-red-400', bg: 'bg-red-500/10', dot: 'bg-red-400' },
+  };
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });

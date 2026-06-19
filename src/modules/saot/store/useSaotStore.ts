@@ -23,13 +23,13 @@ export type ScenarioType =
   | 'no-offside-behind'
   | 'no-offside-level';
 
-/** Cenario pre-definido com posicoes dos jogadores e descricao. */
+/** Cenario pre-definido com posicoes dos jogadores e chave de traducao. */
 interface Scenario {
   attacker: Position;
   defender: Position;
   goalkeeper: Position;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
 }
 
 export const SCENARIOS: Record<Exclude<ScenarioType, 'custom'>, Scenario> = {
@@ -37,36 +37,36 @@ export const SCENARIOS: Record<Exclude<ScenarioType, 'custom'>, Scenario> = {
     attacker: { x: 5, z: 0 },
     defender: { x: 2, z: 0 },
     goalkeeper: { x: -15, z: 0 },
-    label: 'Impedimento Classico',
-    description: 'Atacante posicionado a frente do penultimo defensor',
+    labelKey: 'saot.scenarios_data.normal-offside.label',
+    descriptionKey: 'saot.scenarios_data.normal-offside.description',
   },
   'marginal': {
     attacker: { x: 3.05, z: 0 },
     defender: { x: 3, z: 0 },
     goalkeeper: { x: -15, z: 0 },
-    label: 'Impedimento Marginal',
-    description: 'Diferenca de apenas 5cm — decisao apertada',
+    labelKey: 'saot.scenarios_data.marginal.label',
+    descriptionKey: 'saot.scenarios_data.marginal.description',
   },
   'reverse-offside': {
     attacker: { x: 2, z: 0 },
     defender: { x: 5, z: 0 },
     goalkeeper: { x: -15, z: 0 },
-    label: 'Impedimento Reverso',
-    description: 'Atacante recua mas defensor avanca para criar a linha',
+    labelKey: 'saot.scenarios_data.reverse-offside.label',
+    descriptionKey: 'saot.scenarios_data.reverse-offside.description',
   },
   'no-offside-behind': {
     attacker: { x: -2, z: 0 },
     defender: { x: 3, z: 0 },
     goalkeeper: { x: -15, z: 0 },
-    label: 'Bola Por Tras',
-    description: 'Atacante comeca atras do defensor — posicao legal',
+    labelKey: 'saot.scenarios_data.no-offside-behind.label',
+    descriptionKey: 'saot.scenarios_data.no-offside-behind.description',
   },
   'no-offside-level': {
     attacker: { x: 3, z: 0 },
     defender: { x: 3, z: 0 },
     goalkeeper: { x: -15, z: 0 },
-    label: 'Posicao Legal',
-    description: 'Atacante na mesma linha do defensor — sem impedimento',
+    labelKey: 'saot.scenarios_data.no-offside-level.label',
+    descriptionKey: 'saot.scenarios_data.no-offside-level.description',
   },
 };
 

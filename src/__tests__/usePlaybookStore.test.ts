@@ -75,9 +75,7 @@ describe('usePlaybookStore', () => {
     const plays = usePlaybookStore.getState().plays;
     for (const play of plays) {
       expect(play.id).toBeTruthy();
-      expect(play.name).toBeTruthy();
       expect(play.icon).toBeTruthy();
-      expect(play.description).toBeTruthy();
       expect(play.steps.length).toBeGreaterThan(0);
       expect(['offside', 'legal']).toContain(play.result);
       expect(['facil', 'medio', 'dificil']).toContain(play.difficulty);

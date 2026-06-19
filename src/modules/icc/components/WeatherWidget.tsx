@@ -32,15 +32,7 @@ const conditionIcons: Record<string, string> = {
   rainy: '\uD83C\uDF27\uFE0F',
 };
 
-const conditionLabels: Record<string, string> = {
-  sunny: 'Ensolarado',
-  cloudy: 'Nublado',
-  rainy: 'Chuvoso',
-};
-
-const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
-
-function generateWeekly(): DayForecast[] {
+function generateWeekly(dayNames: string[]): DayForecast[] {
   const today = new Date();
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today);
@@ -48,7 +40,7 @@ function generateWeekly(): DayForecast[] {
     const baseTemp = 20 + Math.random() * 10;
     const cond = Math.random() > 0.7 ? (Math.random() > 0.5 ? 'cloudy' : 'rainy') : 'sunny';
     return {
-      day: DAY_NAMES[d.getDay()],
+      day: dayNames[d.getDay()],
       tempMin: Math.round(baseTemp - 4 - Math.random() * 3),
       tempMax: Math.round(baseTemp + 2 + Math.random() * 4),
       condition: cond,
@@ -69,6 +61,15 @@ function generateMonthly(): MonthData {
 
 export default function WeatherWidget() {
   const { t } = useTranslation();
+
+  const conditionLabels: Record<string, string> = {
+    sunny: t('icc.weather.sunny_label'),
+    cloudy: t('icc.weather.cloudy_label'),
+    rainy: t('icc.weather.rainy_label'),
+  };
+
+  const DAY_NAMES = t('icc.weather.day_names', { returnObjects: true }) as string[];
+
   const [tab, setTab] = useState<Tab>('now');
   const [weather, setWeather] = useState<Weather>({
     temp: 24,
@@ -76,7 +77,7 @@ export default function WeatherWidget() {
     humidity: 55,
     wind: 10,
   });
-  const [weekly] = useState<DayForecast[]>(generateWeekly);
+  const [weekly] = useState<DayForecast[]>(() => generateWeekly(DAY_NAMES));
   const [monthly] = useState<MonthData>(generateMonthly);
 
   useEffect(() => {
