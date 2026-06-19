@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from '../../modules/notifications/components/NotificationBell';
+import SessionBar from '../../modules/multiplayer/components/SessionBar';
 
 type Props = {
   children: ReactNode;
@@ -79,6 +80,7 @@ export default function Layout({ children, activeTab, onTabChange }: Props) {
                 <span className="sm:hidden">ICC</span>
               </button>
             </div>
+            <SessionBar />
             <NotificationBell />
             <LanguageSwitcher />
           </nav>

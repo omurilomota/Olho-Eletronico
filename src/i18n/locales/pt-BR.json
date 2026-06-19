@@ -155,6 +155,21 @@
       "empty": "Nenhuma notificacao",
       "clear_all": "Limpar todas"
     },
+    "multiplayer": {
+      "title": "Sessao Colaborativa",
+      "connect": "Conectar",
+      "create_session": "Criar Sessao",
+      "join_session": "Entrar em Sessao",
+      "your_name": "Seu Nome",
+      "name_placeholder": "Digite seu nome",
+      "session_name": "Nome da Sessao",
+      "session_name_placeholder": "Ex: Analise Final",
+      "session_id": "ID da Sessao",
+      "session_id_placeholder": "Ex: ABC123",
+      "create": "Criar",
+      "join": "Entrar",
+      "leave": "Sair"
+    },
     "ticker": {
       "title": "Operacoes ao Vivo",
       "events": "eventos",

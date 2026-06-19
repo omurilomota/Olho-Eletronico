@@ -155,6 +155,21 @@
       "empty": "No notifications",
       "clear_all": "Clear all"
     },
+    "multiplayer": {
+      "title": "Collaborative Session",
+      "connect": "Connect",
+      "create_session": "Create Session",
+      "join_session": "Join Session",
+      "your_name": "Your Name",
+      "name_placeholder": "Enter your name",
+      "session_name": "Session Name",
+      "session_name_placeholder": "Ex: Final Analysis",
+      "session_id": "Session ID",
+      "session_id_placeholder": "Ex: ABC123",
+      "create": "Create",
+      "join": "Join",
+      "leave": "Leave"
+    },
     "ticker": {
       "title": "Live Operations",
       "events": "events",
