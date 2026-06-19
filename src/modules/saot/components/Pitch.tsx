@@ -7,8 +7,8 @@ function createGrassTexture(): THREE.CanvasTexture {
   canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
 
-  const stripeWidth = 512 / 14;
-  for (let i = 0; i < 14; i++) {
+  const stripeWidth = 512 / 6;
+  for (let i = 0; i < 6; i++) {
     ctx.fillStyle = i % 2 === 0 ? '#4caf50' : '#388e3c';
     ctx.fillRect(i * stripeWidth, 0, stripeWidth, 512);
   }
