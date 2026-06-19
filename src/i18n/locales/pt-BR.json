@@ -149,6 +149,12 @@
       "avg_speed": "Vel. Media",
       "congested": "Congestionados"
     },
+    "notifications": {
+      "title": "Notificacoes",
+      "mark_all_read": "Marcar lidas",
+      "empty": "Nenhuma notificacao",
+      "clear_all": "Limpar todas"
+    },
     "ticker": {
       "title": "Operacoes ao Vivo",
       "events": "eventos",
