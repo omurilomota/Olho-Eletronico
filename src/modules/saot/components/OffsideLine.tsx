@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 /** Props do componente de linhas de impedimento. */
 interface OffsideLineProps {
-  /** Posicao X do defensor (linha vermelha = impedimento). */
+  /** Posicao X do defensor (linha azul = impedimento). */
   defenderX: number;
-  /** Posicao X do atacante (linha azul). */
+  /** Posicao X do atacante (linha vermelha). */
   attackerX: number;
   /** Se o atacante esta impedido. */
   isOffside: boolean;
@@ -16,14 +16,14 @@ interface OffsideLineProps {
   visible: boolean;
 }
 
-const DEFENDER_COLOR = '#ef4444';
-const ATTACKER_COLOR = '#3b82f6';
+const DEFENDER_COLOR = '#3b82f6';
+const ATTACKER_COLOR = '#ef4444';
 const LEGAL_COLOR = '#22c55e';
 
 /**
  * Renderiza as linhas de impedimento no campo 3D.
- * - Linha vermelha na posicao do defensor (linha de impedimento)
- * - Linha azul na posicao do atacante
+ * - Linha azul na posicao do defensor (linha de impedimento)
+ * - Linha vermelha na posicao do atacante
  * - Zona vermelha transparente atras da linha do defensor
  * - Conector visual mostrando a distancia entre as duas linhas
  */
@@ -55,7 +55,7 @@ export default function OffsideLine({
         />
       </mesh>
 
-      {/* === LINHA DO DEFENSOR (VERMELHA) === */}
+      {/* === LINHA DO DEFENSOR (AZUL) === */}
       {/* Linha principal no chao */}
       <mesh position={[defenderX, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.18, 12]} />
@@ -78,7 +78,7 @@ export default function OffsideLine({
         <meshBasicMaterial color={DEFENDER_COLOR} />
       </mesh>
 
-      {/* === LINHA DO ATACANTE (AZUL) === */}
+      {/* === LINHA DO ATACANTE (VERMELHA) === */}
       {/* Linha principal no chao */}
       <mesh position={[attackerX, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[0.18, 12]} />
