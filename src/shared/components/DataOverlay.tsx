@@ -57,7 +57,7 @@ export default function DataOverlay() {
   const fpsBg = fps >= 50 ? 'bg-emerald-400' : fps >= 30 ? 'bg-amber-400' : 'bg-red-400';
 
   return (
-    <div className="absolute top-3 right-3 glass rounded-xl px-4 py-3 z-50 min-w-[200px] animate-fade-in">
+    <div className="absolute top-3 right-3 glass rounded-xl px-4 py-3 z-10 min-w-[200px] animate-fade-in">
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-surface-700/50">
         <span className={`w-2 h-2 rounded-full ${fpsBg}`} />
         <span className="text-xs font-semibold text-surface-200/80 tracking-wider uppercase">
