@@ -10,7 +10,7 @@ describe('useSaotStore', () => {
     const state = useSaotStore.getState();
     expect(state.attacker).toEqual({ x: 3, z: 0 });
     expect(state.defender).toEqual({ x: -3, z: 0 });
-    expect(state.goalkeeper).toEqual({ x: -5, z: 0 });
+    expect(state.goalkeeper).toEqual({ x: -15, z: 0 });
     expect(state.cameraPreset).toBe('broadcast');
     expect(state.showShadows).toBe(true);
     expect(state.showOffsideLine).toBe(false);

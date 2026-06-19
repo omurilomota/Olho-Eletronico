@@ -30,7 +30,7 @@ const PLAYS: Play[] = [
     steps: [
       {
         description: 'Meio-campo levanta a bola',
-        ballStart: [-4, 0.2, 0],
+        ballStart: [-15, 0.2, 0],
         ballEnd: [2, 3, 0],
         attackerEnd: { x: 2, z: 0 },
         defenderEnd: { x: 0, z: 0 },
@@ -61,7 +61,7 @@ const PLAYS: Play[] = [
     steps: [
       {
         description: 'Atacante recua para receber',
-        ballStart: [-4, 0.2, 0],
+        ballStart: [-15, 0.2, 0],
         ballEnd: [0, 0.2, 0],
         attackerEnd: { x: 0, z: 0 },
         defenderEnd: { x: 3, z: 0 },
@@ -92,7 +92,7 @@ const PLAYS: Play[] = [
     steps: [
       {
         description: 'Primeiro passe curto',
-        ballStart: [-5, 0.2, 0],
+        ballStart: [-15, 0.2, 0],
         ballEnd: [-2, 0.2, 0],
         attackerEnd: { x: -2, z: 0 },
         defenderEnd: { x: 1, z: 0 },
