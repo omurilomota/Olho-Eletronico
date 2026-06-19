@@ -27,7 +27,7 @@ export default function SessionModal({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] bg-black/60 backdrop-blur-sm">
       <div className="bg-surface-800 rounded-2xl border border-surface-700/50 shadow-2xl w-full max-w-sm mx-4 animate-slide-up">
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface-700/50">
           <h2 className="text-sm font-semibold text-surface-200/80">{t('icc.multiplayer.title')}</h2>

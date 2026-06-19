@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAIResponse, SUGGESTED_PROMPTS, MODEL_LABELS } from '../modules/icc/services/mockAIResponses';
+import { getAIResponse, SUGGESTED_PROMPTS, getModelLabels } from '../modules/icc/services/mockAIResponses';
 
 describe('getAIResponse', () => {
   it('returns response for "ataque" keyword with tatico model', () => {
@@ -122,12 +122,13 @@ describe('getAIResponse', () => {
   });
 });
 
-describe('MODEL_LABELS', () => {
+describe('getModelLabels', () => {
   it('has all four models', () => {
-    expect(MODEL_LABELS).toHaveProperty('tatico');
-    expect(MODEL_LABELS).toHaveProperty('estatistico');
-    expect(MODEL_LABELS).toHaveProperty('operacional');
-    expect(MODEL_LABELS).toHaveProperty('preditivo');
+    const labels = getModelLabels();
+    expect(labels).toHaveProperty('tatico');
+    expect(labels).toHaveProperty('estatistico');
+    expect(labels).toHaveProperty('operacional');
+    expect(labels).toHaveProperty('preditivo');
   });
 });
 

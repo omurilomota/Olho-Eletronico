@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import i18n from '../../i18n';
 
 interface Props {
   children: ReactNode;
@@ -42,10 +43,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">
-              Erro no modulo {this.props.module || 'desconhecido'}
+              {i18n.t('error_boundary.module_error')} {this.props.module || i18n.t('error_boundary.unknown')}
             </h3>
             <p className="text-sm text-surface-200/60 mb-4">
-              Ocorreu um erro inesperado. Tente novamente.
+              {i18n.t('error_boundary.unexpected')}
             </p>
             {this.state.error && (
               <p className="text-xs font-mono text-red-400/70 mb-4 bg-red-500/5 rounded-lg p-2 overflow-auto max-h-20">
@@ -56,7 +57,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               onClick={this.handleRetry}
               className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-brand-600/20"
             >
-              Tentar novamente
+              {i18n.t('error_boundary.retry')}
             </button>
           </div>
         </div>

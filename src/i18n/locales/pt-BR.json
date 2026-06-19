@@ -63,7 +63,85 @@
     "above_line": "acima da linha",
     "below_line": "abaixo da linha",
     "offside_line_label": "LINHA DE IMPEDIMENTO",
-    "attacker_position": "POSICAO DO ATACANTE"
+    "attacker_position": "POSICAO DO ATACANTE",
+    "drag_hint": "Arraste os jogadores",
+    "controls": "Controles",
+    "difficulty": {
+      "facil": "Facil",
+      "medio": "Medio",
+      "dificil": "Dificil"
+    },
+    "scenarios_data": {
+      "normal-offside": {
+        "label": "Impedimento Classico",
+        "description": "Atacante posicionado a frente do penultimo defensor"
+      },
+      "marginal": {
+        "label": "Impedimento Marginal",
+        "description": "Diferenca de apenas 5cm — decisao apertada"
+      },
+      "reverse-offside": {
+        "label": "Impedimento Reverso",
+        "description": "Atacante recua mas defensor avanca para criar a linha"
+      },
+      "no-offside-behind": {
+        "label": "Bola Por Tras",
+        "description": "Atacante comeca atras do defensor — posicao legal"
+      },
+      "no-offside-level": {
+        "label": "Posicao Legal",
+        "description": "Atacante na mesma linha do defensor — sem impedimento"
+      }
+    },
+    "plays": {
+      "passe-longo": {
+        "name": "Passe Longo Classico",
+        "description": "Meio-campo joga por cima da defesa. Atacante entra na area."
+      },
+      "linha-fundo": {
+        "name": "Linha de Fundo Reversa",
+        "description": "Atacante recua para receber a bola em posicao legal."
+      },
+      "bola-curta": {
+        "name": "Bola Curta do Meio",
+        "description": "Passes curtos no meio campo. Finalizacao marginal."
+      },
+      "contra-ataque": {
+        "name": "Contra-Ataque Rapido",
+        "description": "Roubada de bola e contra-ataque. Posicao legal."
+      },
+      "tiro-livre": {
+        "name": "Tiro Livre Indireto",
+        "description": "Cobranca de falta. Toque sutil e finalizacao."
+      },
+      "steps": {
+        "passe-longo": [
+          "Meio-campo levanta a bola",
+          "Bola desce na area",
+          "Atacante finaliza — IMPEDIDO"
+        ],
+        "linha-fundo": [
+          "Atacante recua para receber",
+          "Toque de primeira para o meio",
+          "Finalizacao — LEGAL"
+        ],
+        "bola-curta": [
+          "Primeiro passe curto",
+          "Segundo passe — atacante avanca",
+          "Finalizacao — IMPEDIDO por 10cm"
+        ],
+        "contra-ataque": [
+          "Roubada de bola no meio",
+          "Atacante arranca com a bola",
+          "Gol — LEGAL, defensor atras"
+        ],
+        "tiro-livre": [
+          "Cobranca curta da falta",
+          "Toque de cabeca para tras",
+          "Finalizacao — IMPEDIDO"
+        ]
+      }
+    }
   },
   "icc": {
     "chat": {
@@ -84,7 +162,16 @@
         "estatistico": "Modelo Estatistico",
         "operacional": "Modelo Operacional",
         "preditivo": "Modelo Preditivo"
-      }
+      },
+      "suggested_prompts": [
+        "Analise de ataque",
+        "Vulnerabilidades defensivas",
+        "Formacao recomendada",
+        "Estrategia para o jogo",
+        "Previsao de resultado",
+        "Status do estadio",
+        "Analise comercial"
+      ]
     },
     "risk": {
       "title": "Nivel de Risco",
@@ -121,10 +208,11 @@
       "sunny": "Ensolarados",
       "cloudy": "Nublados",
       "rainy": "Chuvosos",
-      "rainy_days": "Dias de chuva no mes",
       "sunny_label": "Ensolarado",
       "cloudy_label": "Nublado",
-      "rainy_label": "Chuvoso"
+      "rainy_label": "Chuvoso",
+      "rainy_days": "Dias de chuva no mes",
+      "day_names": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"]
     },
     "status": {
       "title": "Status dos Sistemas",
@@ -200,7 +288,21 @@
       "gate_sul_a": "Sul A",
       "gate_sul_b": "Sul B",
       "alert_prefix": "Alerta:"
-    }
+    },
+    "notifications_pool": [
+      {"type": "info", "title": "Check-in concluido", "message": "Delegacao do Brasil fez check-in no portao principal"},
+      {"type": "info", "title": "Camera recalibrada", "message": "Camera 12 reposicionada com sucesso"},
+      {"type": "warning", "title": "Congestionamento detectado", "message": "Portao Norte A atingiu 85% da capacidade"},
+      {"type": "warning", "title": "Temperatura elevada", "message": "Setor C registrou 32°C — acima do limite recomendado"},
+      {"type": "critical", "title": "Sensor de seguranca", "message": "Sensor do portao Sul B disparou — verificacao imediata"},
+      {"type": "success", "title": "Simulacao concluida", "message": "Teste de evacuacao finalizado sem incidentes"},
+      {"type": "info", "title": "Atualizacao de sistema", "message": "Firmware das cameras atualizado para v3.2.1"},
+      {"type": "warning", "title": "Estoque baixo", "message": "Concessionaria do setor D com estoque critico de agua"},
+      {"type": "critical", "title": "Falha de conexao", "message": "Camera 7 sem sinal ha 30 segundos"},
+      {"type": "success", "title": "Backup concluido", "message": "Dados do primeiro tempo salvos com sucesso"},
+      {"type": "info", "title": "VIP detectado", "message": "Delegacao da FIFA entrou pelo portao VIP"},
+      {"type": "warning", "title": "Fluxo irregular", "message": "Movimentacao anormal detectada na arquibancada Leste"}
+    ]
   },
   "overlay": {
     "title": "Telemetria",
@@ -208,5 +310,11 @@
       "pdf": "Exportar PDF",
       "success": "PDF exportado!"
     }
+  },
+  "error_boundary": {
+    "module_error": "Erro no modulo",
+    "unknown": "desconhecido",
+    "unexpected": "Ocorreu um erro inesperado. Tente novamente.",
+    "retry": "Tentar novamente"
   }
 }

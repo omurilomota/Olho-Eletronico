@@ -1,3 +1,4 @@
+import i18n from '../../../i18n';
 import type { AIModel, ChatMessage } from '../store/useIccStore';
 
 interface AIResponse {
@@ -393,22 +394,19 @@ export function getAIResponse(userMessage: string): ChatMessage {
   };
 }
 
-export const SUGGESTED_PROMPTS = [
-  'Analise de ataque',
-  'Vulnerabilidades defensivas',
-  'Formacao recomendada',
-  'Estrategia para o jogo',
-  'Previsao de resultado',
-  'Status do estadio',
-  'Analise comercial',
-];
+export const SUGGESTED_PROMPTS = (() => {
+  const prompts = i18n.t('icc.chat.suggested_prompts', { returnObjects: true }) as string[];
+  return prompts;
+})();
 
-export const MODEL_LABELS: Record<AIModel, string> = {
-  tatico: 'Modelo Tatico',
-  estatistico: 'Modelo Estatistico',
-  operacional: 'Modelo Operacional',
-  preditivo: 'Modelo Preditivo',
-};
+export function getModelLabels(): Record<AIModel, string> {
+  return {
+    tatico: i18n.t('icc.chat.models.tatico'),
+    estatistico: i18n.t('icc.chat.models.estatistico'),
+    operacional: i18n.t('icc.chat.models.operacional'),
+    preditivo: i18n.t('icc.chat.models.preditivo'),
+  };
+}
 
 export const MODEL_COLORS: Record<AIModel, string> = {
   tatico: '#22c55e',
