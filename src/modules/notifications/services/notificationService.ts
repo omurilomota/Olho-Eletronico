@@ -1,3 +1,4 @@
+import i18n from '../../../i18n';
 import type { NotificationType } from '../store/useNotificationStore';
 
 interface MockNotification {
@@ -6,23 +7,35 @@ interface MockNotification {
   message: string;
 }
 
-const NOTIFICATION_POOL: MockNotification[] = [
-  { type: 'info', title: 'Check-in concluido', message: 'Delegacao do Brasil fez check-in no portao principal' },
-  { type: 'info', title: 'Camera recalibrada', message: 'Camera 12 reposicionada com sucesso' },
-  { type: 'warning', title: 'Congestionamento detectado', message: 'Portao Norte A atingiu 85% da capacidade' },
-  { type: 'warning', title: 'Temperatura elevada', message: 'Setor C registrou 32°C — acima do limite recomendado' },
-  { type: 'critical', title: 'Sensor de seguranca', message: 'Sensor do portao Sul B disparou — verificacao imediata' },
-  { type: 'success', title: 'Simulacao concluida', message: 'Teste de evacuacao finalizado sem incidentes' },
-  { type: 'info', title: 'Atualizacao de sistema', message: 'Firmware das cameras atualizado para v3.2.1' },
-  { type: 'warning', title: 'Estoque baixo', message: 'Concessionaria do setor D com estoque critico de agua' },
-  { type: 'critical', title: 'Falha de conexao', message: 'Camera 7 sem sinal ha 30 segundos' },
-  { type: 'success', title: 'Backup concluido', message: 'Dados do primeiro tempo salvos com sucesso' },
-  { type: 'info', title: 'VIP detectado', message: 'Delegacao da FIFA entrou pelo portao VIP' },
-  { type: 'warning', title: 'Fluxo irregular', message: 'Movimentacao anormal detectada na arquibancada Leste' },
+interface NotificationTemplate {
+  type: NotificationType;
+  key: string;
+}
+
+const NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
+  { type: 'info', key: '0' },
+  { type: 'info', key: '1' },
+  { type: 'warning', key: '2' },
+  { type: 'warning', key: '3' },
+  { type: 'critical', key: '4' },
+  { type: 'success', key: '5' },
+  { type: 'info', key: '6' },
+  { type: 'warning', key: '7' },
+  { type: 'critical', key: '8' },
+  { type: 'success', key: '9' },
+  { type: 'info', key: '10' },
+  { type: 'warning', key: '11' },
 ];
 
 export function getRandomNotification(): MockNotification {
-  return NOTIFICATION_POOL[Math.floor(Math.random() * NOTIFICATION_POOL.length)];
+  const template = NOTIFICATION_TEMPLATES[Math.floor(Math.random() * NOTIFICATION_TEMPLATES.length)];
+  const pool = i18n.t('icc.notifications_pool', { returnObjects: true }) as Array<{ title: string; message: string }>;
+  const data = pool[Number(template.key)];
+  return {
+    type: template.type,
+    title: data?.title ?? template.key,
+    message: data?.message ?? '',
+  };
 }
 
 let intervalId: ReturnType<typeof setInterval> | null = null;

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { Html } from '@react-three/drei';
+import { useTranslation } from 'react-i18next';
 
 /** Props do componente de linhas de impedimento. */
 interface OffsideLineProps {
@@ -33,6 +34,7 @@ export default function OffsideLine({
   marginCm,
   visible,
 }: OffsideLineProps) {
+  const { t } = useTranslation();
   if (!visible) return null;
 
   const resultColor = isOffside ? DEFENDER_COLOR : LEGAL_COLOR;
@@ -132,7 +134,7 @@ export default function OffsideLine({
               boxShadow: `0 0 30px ${DEFENDER_COLOR}88, 0 0 60px ${DEFENDER_COLOR}44`,
             }}
           >
-            LINHA DE IMPEDIMENTO
+            {t('saot.offside_line_label')}
           </div>
         </div>
       </Html>
@@ -147,7 +149,7 @@ export default function OffsideLine({
               boxShadow: `0 0 30px ${ATTACKER_COLOR}88, 0 0 60px ${ATTACKER_COLOR}44`,
             }}
           >
-            POSICAO DO ATACANTE
+            {t('saot.attacker_position')}
           </div>
         </div>
       </Html>
@@ -162,7 +164,7 @@ export default function OffsideLine({
               boxShadow: `0 0 20px ${resultColor}66`,
             }}
           >
-            {isOffside ? '⚠ IMPEDIDO' : '✓ LEGAL'}
+            {isOffside ? `\u26A0 ${t('saot.offside')}` : `\u2713 ${t('saot.legal')}`}
           </div>
         </div>
       </Html>
@@ -174,7 +176,7 @@ export default function OffsideLine({
             {absMargin.toFixed(1)} cm
             <br />
             <span className="text-[9px] font-normal opacity-70">
-              {isOffside ? 'acima da linha' : 'abaixo da linha'}
+              {isOffside ? t('saot.above_line') : t('saot.below_line')}
             </span>
           </div>
         </div>

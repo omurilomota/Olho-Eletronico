@@ -96,9 +96,9 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
               >
                 <div className="flex items-center gap-2">
                   <span>{s.icon}</span>
-                  <span className="font-medium">{scenario.label}</span>
+                  <span className="font-medium">{t(scenario.labelKey)}</span>
                 </div>
-                <p className="text-[10px] text-surface-200/40 mt-0.5 ml-6">{scenario.description}</p>
+                <p className="text-[10px] text-surface-200/40 mt-0.5 ml-6">{t(scenario.descriptionKey)}</p>
               </button>
             );
           })}

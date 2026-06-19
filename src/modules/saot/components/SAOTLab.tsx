@@ -77,7 +77,7 @@ export default function SAOTLab() {
             position={isSimulating ? simulation.currentFrame.attackerPosition : attacker}
             color="#ef4444"
             secondaryColor="#ffffff"
-            label="Atacante"
+            label={t('saot.attacker')}
             number={9}
             onDragEnd={setAttacker}
             highlighted={result.isOffside && showOffsideLine}
@@ -88,7 +88,7 @@ export default function SAOTLab() {
             position={isSimulating ? simulation.currentFrame.defenderPosition : defender}
             color="#3b82f6"
             secondaryColor="#1e3a5f"
-            label="Defensor"
+            label={t('saot.defender')}
             number={4}
             onDragEnd={setDefender}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
@@ -98,7 +98,7 @@ export default function SAOTLab() {
             position={{ x: goalkeeper.x, z: goalkeeper.z }}
             color="#eab308"
             secondaryColor="#1a1a1a"
-            label="Goleiro"
+            label={t('saot.goalkeeper')}
             number={1}
             onDragEnd={setGoalkeeper}
           />

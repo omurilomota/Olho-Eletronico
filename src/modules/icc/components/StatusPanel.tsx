@@ -11,12 +11,12 @@ interface SystemStatus {
 export default function StatusPanel() {
   const { t } = useTranslation();
   const [systems, setSystems] = useState<SystemStatus[]>([
-    { name: 'Cameras HD', status: 'online', latency: 12, icon: '\uD83D\uDCF9' },
-    { name: 'Sensores IoT', status: 'online', latency: 8, icon: '\uD83D\uDCE1' },
-    { name: 'Rede 5G', status: 'online', latency: 3, icon: '\uD83D\uDFE6' },
-    { name: 'IA Tatica', status: 'online', latency: 45, icon: '\uD83E\uDD16' },
-    { name: 'Backup Power', status: 'warning', latency: undefined, icon: '\u26A1' },
-    { name: 'GPS Tracking', status: 'online', latency: 15, icon: '\uD83D\uDCCD' },
+    { name: t('icc.status.cameras'), status: 'online', latency: 12, icon: '\uD83D\uDCF9' },
+    { name: t('icc.status.iot'), status: 'online', latency: 8, icon: '\uD83D\uDCE1' },
+    { name: t('icc.status.five_g'), status: 'online', latency: 3, icon: '\uD83D\uDFE6' },
+    { name: t('icc.status.ai'), status: 'online', latency: 45, icon: '\uD83E\uDD16' },
+    { name: t('icc.status.backup'), status: 'warning', latency: undefined, icon: '\u26A1' },
+    { name: t('icc.status.gps'), status: 'online', latency: 15, icon: '\uD83D\uDCCD' },
   ]);
 
   useEffect(() => {
