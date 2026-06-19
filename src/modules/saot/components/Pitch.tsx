@@ -16,7 +16,7 @@ function createGrassTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 3000; i++) {
     const x = Math.random() * 512;
     const y = Math.random() * 512;
-    ctx.fillStyle = `rgba(${20 + Math.random() * 20}, ${90 + Math.random() * 30}, ${30 + Math.random() * 20}, 0.4)`;
+    ctx.fillStyle = `rgba(${40 + Math.random() * 30}, ${120 + Math.random() * 40}, ${50 + Math.random() * 30}, 0.2)`;
     ctx.fillRect(x, y, 1, 2);
   }
 

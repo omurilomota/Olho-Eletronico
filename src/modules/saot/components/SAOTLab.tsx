@@ -28,7 +28,7 @@ export default function SAOTLab() {
   const simulation = useSimulation({
     attackerStart: attacker,
     defenderStart: defender,
-    ballStart: [-3, 0.2, 0],
+    ballStart: [-15, 0.2, 0],
     ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
   });
 
@@ -101,7 +101,7 @@ export default function SAOTLab() {
           />
 
           <Ball
-            position={isSimulating ? simulation.currentFrame.ballPosition : [-3, 0.2, 0]}
+            position={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
             spinning={isSimulating}
           />
 
@@ -118,7 +118,7 @@ export default function SAOTLab() {
           <CameraController
             preset={cameraPreset}
             followBall={isSimulating}
-            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-3, 0.2, 0]}
+            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
           />
         </Canvas>
       </div>
