@@ -155,6 +155,21 @@
       "empty": "Sin notificaciones",
       "clear_all": "Limpiar todas"
     },
+    "multiplayer": {
+      "title": "Sesion Colaborativa",
+      "connect": "Conectar",
+      "create_session": "Crear Sesion",
+      "join_session": "Unirse a Sesion",
+      "your_name": "Tu Nombre",
+      "name_placeholder": "Ingresa tu nombre",
+      "session_name": "Nombre de Sesion",
+      "session_name_placeholder": "Ej: Analisis Final",
+      "session_id": "ID de Sesion",
+      "session_id_placeholder": "Ej: ABC123",
+      "create": "Crear",
+      "join": "Unirse",
+      "leave": "Salir"
+    },
     "ticker": {
       "title": "Operaciones en Vivo",
       "events": "eventos",
