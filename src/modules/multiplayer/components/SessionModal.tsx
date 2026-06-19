@@ -15,6 +15,7 @@ export default function SessionModal({ onClose }: Props) {
   const [userName, setUserName] = useState('');
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCreate = () => {
     if (!sessionName.trim() || !userName.trim()) return;
@@ -25,6 +26,7 @@ export default function SessionModal({ onClose }: Props) {
 
   const handleJoin = () => {
     if (!sessionId.trim() || !userName.trim()) return;
+    setError('');
     joinSession(sessionId.trim().toUpperCase(), userName.trim());
     onClose();
   };
@@ -134,6 +136,10 @@ export default function SessionModal({ onClose }: Props) {
                     maxLength={6}
                   />
                 </div>
+              )}
+
+              {error && (
+                <p className="text-xs text-red-400 text-center">{error}</p>
               )}
 
               <button

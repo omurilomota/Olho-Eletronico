@@ -1,57 +1,81 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { useMultiplayerStore, type Participant } from '../store/useMultiplayerStore';
+import { useEffect, useCallback, useRef } from 'react';
+import { useMultiplayerStore } from '../store/useMultiplayerStore';
+import { usePresence } from './usePresence';
+import { useBroadcast, useBroadcastListeners } from './useBroadcast';
+import type { CursorPayload, ScenarioPayload, PlaybookPayload, PlayerPayload } from './useBroadcast';
 
-const SIMULATED_PARTICIPANTS: Omit<Participant, 'id'>[] = [
-  { name: 'Coach AI', color: '#3b82f6', role: 'viewer', cursor: { x: 2, z: -1 } },
-  { name: 'Analista', color: '#22c55e', role: 'viewer', cursor: { x: -3, z: 2 } },
-];
+export type { CursorPayload, ScenarioPayload, PlaybookPayload, PlayerPayload };
 
-export function useRealtimeSync() {
-  const { session, addParticipant, removeParticipant, updateCursor } = useMultiplayerStore();
-  const intervalRef = useRef<ReturnType<typeof setInterval>>(null);
-  const simParticipantRef = useRef<string | null>(null);
+interface RealtimeCallbacks {
+  onRemoteCursor?: (userId: string, x: number, z: number) => void;
+  onRemoteScenario?: (payload: ScenarioPayload) => void;
+  onRemotePlaybook?: (payload: PlaybookPayload) => void;
+  onRemotePlayer?: (payload: PlayerPayload) => void;
+}
+
+export function useRealtimeSync(callbacks?: RealtimeCallbacks) {
+  const { session } = useMultiplayerStore();
+  const { trackCursor } = usePresence();
+  const { broadcastCursor, broadcastScenario, broadcastPlaybook, broadcastPlayer } = useBroadcast();
+  const { setCallbacks } = useBroadcastListeners();
+  const callbacksRef = useRef(callbacks);
+  callbacksRef.current = callbacks;
 
   useEffect(() => {
-    if (!session) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      return;
-    }
+    setCallbacks({
+      onCursor: (payload: CursorPayload) => {
+        const me = session?.participants[0];
+        if (me && payload.userId !== me.id) {
+          callbacksRef.current?.onRemoteCursor?.(payload.userId, payload.x, payload.z);
+        }
+      },
+      onScenario: (payload: ScenarioPayload) => {
+        callbacksRef.current?.onRemoteScenario?.(payload);
+      },
+      onPlaybook: (payload: PlaybookPayload) => {
+        callbacksRef.current?.onRemotePlaybook?.(payload);
+      },
+      onPlayer: (payload: PlayerPayload) => {
+        callbacksRef.current?.onRemotePlayer?.(payload);
+      },
+    });
+  }, [session?.id, setCallbacks]);
 
-    const sim = SIMULATED_PARTICIPANTS[Math.floor(Math.random() * SIMULATED_PARTICIPANTS.length)];
-    const simId = `sim-${Date.now()}`;
-    simParticipantRef.current = simId;
-
-    const timeout = setTimeout(() => {
-      addParticipant({
-        ...sim,
-        id: simId,
-        cursor: { x: Math.random() * 10 - 5, z: Math.random() * 6 - 3 },
-      });
-
-      intervalRef.current = setInterval(() => {
-        updateCursor(
-          Math.random() * 10 - 5,
-          Math.random() * 6 - 3,
-        );
-      }, 2000);
-    }, 3000);
-
-    return () => {
-      clearTimeout(timeout);
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (simParticipantRef.current) {
-        removeParticipant(simParticipantRef.current);
-        simParticipantRef.current = null;
-      }
-    };
-  }, [session?.id]);
-
-  const broadcastCursor = useCallback(
-    (x: number, z: number) => {
-      updateCursor(x, z);
+  const sendCursor = useCallback(
+    async (x: number, z: number) => {
+      const me = session?.participants[0];
+      if (!me) return;
+      await broadcastCursor(me.id, me.name, me.color, x, z);
+      await trackCursor(x, z);
     },
-    [updateCursor],
+    [session?.participants, broadcastCursor, trackCursor],
   );
 
-  return { broadcastCursor };
+  const sendScenario = useCallback(
+    async (payload: ScenarioPayload) => {
+      await broadcastScenario(payload);
+    },
+    [broadcastScenario],
+  );
+
+  const sendPlaybook = useCallback(
+    async (payload: PlaybookPayload) => {
+      await broadcastPlaybook(payload);
+    },
+    [broadcastPlaybook],
+  );
+
+  const sendPlayer = useCallback(
+    async (payload: PlayerPayload) => {
+      await broadcastPlayer(payload);
+    },
+    [broadcastPlayer],
+  );
+
+  return {
+    sendCursor,
+    sendScenario,
+    sendPlaybook,
+    sendPlayer,
+  };
 }
