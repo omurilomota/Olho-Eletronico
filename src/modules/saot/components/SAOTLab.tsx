@@ -12,13 +12,28 @@ import OffsideLine from './OffsideLine';
 import CameraController from './CameraController';
 import ControlPanel from './ControlPanel';
 import PlaybookMode from './PlaybookMode';
+import RemoteCursor from './RemoteCursor';
 import DataOverlay from '../../../shared/components/DataOverlay';
 import { calculateOffside } from '../services/OffsideCalculator';
-import { useState } from 'react';
+import { useMultiplayerStore } from '../../multiplayer/store/useMultiplayerStore';
+import { useRealtimeSync, type ScenarioPayload, type PlayerPayload } from '../../multiplayer/services/useRealtimeSync';
+import { useState, useCallback, useRef } from 'react';
+
+interface RemoteCursorData {
+  userId: string;
+  name: string;
+  color: string;
+  x: number;
+  z: number;
+}
 
 export default function SAOTLab() {
   const { t } = useTranslation();
   const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
+  const { session } = useMultiplayerStore();
+  const [remoteCursors, setRemoteCursors] = useState<RemoteCursorData[]>([]);
+  const me = session?.participants[0];
+  const isAdmin = me?.role === 'admin';
 
   const {
     attacker, defender, goalkeeper,
@@ -59,9 +74,72 @@ export default function SAOTLab() {
       )
     : 0;
 
+  const handleRemoteCursor = useCallback((userId: string, x: number, z: number) => {
+    setRemoteCursors((prev) => {
+      const existing = prev.find((c) => c.userId === userId);
+      if (existing) {
+        return prev.map((c) => (c.userId === userId ? { ...c, x, z } : c));
+      }
+      const cursorSession = useMultiplayerStore.getState().session;
+      const participant = cursorSession?.participants.find((p) => p.id === userId);
+      if (!participant) return prev;
+      return [...prev, { userId, name: participant.name, color: participant.color, x, z }];
+    });
+  }, []);
+
+  const handleRemoteScenario = useCallback((payload: ScenarioPayload) => {
+    const { setAttacker: sA, setDefender: sD, setGoalkeeper: sG, loadScenario } = useSaotStore.getState();
+    sA(payload.attacker);
+    sD(payload.defender);
+    sG(payload.goalkeeper);
+    loadScenario(payload.activeScenario);
+  }, []);
+
+  const handleRemotePlayer = useCallback((payload: PlayerPayload) => {
+    const store = useSaotStore.getState();
+    if (payload.target === 'attacker') store.setAttacker(payload.position);
+    else if (payload.target === 'defender') store.setDefender(payload.position);
+    else if (payload.target === 'goalkeeper') store.setGoalkeeper(payload.position);
+  }, []);
+
+  const { sendCursor, sendPlayer } = useRealtimeSync({
+    onRemoteCursor: handleRemoteCursor,
+    onRemoteScenario: handleRemoteScenario,
+    onRemotePlayer: handleRemotePlayer,
+  });
+
+  const lastCursorBroadcast = useRef(0);
+
+  const handleDragEnd = useCallback(
+    (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
+      if (target === 'attacker') setAttacker(pos);
+      else if (target === 'defender') setDefender(pos);
+      else if (target === 'goalkeeper') setGoalkeeper(pos);
+
+      if (session) {
+        sendPlayer({ target, position: pos });
+      }
+    },
+    [session, sendPlayer, setAttacker, setDefender, setGoalkeeper],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!session || !isAdmin) return;
+      const now = Date.now();
+      if (now - lastCursorBroadcast.current < 100) return;
+      lastCursorBroadcast.current = now;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 37 - 18.5;
+      const z = ((e.clientY - rect.top) / rect.height) * 22 - 11;
+      sendCursor(x, z);
+    },
+    [session, isAdmin, sendCursor],
+  );
+
   return (
     <div className="h-[calc(100vh-7rem)] flex">
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" onPointerMove={handlePointerMove}>
         <DataOverlay />
         <Canvas
           shadows
@@ -79,7 +157,7 @@ export default function SAOTLab() {
             secondaryColor="#ffffff"
             label={t('saot.attacker')}
             number={9}
-            onDragEnd={setAttacker}
+            onDragEnd={(pos) => handleDragEnd('attacker', pos)}
             highlighted={result.isOffside && showOffsideLine}
             animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
             facingAngle={attackerAngle}
@@ -90,7 +168,7 @@ export default function SAOTLab() {
             secondaryColor="#1e3a5f"
             label={t('saot.defender')}
             number={4}
-            onDragEnd={setDefender}
+            onDragEnd={(pos) => handleDragEnd('defender', pos)}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
             facingAngle={defenderAngle}
           />
@@ -100,7 +178,7 @@ export default function SAOTLab() {
             secondaryColor="#1a1a1a"
             label={t('saot.goalkeeper')}
             number={1}
-            onDragEnd={setGoalkeeper}
+            onDragEnd={(pos) => handleDragEnd('goalkeeper', pos)}
           />
 
           <Ball
@@ -118,6 +196,15 @@ export default function SAOTLab() {
             />
           )}
 
+          {remoteCursors.map((cursor) => (
+            <RemoteCursor
+              key={cursor.userId}
+              position={{ x: cursor.x, z: cursor.z }}
+              color={cursor.color}
+              name={cursor.name}
+            />
+          ))}
+
           <CameraController
             preset={cameraPreset}
             followBall={isSimulating}
@@ -127,7 +214,6 @@ export default function SAOTLab() {
       </div>
 
       <div className="w-72 border-l border-surface-700/50 glass flex flex-col">
-        {/* Tab switcher */}
         <div className="flex border-b border-surface-700/50">
           <button
             onClick={() => setActivePanel('controls')}
