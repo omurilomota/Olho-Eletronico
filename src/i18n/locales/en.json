@@ -182,6 +182,10 @@
     }
   },
   "overlay": {
-    "title": "Telemetry"
+    "title": "Telemetry",
+    "export": {
+      "pdf": "Export PDF",
+      "success": "PDF exported!"
+    }
   }
 }

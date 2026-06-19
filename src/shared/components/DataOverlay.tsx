@@ -1,4 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import ExportButton from './ExportButton';
+import { useSaotStore } from '../../modules/saot/store/useSaotStore';
+import { calculateOffside } from '../../modules/saot/services/OffsideCalculator';
 
 interface FpsHistoryEntry {
   time: number;
@@ -6,11 +10,15 @@ interface FpsHistoryEntry {
 }
 
 export default function DataOverlay() {
+  const { t } = useTranslation();
+  const { attacker, defender, goalkeeper } = useSaotStore();
   const [fps, setFps] = useState(60);
   const [triangles, setTriangles] = useState(0);
   const [drawCalls, setDrawCalls] = useState(0);
   const [history, setHistory] = useState<FpsHistoryEntry[]>([]);
   const historyRef = useRef<FpsHistoryEntry[]>([]);
+
+  const result = calculateOffside(attacker, defender, goalkeeper);
 
   useEffect(() => {
     let frames = 0;
@@ -53,7 +61,7 @@ export default function DataOverlay() {
       <div className="flex items-center gap-2 mb-3 pb-2 border-b border-surface-700/50">
         <span className={`w-2 h-2 rounded-full ${fpsBg}`} />
         <span className="text-xs font-semibold text-surface-200/80 tracking-wider uppercase">
-          Telemetria
+          {t('overlay.title')}
         </span>
       </div>
 
@@ -86,6 +94,10 @@ export default function DataOverlay() {
         <div className="flex items-center justify-between text-xs">
           <span className="text-surface-200/50">Draw Calls</span>
           <span className="font-mono text-surface-200/80">{drawCalls}</span>
+        </div>
+
+        <div className="pt-2 border-t border-surface-700/50">
+          <ExportButton data={{ attacker, defender, goalkeeper, result }} />
         </div>
       </div>
     </div>
