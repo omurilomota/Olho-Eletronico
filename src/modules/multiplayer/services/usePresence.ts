@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from 'react';
-import { supabase, SESSION_CHANNEL_PREFIX } from './supabaseClient';
+import { getSupabase, SESSION_CHANNEL_PREFIX } from './supabaseClient';
 import { useMultiplayerStore, type Participant } from '../store/useMultiplayerStore';
 
 export function usePresence() {
@@ -8,6 +8,7 @@ export function usePresence() {
   useEffect(() => {
     if (!session) return;
 
+    const supabase = getSupabase();
     const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
     const channel = supabase.channel(channelName);
 
@@ -66,6 +67,7 @@ export function usePresence() {
   const trackCursor = useCallback(
     async (x: number, z: number) => {
       if (!session) return;
+      const supabase = getSupabase();
       const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
       const channel = supabase.channel(channelName);
       const me = session.participants.find((p) => p.role === 'admin');

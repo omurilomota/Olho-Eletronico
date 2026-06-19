@@ -1,16 +1,33 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('[Multiplayer] Supabase URL or ANON_KEY missing in .env');
+function validateEnv(): { url: string; key: string } {
+  if (!supabaseUrl || supabaseUrl.includes('SEU_PROJETO')) {
+    throw new Error('[Multiplayer] VITE_SUPABASE_URL not configured in .env.local');
+  }
+  if (!supabaseKey || supabaseKey === 'sua_chave_aqui') {
+    throw new Error('[Multiplayer] VITE_SUPABASE_ANON_KEY not configured in .env.local');
+  }
+  return { url: supabaseUrl, key: supabaseKey };
 }
 
-export const supabase = createClient(
-  supabaseUrl ?? '',
-  supabaseAnonKey ?? '',
-);
+let _supabase: ReturnType<typeof createClient> | null = null;
+
+export function getSupabase() {
+  if (!_supabase) {
+    const env = validateEnv();
+    _supabase = createClient(env.url, env.key, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    });
+  }
+  return _supabase;
+}
 
 export const SESSION_CHANNEL_PREFIX = 'session:';
 export const CURSOR_EVENT = 'cursor';

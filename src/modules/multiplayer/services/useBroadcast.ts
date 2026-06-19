@@ -1,7 +1,8 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { supabase, SESSION_CHANNEL_PREFIX, CURSOR_EVENT, SCENARIO_EVENT, PLAYBOOK_EVENT, PLAYER_EVENT } from './supabaseClient';
+import { getSupabase, SESSION_CHANNEL_PREFIX, CURSOR_EVENT, SCENARIO_EVENT, PLAYBOOK_EVENT, PLAYER_EVENT } from './supabaseClient';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
-import type { ScenarioType, Position } from '../../saot/store/useSaotStore';
+import type { ScenarioType } from '../../saot/store/useSaotStore';
+import type { Position } from '../../saot/store/useSaotStore';
 
 export interface ScenarioPayload {
   attacker: Position;
@@ -28,9 +29,11 @@ export interface CursorPayload {
   z: number;
 }
 
+type ChannelRef = ReturnType<ReturnType<typeof getSupabase>['channel']>;
+
 export function useBroadcast() {
   const { session, addParticipant } = useMultiplayerStore();
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const channelRef = useRef<ChannelRef | null>(null);
 
   useEffect(() => {
     if (!session) {
@@ -38,6 +41,7 @@ export function useBroadcast() {
       return;
     }
 
+    const supabase = getSupabase();
     const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
     const channel = supabase.channel(channelName, {
       config: { broadcast: { self: false } },
@@ -134,6 +138,7 @@ export function useBroadcastListeners() {
   useEffect(() => {
     if (!session) return;
 
+    const supabase = getSupabase();
     const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
     const channel = supabase.channel(channelName, {
       config: { broadcast: { self: false } },
