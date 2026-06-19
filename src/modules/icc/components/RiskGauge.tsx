@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function RiskGauge() {
+  const { t } = useTranslation();
   const [value, setValue] = useState(35);
 
   useEffect(() => {
@@ -14,9 +16,9 @@ export default function RiskGauge() {
   }, []);
 
   const getColor = (v: number) => {
-    if (v < 30) return { stroke: '#22c55e', text: 'text-emerald-400', label: 'BAIXO' };
-    if (v < 60) return { stroke: '#f59e0b', text: 'text-amber-400', label: 'MEDIO' };
-    return { stroke: '#ef4444', text: 'text-red-400', label: 'ALTO' };
+    if (v < 30) return { stroke: '#22c55e', text: 'text-emerald-400', label: t('icc.risk.low') };
+    if (v < 60) return { stroke: '#f59e0b', text: 'text-amber-400', label: t('icc.risk.medium') };
+    return { stroke: '#ef4444', text: 'text-red-400', label: t('icc.risk.high') };
   };
 
   const { stroke, text, label } = getColor(value);
@@ -26,7 +28,7 @@ export default function RiskGauge() {
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4 text-center">
       <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider mb-3">
-        Nivel de Risco
+        {t('icc.risk.title')}
       </h3>
 
       <div className="relative w-28 h-28 mx-auto">

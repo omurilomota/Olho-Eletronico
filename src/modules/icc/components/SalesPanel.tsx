@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart,
   Bar,
@@ -54,6 +55,7 @@ function formatCurrency(value: number): string {
 }
 
 export default function SalesPanel() {
+  const { t } = useTranslation();
   const [categoryRevenue, setCategoryRevenue] = useState(() =>
     CATEGORIES.map((c) => ({
       ...c,
@@ -107,11 +109,11 @@ export default function SalesPanel() {
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <h3 className="text-sm font-semibold text-surface-200/80 mb-3">
-        Vendas & Estabelecimentos
+        {t('icc.sales.title')}
       </h3>
 
       <div className="bg-surface-900/50 rounded-lg p-3 mb-3">
-        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-1">Receita Total</p>
+        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-1">{t('icc.sales.total_revenue')}</p>
         <p className="text-2xl font-black text-emerald-400 font-mono">
           {formatCurrency(totalRevenue)}
         </p>
@@ -119,7 +121,7 @@ export default function SalesPanel() {
 
       <div className="mb-3">
         <div className="flex justify-between text-[10px] text-surface-200/50 mb-1">
-          <span>Ocupacao do Estadio</span>
+          <span>{t('icc.sales.occupancy')}</span>
           <span className="font-mono">{occupancy.toFixed(0)}%</span>
         </div>
         <div className="h-2 bg-surface-900 rounded-full overflow-hidden">
@@ -133,7 +135,7 @@ export default function SalesPanel() {
       </div>
 
       <div className="mb-3">
-        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">Por Categoria</p>
+        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">{t('icc.sales.by_category')}</p>
         <div className="h-36">
           <ResponsiveContainer>
             <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 10 }}>
@@ -159,7 +161,7 @@ export default function SalesPanel() {
                   borderRadius: '8px',
                   fontSize: '11px',
                 }}
-                formatter={(value) => [formatCurrency(Number(value)), 'Receita']}
+                formatter={(value) => [formatCurrency(Number(value)), t('icc.sales.revenue')]}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={16}>
                 {chartData.map((entry, i) => (
@@ -173,8 +175,8 @@ export default function SalesPanel() {
 
       <div className="mb-3">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-[10px] text-surface-200/40 uppercase tracking-wider">Mais Vendido</p>
-          <span className="text-[9px] text-surface-200/30">por categoria: {topCategory?.icon}</span>
+          <p className="text-[10px] text-surface-200/40 uppercase tracking-wider">{t('icc.sales.most_sold')}</p>
+          <span className="text-[9px] text-surface-200/30">{t('icc.sales.by_category_label')} {topCategory?.icon}</span>
         </div>
         <div className="bg-surface-900/50 rounded-lg px-2.5 py-2">
           <div className="flex items-center gap-2">
@@ -184,7 +186,7 @@ export default function SalesPanel() {
                 {mostSold[0]?.name}
               </p>
               <p className="text-[10px] text-surface-200/40">
-                {mostSold[0]?.quantity.toLocaleString('pt-BR')} unidades
+                {mostSold[0]?.quantity.toLocaleString()} {t('icc.sales.units')}
               </p>
             </div>
           </div>
@@ -192,7 +194,7 @@ export default function SalesPanel() {
       </div>
 
       <div>
-        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">Top 3 Lojas</p>
+        <p className="text-[10px] text-surface-200/40 uppercase tracking-wider mb-2">{t('icc.sales.top_stores')}</p>
         <div className="space-y-1.5">
           {stores.slice(0, 3).map((store, i) => {
             const cat = CATEGORIES.find((c) => c.key === store.category);

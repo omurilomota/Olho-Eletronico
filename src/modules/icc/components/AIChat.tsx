@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useIccStore, type AIModel } from '../store/useIccStore';
 import {
   getAIResponse,
@@ -14,12 +15,14 @@ interface SearchPhase {
   icon: string;
 }
 
-const SEARCH_PHASES: SearchPhase[] = [
-  { text: 'Buscando dados relevantes', icon: '🔍' },
-  { text: 'Analisando estatisticas', icon: '📊' },
-  { text: 'Cruzando informacoes', icon: '🔗' },
-  { text: 'Gerando resposta', icon: '✅' },
-];
+function getSearchPhases(t: (key: string) => string): SearchPhase[] {
+  return [
+    { text: t('icc.chat.search_phases.0'), icon: '🔍' },
+    { text: t('icc.chat.search_phases.1'), icon: '📊' },
+    { text: t('icc.chat.search_phases.2'), icon: '🔗' },
+    { text: t('icc.chat.search_phases.3'), icon: '✅' },
+  ];
+}
 
 interface TypingMessage {
   fullText: string;
@@ -42,6 +45,7 @@ function renderMarkdown(text: string): string {
 }
 
 export default function AIChat() {
+  const { t } = useTranslation();
   const { messages, addMessage, clearChat } = useIccStore();
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -67,6 +71,8 @@ export default function AIChat() {
       if (phaseIntervalRef.current) clearInterval(phaseIntervalRef.current);
     };
   }, []);
+
+  const SEARCH_PHASES = getSearchPhases(t);
 
   const handleSend = (text?: string) => {
     const msg = text || input.trim();
@@ -172,7 +178,7 @@ export default function AIChat() {
           onClick={clearChat}
           className="text-xs text-surface-200/40 hover:text-surface-200/70 transition-colors"
         >
-          Limpar
+          {t('icc.chat.clear')}
         </button>
       </div>
 
@@ -184,8 +190,8 @@ export default function AIChat() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
               </svg>
             </div>
-            <p className="text-sm text-surface-200/50 mb-1">Como posso ajudar?</p>
-            <p className="text-xs text-surface-200/30">Pergunte sobre tatica, estatisticas, estadio, previsoes...</p>
+            <p className="text-sm text-surface-200/50 mb-1">{t('icc.chat.empty_title')}</p>
+            <p className="text-xs text-surface-200/30">{t('icc.chat.empty_hint')}</p>
           </div>
         )}
 
@@ -240,7 +246,7 @@ export default function AIChat() {
               )}
 
               <p className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-white/50' : 'text-surface-200/30'}`}>
-                {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                {new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
@@ -345,7 +351,7 @@ export default function AIChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Pergunte sobre o jogo..."
+            placeholder={t('icc.chat.placeholder')}
             disabled={isTyping}
           />
           <button
@@ -353,7 +359,7 @@ export default function AIChat() {
             disabled={!input.trim() || isTyping}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-surface-700 disabled:text-surface-200/30 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            Enviar
+            {t('icc.chat.send')}
           </button>
         </div>
       </div>
