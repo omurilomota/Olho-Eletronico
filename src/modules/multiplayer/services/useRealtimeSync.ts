@@ -1,10 +1,9 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
-import { usePresence } from './usePresence';
-import { useBroadcast, useBroadcastListeners } from './useBroadcast';
-import type { CursorPayload, ScenarioPayload, PlaybookPayload, PlayerPayload } from './useBroadcast';
+import { useRealtimeChannel } from './useRealtimeChannel';
+import type { ScenarioPayload, PlaybookPayload, PlayerPayload } from './useRealtimeChannel';
 
-export type { CursorPayload, ScenarioPayload, PlaybookPayload, PlayerPayload };
+export type { ScenarioPayload, PlaybookPayload, PlayerPayload };
 
 interface RealtimeCallbacks {
   onRemoteCursor?: (userId: string, x: number, z: number) => void;
@@ -14,41 +13,56 @@ interface RealtimeCallbacks {
 }
 
 export function useRealtimeSync(callbacks?: RealtimeCallbacks) {
-  const { session } = useMultiplayerStore();
-  const { trackCursor } = usePresence();
-  const { broadcastCursor, broadcastScenario, broadcastPlaybook, broadcastPlayer } = useBroadcast();
-  const { setCallbacks } = useBroadcastListeners();
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
 
-  useEffect(() => {
-    setCallbacks({
-      onCursor: (payload: CursorPayload) => {
-        const me = session?.participants[0];
-        if (me && payload.userId !== me.id) {
-          callbacksRef.current?.onRemoteCursor?.(payload.userId, payload.x, payload.z);
-        }
-      },
-      onScenario: (payload: ScenarioPayload) => {
-        callbacksRef.current?.onRemoteScenario?.(payload);
-      },
-      onPlaybook: (payload: PlaybookPayload) => {
-        callbacksRef.current?.onRemotePlaybook?.(payload);
-      },
-      onPlayer: (payload: PlayerPayload) => {
-        callbacksRef.current?.onRemotePlayer?.(payload);
-      },
+  const handleCursor = useCallback(
+    (payload: { userId: string; name: string; color: string; x: number; z: number }) => {
+      const me = useMultiplayerStore.getState().session?.participants[0];
+      if (me && payload.userId !== me.id) {
+        callbacksRef.current?.onRemoteCursor?.(payload.userId, payload.x, payload.z);
+      }
+    },
+    [],
+  );
+
+  const handleScenario = useCallback(
+    (payload: ScenarioPayload) => {
+      callbacksRef.current?.onRemoteScenario?.(payload);
+    },
+    [],
+  );
+
+  const handlePlaybook = useCallback(
+    (payload: PlaybookPayload) => {
+      callbacksRef.current?.onRemotePlaybook?.(payload);
+    },
+    [],
+  );
+
+  const handlePlayer = useCallback(
+    (payload: PlayerPayload) => {
+      callbacksRef.current?.onRemotePlayer?.(payload);
+    },
+    [],
+  );
+
+  const { trackCursor, broadcastCursor, broadcastScenario, broadcastPlaybook, broadcastPlayer } =
+    useRealtimeChannel({
+      onCursor: handleCursor,
+      onScenario: handleScenario,
+      onPlaybook: handlePlaybook,
+      onPlayer: handlePlayer,
     });
-  }, [session?.id, setCallbacks]);
 
   const sendCursor = useCallback(
     async (x: number, z: number) => {
-      const me = session?.participants[0];
+      const me = useMultiplayerStore.getState().session?.participants[0];
       if (!me) return;
       await broadcastCursor(me.id, me.name, me.color, x, z);
       await trackCursor(x, z);
     },
-    [session?.participants, broadcastCursor, trackCursor],
+    [broadcastCursor, trackCursor],
   );
 
   const sendScenario = useCallback(
@@ -72,10 +86,5 @@ export function useRealtimeSync(callbacks?: RealtimeCallbacks) {
     [broadcastPlayer],
   );
 
-  return {
-    sendCursor,
-    sendScenario,
-    sendPlaybook,
-    sendPlayer,
-  };
+  return { sendCursor, sendScenario, sendPlaybook, sendPlayer };
 }
