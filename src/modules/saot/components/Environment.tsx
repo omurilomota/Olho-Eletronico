@@ -73,9 +73,9 @@ export default function Environment() {
       <Sky />
       <Stars />
 
-      <ambientLight intensity={0.3} color="#b0c4de" />
+      <ambientLight intensity={0.7} color="#ffffff" />
 
-      <hemisphereLight args={['#87ceeb', '#2d5016', 0.4]} />
+      <hemisphereLight args={['#87ceeb', '#4caf50', 0.6]} />
 
       <directionalLight
         position={[15, 20, 10]}
@@ -92,7 +92,7 @@ export default function Environment() {
         shadow-bias={-0.0005}
       />
 
-      <fog attach="fog" args={['#1a237e', 30, 60]} />
+      <fog attach="fog" args={['#1a237e', 50, 80]} />
     </group>
   );
 }

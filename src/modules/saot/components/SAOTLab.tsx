@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber';
+import { useTranslation } from 'react-i18next';
 import { useSaotStore } from '../store/useSaotStore';
 import { useSimulation } from '../hooks/useSimulation';
 import Pitch from './Pitch';
@@ -16,6 +17,7 @@ import { calculateOffside } from '../services/OffsideCalculator';
 import { useState } from 'react';
 
 export default function SAOTLab() {
+  const { t } = useTranslation();
   const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
 
   const {
@@ -25,13 +27,11 @@ export default function SAOTLab() {
     setAttacker, setDefender, setGoalkeeper,
   } = useSaotStore();
 
-  const ballStart: [number, number, number] = [goalkeeper.x, 0.2, goalkeeper.z];
-
   const simulation = useSimulation({
     attackerStart: attacker,
     defenderStart: defender,
-    goalkeeperStart: goalkeeper,
-    ballStart,
+    goalkeeperStart: { x: goalkeeper.x, z: goalkeeper.z },
+    ballStart: [-15, 0.2, 0],
     ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
   });
 
@@ -95,17 +95,16 @@ export default function SAOTLab() {
             facingAngle={defenderAngle}
           />
           <Player
-            position={isSimulating ? simulation.currentFrame.goalkeeperPosition : goalkeeper}
+            position={{ x: goalkeeper.x, z: goalkeeper.z }}
             color="#eab308"
             secondaryColor="#1a1a1a"
             label="Goleiro"
             number={1}
             onDragEnd={setGoalkeeper}
-            animationState={isSimulating ? simulation.currentFrame.goalkeeperAnim : 'idle'}
           />
 
           <Ball
-            position={isSimulating ? simulation.currentFrame.ballPosition : ballStart}
+            position={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
             spinning={isSimulating}
           />
 
@@ -122,7 +121,7 @@ export default function SAOTLab() {
           <CameraController
             preset={cameraPreset}
             followBall={isSimulating}
-            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : ballStart}
+            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
           />
         </Canvas>
       </div>
@@ -138,7 +137,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            Controles
+            {t('saot.controls', 'Controles')}
           </button>
           <button
             onClick={() => setActivePanel('playbook')}
@@ -148,7 +147,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            Playbook
+            {t('saot.playbook', 'Playbook')}
           </button>
         </div>
 

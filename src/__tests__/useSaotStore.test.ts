@@ -8,9 +8,9 @@ describe('useSaotStore', () => {
 
   it('has correct default state', () => {
     const state = useSaotStore.getState();
-    expect(state.attacker).toEqual({ x: 3, z: 1 });
-    expect(state.defender).toEqual({ x: -3, z: -1 });
-    expect(state.goalkeeper).toEqual({ x: -3, z: 0 });
+    expect(state.attacker).toEqual({ x: 3, z: 0 });
+    expect(state.defender).toEqual({ x: -3, z: 0 });
+    expect(state.goalkeeper).toEqual({ x: -15, z: 0 });
     expect(state.cameraPreset).toBe('broadcast');
     expect(state.showShadows).toBe(true);
     expect(state.showOffsideLine).toBe(false);
@@ -70,7 +70,7 @@ describe('useSaotStore', () => {
     useSaotStore.getState().setAttacker({ x: 99, z: 99 });
     useSaotStore.getState().loadScenario('custom');
     const state = useSaotStore.getState();
-    expect(state.attacker).toEqual({ x: 3, z: 1 });
+    expect(state.attacker).toEqual({ x: 3, z: 0 });
     expect(state.activeScenario).toBe('custom');
   });
 
@@ -79,7 +79,7 @@ describe('useSaotStore', () => {
     useSaotStore.getState().setCameraPreset('tactical');
     useSaotStore.getState().reset();
     const state = useSaotStore.getState();
-    expect(state.attacker).toEqual({ x: 3, z: 1 });
+    expect(state.attacker).toEqual({ x: 3, z: 0 });
     expect(state.cameraPreset).toBe('broadcast');
   });
 

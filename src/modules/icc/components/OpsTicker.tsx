@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TickerEvent {
   id: number;
@@ -35,6 +36,7 @@ const severityConfig = {
 };
 
 export default function OpsTicker() {
+  const { t } = useTranslation();
   const [events, setEvents] = useState<TickerEvent[]>(() =>
     EVENTS.slice(0, 6).map((e, i) => ({
       ...e,
@@ -62,7 +64,7 @@ export default function OpsTicker() {
   }, []);
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
   };
 
   const current = events[events.length - 1];
@@ -73,10 +75,10 @@ export default function OpsTicker() {
       <div className="flex items-center gap-3 px-4 py-2 border-b border-surface-700/50">
         <div className={`w-2 h-2 rounded-full ${config.dot} animate-pulse`} />
         <span className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider">
-          Operacoes ao Vivo
+          {t('icc.ticker.title')}
         </span>
         <span className="ml-auto text-[10px] font-mono text-surface-200/30">
-          {events.length} eventos
+          {events.length} {t('icc.ticker.events')}
         </span>
       </div>
 

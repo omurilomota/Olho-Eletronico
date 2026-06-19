@@ -1,0 +1,212 @@
+{
+  "app": {
+    "title": "OLHO ELETRONICO",
+    "subtitle": "Impedimento Milimetrico 4.0",
+    "system_status": "Sistema Operacional",
+    "copa": "COPA FIFA 2026"
+  },
+  "nav": {
+    "saot": "SAOT Lab",
+    "icc": "ICC Center"
+  },
+  "login": {
+    "username": "Usuario",
+    "username_placeholder": "Digite seu usuario",
+    "password": "Senha",
+    "password_placeholder": "Digite sua senha",
+    "error": "Usuario ou senha incorretos",
+    "submit": "Entrar",
+    "footer": "COPA FIFA 2026 — Sistema Autorizado"
+  },
+  "saot": {
+    "tabs": {
+      "controls": "Controles",
+      "playbook": "Playbook"
+    },
+    "camera": "Camera",
+    "camera_presets": {
+      "broadcast": "Broadcast",
+      "tactical": "Tatico",
+      "goal-left": "Gol Esq.",
+      "goal-right": "Gol Dir.",
+      "free": "Livre"
+    },
+    "scenarios": "Cenarios",
+    "free_mode": "Modo Livre",
+    "free_mode_hint": "Arraste os jogadores como quiser",
+    "simulation": "Simulacao",
+    "play": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Reset",
+    "progress": "Progresso",
+    "speed": "Velocidade",
+    "players": "Jogadores",
+    "attacker": "Atacante",
+    "defender": "Defensor",
+    "goalkeeper": "Goleiro",
+    "result": "Resultado",
+    "offside": "IMPEDIDO",
+    "legal": "LEGAL",
+    "margin": "Margem:",
+    "options": "Opcoes",
+    "shadows": "Sombras",
+    "offside_line": "Linha de impedimento",
+    "reset_positions": "Resetar posicoes",
+    "playbook_title": "Playbook — Simulador de Passes",
+    "playbook_hint": "Escolha um play para simular diferentes situacoes de impedimento.",
+    "steps": "etapas",
+    "step": "ETAPA",
+    "ball": "Bola:",
+    "prev": "Anterior",
+    "next": "Proximo",
+    "back": "Voltar",
+    "above_line": "acima da linha",
+    "below_line": "abaixo da linha",
+    "offside_line_label": "LINHA DE IMPEDIMENTO",
+    "attacker_position": "POSICAO DO ATACANTE"
+  },
+  "icc": {
+    "chat": {
+      "title": "FIFA AI Pro",
+      "clear": "Limpar",
+      "empty_title": "Como posso ajudar?",
+      "empty_hint": "Pergunte sobre tatica, estatisticas, estadio, previsoes...",
+      "placeholder": "Pergunte sobre o jogo...",
+      "send": "Enviar",
+      "search_phases": [
+        "Buscando dados relevantes",
+        "Analisando estatisticas",
+        "Cruzando informacoes",
+        "Gerando resposta"
+      ],
+      "models": {
+        "tatico": "Modelo Tatico",
+        "estatistico": "Modelo Estatistico",
+        "operacional": "Modelo Operacional",
+        "preditivo": "Modelo Preditivo"
+      }
+    },
+    "risk": {
+      "title": "Nivel de Risco",
+      "low": "BAIXO",
+      "medium": "MEDIO",
+      "high": "ALTO"
+    },
+    "sales": {
+      "title": "Vendas & Estabelecimentos",
+      "total_revenue": "Receita Total",
+      "occupancy": "Ocupacao do Estadio",
+      "by_category": "Por Categoria",
+      "most_sold": "Mais Vendido",
+      "by_category_label": "por categoria:",
+      "units": "unidades",
+      "top_stores": "Top 3 Lojas",
+      "revenue": "Receita",
+      "categories": {
+        "alimentacao": "Alimentacao",
+        "merchandise": "Merchandise",
+        "bebidas": "Bebidas",
+        "ingressos": "Ingressos"
+      }
+    },
+    "weather": {
+      "title": "Clima",
+      "now": "Agora",
+      "weekly": "Semanal",
+      "monthly": "Mensal",
+      "humidity": "Umidade",
+      "wind": "Vento",
+      "avg_temp": "Temp Media",
+      "precipitation": "Precipitacao",
+      "sunny": "Ensolarados",
+      "cloudy": "Nublados",
+      "rainy": "Chuvosos",
+      "rainy_days": "Dias de chuva no mes",
+      "sunny_label": "Ensolarado",
+      "cloudy_label": "Nublado",
+      "rainy_label": "Chuvoso"
+    },
+    "status": {
+      "title": "Status dos Sistemas",
+      "cameras": "Cameras HD",
+      "iot": "Sensores IoT",
+      "five_g": "Rede 5G",
+      "ai": "IA Tatica",
+      "backup": "Backup Power",
+      "gps": "GPS Tracking",
+      "warning": "Alerta",
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "digital_twin": {
+      "title": "Gemeos Digitais - Fluxo de Torcedores",
+      "resume": "Retomar",
+      "pause": "Pausar",
+      "reset": "Reset",
+      "time_to_start": "Tempo p/ inicio:",
+      "heatmap": "Heatmap",
+      "fans": "Torcedores",
+      "avg_speed": "Vel. Media",
+      "congested": "Congestionados"
+    },
+    "notifications": {
+      "title": "Notificacoes",
+      "mark_all_read": "Marcar lidas",
+      "empty": "Nenhuma notificacao",
+      "clear_all": "Limpar todas"
+    },
+    "multiplayer": {
+      "title": "Sessao Colaborativa",
+      "connect": "Conectar",
+      "create_session": "Criar Sessao",
+      "join_session": "Entrar em Sessao",
+      "your_name": "Seu Nome",
+      "name_placeholder": "Digite seu nome",
+      "session_name": "Nome da Sessao",
+      "session_name_placeholder": "Ex: Analise Final",
+      "session_id": "ID da Sessao",
+      "session_id_placeholder": "Ex: ABC123",
+      "create": "Criar",
+      "join": "Entrar",
+      "leave": "Sair"
+    },
+    "ticker": {
+      "title": "Operacoes ao Vivo",
+      "events": "eventos",
+      "events_list": [
+        "Delegacao do Brasil chegou ao estadio",
+        "Checkpoint 3 liberado com sucesso",
+        "Reabastecimento de alimentos no setor B concluido",
+        "Sinal de IPTV 100% estavel",
+        "Equipe medica posicionada no portao 2",
+        "Varredura de seguranca concluida",
+        "Congestionamento detectado no portao Norte A",
+        "Temperatura interna: 28C - acima do ideal",
+        "Camara 7 com intermitencia - manutencao solicitada",
+        "Sensor de fumaca setor C disparou - verificacao em andamento",
+        "Incidente no portao Sul B - equipe de seguranca acionada",
+        "Alerta: fluxo irregular de torcedores na arquibancada Leste",
+        "Sistema de iluminacao do campo: backup ativado",
+        "Delegacao da Argentina em deslocamento - ETA 15 min",
+        "Concessionaria setor D: estoque baixo de agua",
+        "Check-in VIP: 85% dos convites confirmados",
+        "Drone de inspecao concluiu volta ao estadio",
+        "Radio comunicacao: canal 7 com interferencia"
+      ]
+    },
+    "crowd": {
+      "gate_norte_a": "Norte A",
+      "gate_norte_b": "Norte B",
+      "gate_sul_a": "Sul A",
+      "gate_sul_b": "Sul B",
+      "alert_prefix": "Alerta:"
+    }
+  },
+  "overlay": {
+    "title": "Telemetria",
+    "export": {
+      "pdf": "Exportar PDF",
+      "success": "PDF exportado!"
+    }
+  }
+}

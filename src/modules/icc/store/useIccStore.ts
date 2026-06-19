@@ -1,8 +1,12 @@
 import { create } from 'zustand';
 
+export type AIModel = 'tatico' | 'estatistico' | 'operacional' | 'preditivo';
+
 export interface ChatMessage {
   role: 'user' | 'ai';
   content: string;
+  reasoning?: string;
+  model?: AIModel;
   chartData?: { label: string; data: number[] };
 }
 

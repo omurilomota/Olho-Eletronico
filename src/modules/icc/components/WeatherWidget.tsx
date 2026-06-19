@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Tab = 'now' | 'weekly' | 'monthly';
 
@@ -67,6 +68,7 @@ function generateMonthly(): MonthData {
 }
 
 export default function WeatherWidget() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('now');
   const [weather, setWeather] = useState<Weather>({
     temp: 24,
@@ -90,16 +92,16 @@ export default function WeatherWidget() {
   }, []);
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: 'now', label: 'Agora' },
-    { id: 'weekly', label: 'Semanal' },
-    { id: 'monthly', label: 'Mensal' },
+    { id: 'now', label: t('icc.weather.now') },
+    { id: 'weekly', label: t('icc.weather.weekly') },
+    { id: 'monthly', label: t('icc.weather.monthly') },
   ];
 
   return (
     <div className="bg-surface-800/50 rounded-xl border border-surface-700/50 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-surface-200/60 uppercase tracking-wider">
-          Clima
+          {t('icc.weather.title')}
         </h3>
         <div className="flex gap-1 bg-surface-900/50 rounded-lg p-0.5">
           {tabs.map((t) => (
@@ -133,11 +135,11 @@ export default function WeatherWidget() {
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="bg-surface-900/50 rounded-lg p-2">
-              <p className="text-surface-200/40 mb-0.5">Umidade</p>
+              <p className="text-surface-200/40 mb-0.5">{t('icc.weather.humidity')}</p>
               <p className="font-mono text-surface-200/70">{Math.round(weather.humidity)}%</p>
             </div>
             <div className="bg-surface-900/50 rounded-lg p-2">
-              <p className="text-surface-200/40 mb-0.5">Vento</p>
+              <p className="text-surface-200/40 mb-0.5">{t('icc.weather.wind')}</p>
               <p className="font-mono text-surface-200/70">{Math.round(weather.wind)} km/h</p>
             </div>
           </div>
@@ -177,11 +179,11 @@ export default function WeatherWidget() {
         <div className="space-y-2">
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="bg-surface-900/50 rounded-lg p-2">
-              <p className="text-surface-200/40 mb-0.5">Temp Media</p>
+              <p className="text-surface-200/40 mb-0.5">{t('icc.weather.avg_temp')}</p>
               <p className="font-mono text-lg text-surface-200/90">{monthly.avgTemp}°C</p>
             </div>
             <div className="bg-surface-900/50 rounded-lg p-2">
-              <p className="text-surface-200/40 mb-0.5">Precipitacao</p>
+              <p className="text-surface-200/40 mb-0.5">{t('icc.weather.precipitation')}</p>
               <p className="font-mono text-lg text-surface-200/90">{monthly.totalPrecipMm}mm</p>
             </div>
           </div>
@@ -189,22 +191,22 @@ export default function WeatherWidget() {
             <div className="bg-surface-900/50 rounded-lg p-2 text-center">
               <p className="text-lg">{conditionIcons.sunny}</p>
               <p className="font-mono text-surface-200/80">{monthly.sunnyDays}</p>
-              <p className="text-surface-200/30 text-[10px]">Ensolarados</p>
+              <p className="text-surface-200/30 text-[10px]">{t('icc.weather.sunny')}</p>
             </div>
             <div className="bg-surface-900/50 rounded-lg p-2 text-center">
               <p className="text-lg">{conditionIcons.cloudy}</p>
               <p className="font-mono text-surface-200/80">{monthly.cloudyDays}</p>
-              <p className="text-surface-200/30 text-[10px]">Nublados</p>
+              <p className="text-surface-200/30 text-[10px]">{t('icc.weather.cloudy')}</p>
             </div>
             <div className="bg-surface-900/50 rounded-lg p-2 text-center">
               <p className="text-lg">{conditionIcons.rainy}</p>
               <p className="font-mono text-surface-200/80">{monthly.rainyDays}</p>
-              <p className="text-surface-200/30 text-[10px]">Chuvosos</p>
+              <p className="text-surface-200/30 text-[10px]">{t('icc.weather.rainy')}</p>
             </div>
           </div>
           <div className="bg-surface-900/50 rounded-lg p-2">
             <div className="flex justify-between text-[10px] text-surface-200/40 mb-1">
-              <span>Dias de chuva no mes</span>
+              <span>{t('icc.weather.rainy_days')}</span>
               <span className="font-mono">{monthly.rainyDays}/30</span>
             </div>
             <div className="h-1.5 bg-surface-700 rounded-full overflow-hidden">
