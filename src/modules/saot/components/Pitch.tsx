@@ -9,15 +9,15 @@ function createGrassTexture(): THREE.CanvasTexture {
 
   const stripeWidth = 512 / 14;
   for (let i = 0; i < 14; i++) {
-    ctx.fillStyle = i % 2 === 0 ? '#2d8a4e' : '#34a058';
+    ctx.fillStyle = i % 2 === 0 ? '#3cb043' : '#4caf50';
     ctx.fillRect(i * stripeWidth, 0, stripeWidth, 512);
   }
 
-  for (let i = 0; i < 3000; i++) {
+  for (let i = 0; i < 2000; i++) {
     const x = Math.random() * 512;
     const y = Math.random() * 512;
-    ctx.fillStyle = `rgba(${40 + Math.random() * 30}, ${120 + Math.random() * 40}, ${50 + Math.random() * 30}, 0.2)`;
-    ctx.fillRect(x, y, 1, 2);
+    ctx.fillStyle = `rgba(255, 255, 255, 0.03)`;
+    ctx.fillRect(x, y, 1, 1);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
