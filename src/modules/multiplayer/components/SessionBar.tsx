@@ -7,14 +7,38 @@ export default function SessionBar() {
   const { t } = useTranslation();
   const { session, isConnected, leaveSession } = useMultiplayerStore();
   const [showModal, setShowModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyId = async () => {
+    if (!session) return;
+    try {
+      await navigator.clipboard.writeText(session.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   if (isConnected && session) {
     return (
-      <div className="flex items-center gap-3 px-3 py-1.5 glass rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-lg">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-slow" />
           <span className="text-xs font-medium text-surface-200/70">{session.name}</span>
         </div>
+        <button
+          onClick={handleCopyId}
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-700/50 hover:bg-surface-700 transition-colors group"
+          title={t('icc.multiplayer.copy_id')}
+        >
+          <span className="text-[10px] font-mono text-surface-200/40 group-hover:text-surface-200/70">{session.id}</span>
+          <svg className="w-3 h-3 text-surface-200/30 group-hover:text-surface-200/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+          </svg>
+        </button>
+        {copied && <span className="text-[9px] text-emerald-400">{t('icc.multiplayer.copied')}</span>}
         <div className="flex -space-x-1.5">
           {session.participants.map((p) => (
             <div

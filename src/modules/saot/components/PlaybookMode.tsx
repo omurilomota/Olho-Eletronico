@@ -132,7 +132,7 @@ export default function PlaybookMode() {
             </span>
           </div>
           <p className="text-xs text-surface-200/80 font-medium">
-            {t(`saot.plays.${currentPlayId}.steps.${currentStep}`)}
+            {t(`saot.plays.steps.${currentPlayId}.${currentStep}`)}
           </p>
 
           <div className="mt-2 grid grid-cols-2 gap-2 text-[10px]">

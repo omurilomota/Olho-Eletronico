@@ -256,7 +256,11 @@
       "session_id_placeholder": "Ex: ABC123",
       "create": "Criar",
       "join": "Entrar",
-      "leave": "Sair"
+      "leave": "Sair",
+      "session_created": "Sessao criada!",
+      "share_id": "Compartilhe este ID para outros entrarem",
+      "copy_id": "Copiar ID",
+      "copied": "Copiado!"
     },
     "ticker": {
       "title": "Operacoes ao Vivo",

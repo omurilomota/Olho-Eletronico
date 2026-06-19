@@ -256,7 +256,11 @@
       "session_id_placeholder": "Ex: ABC123",
       "create": "Create",
       "join": "Join",
-      "leave": "Leave"
+      "leave": "Leave",
+      "session_created": "Session created!",
+      "share_id": "Share this ID for others to join",
+      "copy_id": "Copy ID",
+      "copied": "Copied!"
     },
     "ticker": {
       "title": "Live Operations",
