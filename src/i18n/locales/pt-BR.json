@@ -182,6 +182,10 @@
     }
   },
   "overlay": {
-    "title": "Telemetria"
+    "title": "Telemetria",
+    "export": {
+      "pdf": "Exportar PDF",
+      "success": "PDF exportado!"
+    }
   }
 }
