@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 
+const COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+function generateId(): string {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 export interface Participant {
   id: string;
   name: string;
@@ -19,24 +25,23 @@ export interface Session {
 interface MultiplayerState {
   session: Session | null;
   isConnected: boolean;
+  channelName: string | null;
   createSession: (name: string, userName: string) => void;
   joinSession: (sessionId: string, userName: string) => void;
   leaveSession: () => void;
+  setSession: (session: Session | null) => void;
+  setConnected: (connected: boolean) => void;
+  setChannelName: (name: string | null) => void;
   updateCursor: (x: number, z: number) => void;
+  setParticipants: (participants: Participant[]) => void;
   addParticipant: (p: Participant) => void;
   removeParticipant: (id: string) => void;
-  setConnected: (connected: boolean) => void;
-}
-
-const COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
-
-function generateId(): string {
-  return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
 export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   session: null,
   isConnected: false,
+  channelName: null,
 
   createSession: (name, userName) => {
     const userId = generateId();
@@ -66,16 +71,9 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       createdBy: 'Remote',
       participants: [
         {
-          id: 'host',
-          name: 'Host',
-          color: COLORS[0],
-          role: 'admin',
-          cursor: { x: 0, z: 0 },
-        },
-        {
           id: userId,
           name: userName,
-          color: COLORS[participantCount % COLORS.length],
+          color: COLORS[(participantCount + 1) % COLORS.length],
           role: 'viewer',
         },
       ],
@@ -84,26 +82,38 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
     set({ session, isConnected: true });
   },
 
-  leaveSession: () => set({ session: null, isConnected: false }),
+  leaveSession: () => set({ session: null, isConnected: false, channelName: null }),
+
+  setSession: (session) => set({ session }),
+  setConnected: (connected) => set({ isConnected: connected }),
+  setChannelName: (name) => set({ channelName: name }),
 
   updateCursor: (x, z) => {
     const session = get().session;
     if (!session) return;
-    const myId = session.participants.find((p) => p.role === 'admin')?.id;
-    if (!myId) return;
+    const me = session.participants.find((p) => p.role === 'admin');
+    if (!me) return;
     set({
       session: {
         ...session,
         participants: session.participants.map((p) =>
-          p.id === myId ? { ...p, cursor: { x, z } } : p,
+          p.id === me.id ? { ...p, cursor: { x, z } } : p,
         ),
       },
     });
   },
 
+  setParticipants: (participants) => {
+    const session = get().session;
+    if (!session) return;
+    set({ session: { ...session, participants } });
+  },
+
   addParticipant: (p) => {
     const session = get().session;
     if (!session) return;
+    const exists = session.participants.some((ep) => ep.id === p.id);
+    if (exists) return;
     set({
       session: {
         ...session,
@@ -122,6 +132,4 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       },
     });
   },
-
-  setConnected: (connected) => set({ isConnected: connected }),
 }));
