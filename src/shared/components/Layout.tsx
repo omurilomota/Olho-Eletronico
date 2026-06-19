@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import NotificationBell from '../../modules/notifications/components/NotificationBell';
 
 type Props = {
   children: ReactNode;
@@ -78,6 +79,7 @@ export default function Layout({ children, activeTab, onTabChange }: Props) {
                 <span className="sm:hidden">ICC</span>
               </button>
             </div>
+            <NotificationBell />
             <LanguageSwitcher />
           </nav>
         </div>

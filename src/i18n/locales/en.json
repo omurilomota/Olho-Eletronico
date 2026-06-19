@@ -149,6 +149,12 @@
       "avg_speed": "Avg Speed",
       "congested": "Congested"
     },
+    "notifications": {
+      "title": "Notifications",
+      "mark_all_read": "Mark all read",
+      "empty": "No notifications",
+      "clear_all": "Clear all"
+    },
     "ticker": {
       "title": "Live Operations",
       "events": "events",

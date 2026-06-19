@@ -149,6 +149,12 @@
       "avg_speed": "Vel. Prom",
       "congested": "Congestionados"
     },
+    "notifications": {
+      "title": "Notificaciones",
+      "mark_all_read": "Marcar leidas",
+      "empty": "Sin notificaciones",
+      "clear_all": "Limpiar todas"
+    },
     "ticker": {
       "title": "Operaciones en Vivo",
       "events": "eventos",
