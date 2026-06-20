@@ -31,7 +31,7 @@ interface RemoteCursorData {
 export default function SAOTLab() {
   const { t } = useTranslation();
   const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
-  const { session } = useMultiplayerStore();
+  const session = useMultiplayerStore((s) => s.session);
   const [remoteCursors, setRemoteCursors] = useState<RemoteCursorData[]>([]);
   const me = session?.participants[0];
   const isAdmin = me?.role === 'admin';
@@ -42,13 +42,15 @@ export default function SAOTLab() {
     setRemoteCursors((prev) => prev.filter((c) => participantIds.has(c.userId)));
   }, [session?.participants]);
 
-  const {
-    attacker, defender, goalkeeper,
-    activeScenario,
-    cameraPreset,
-    showOffsideLine,
-    setAttacker, setDefender, setGoalkeeper,
-  } = useSaotStore();
+  const attacker = useSaotStore((s) => s.attacker);
+  const defender = useSaotStore((s) => s.defender);
+  const goalkeeper = useSaotStore((s) => s.goalkeeper);
+  const activeScenario = useSaotStore((s) => s.activeScenario);
+  const cameraPreset = useSaotStore((s) => s.cameraPreset);
+  const showOffsideLine = useSaotStore((s) => s.showOffsideLine);
+  const setAttacker = useSaotStore((s) => s.setAttacker);
+  const setDefender = useSaotStore((s) => s.setDefender);
+  const setGoalkeeper = useSaotStore((s) => s.setGoalkeeper);
 
   const simulation = useSimulation({
     attackerStart: attacker,
@@ -180,7 +182,6 @@ export default function SAOTLab() {
             color="#ef4444"
             secondaryColor="#ffffff"
             label={t('saot.attacker')}
-            number={9}
             onDragEnd={(pos) => handleDragEnd('attacker', pos)}
             highlighted={result.isOffside && showOffsideLine}
             animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
@@ -191,7 +192,6 @@ export default function SAOTLab() {
             color="#3b82f6"
             secondaryColor="#1e3a5f"
             label={t('saot.defender')}
-            number={4}
             onDragEnd={(pos) => handleDragEnd('defender', pos)}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
             facingAngle={defenderAngle}
@@ -201,7 +201,6 @@ export default function SAOTLab() {
             color="#eab308"
             secondaryColor="#1a1a1a"
             label={t('saot.goalkeeper')}
-            number={1}
             onDragEnd={(pos) => handleDragEnd('goalkeeper', pos)}
           />
 

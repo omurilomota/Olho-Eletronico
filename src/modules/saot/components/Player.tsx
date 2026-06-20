@@ -13,7 +13,6 @@ interface PlayerProps {
   color: string;
   secondaryColor: string;
   label: string;
-  number: number;
   onDragEnd: (pos: Position) => void;
   highlighted?: boolean;
   animationState?: AnimationState;

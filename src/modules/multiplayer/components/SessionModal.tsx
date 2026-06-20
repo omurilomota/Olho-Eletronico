@@ -8,7 +8,10 @@ interface Props {
 
 export default function SessionModal({ onClose }: Props) {
   const { t } = useTranslation();
-  const { createSession, joinSession, isConnected, connectionError } = useMultiplayerStore();
+  const createSession = useMultiplayerStore((s) => s.createSession);
+  const joinSession = useMultiplayerStore((s) => s.joinSession);
+  const isConnected = useMultiplayerStore((s) => s.isConnected);
+  const connectionError = useMultiplayerStore((s) => s.connectionError);
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [sessionName, setSessionName] = useState('');
   const [sessionId, setSessionId] = useState('');
