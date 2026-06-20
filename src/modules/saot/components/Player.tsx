@@ -1,10 +1,9 @@
-import { useRef, useEffect, useState, memo, useCallback } from 'react';
-import { Group, Mesh, Material } from 'three';
+import { useRef, useEffect, memo, useCallback } from 'react';
+import { Group, Mesh, Material, Vector3, Quaternion } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { DragControls } from '@react-three/drei';
 import type { Position } from '../store/useSaotStore';
-import { useDragPlayer } from '../hooks/useDragPlayer';
 
 export type AnimationState = 'idle' | 'running' | 'kicking';
 
@@ -19,6 +18,10 @@ interface PlayerProps {
   animationState?: AnimationState;
   facingAngle?: number;
 }
+
+const _parentPos = new Vector3();
+const _parentQuat = new Quaternion();
+const _parentScale = new Vector3();
 
 const Player = memo(function Player({
   position,
@@ -37,38 +40,31 @@ const Player = memo(function Player({
   const leftArmRef = useRef<Group>(null);
   const rightArmRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
-  const startPosRef = useRef<Position>(position);
-  const dragOffsetRef = useRef({ x: 0, z: 0 });
-  const [, forceRender] = useState(0);
+  const positionRef = useRef(position);
+  positionRef.current = position;
 
-  const handleDrag = useDragPlayer((pos) => {
-    const dx = pos.x - startPosRef.current.x;
-    const dz = pos.z - startPosRef.current.z;
-    dragOffsetRef.current = { x: dx, z: dz };
-    if (groupRef.current) {
-      groupRef.current.position.x = startPosRef.current.x + dx;
-      groupRef.current.position.z = startPosRef.current.z + dz;
-    }
-  });
+  const handleDrag = useCallback(() => {}, []);
 
   const handleDragStart = useCallback(() => {
-    const currentPos = groupRef.current
-      ? { x: groupRef.current.position.x, z: groupRef.current.position.z }
-      : position;
-    startPosRef.current = { ...currentPos };
-    dragOffsetRef.current = { x: 0, z: 0 };
-  }, [position]);
+    if (groupRef.current?.parent) {
+      groupRef.current.parent.position.set(0, 0, 0);
+      groupRef.current.parent.updateMatrix();
+    }
+  }, []);
 
   const handleDragComplete = useCallback(() => {
-    const offset = dragOffsetRef.current;
-    const finalPos = {
-      x: startPosRef.current.x + offset.x,
-      z: startPosRef.current.z + offset.z,
+    const parent = groupRef.current?.parent;
+    if (!parent) return;
+    parent.matrixWorld.decompose(_parentPos, _parentQuat, _parentScale);
+    const finalPos: Position = {
+      x: _parentPos.x + positionRef.current.x,
+      z: _parentPos.z + positionRef.current.z,
     };
-    dragOffsetRef.current = { x: 0, z: 0 };
+    parent.position.set(0, 0, 0);
+    parent.matrix.identity();
+    parent.updateMatrixWorld(true);
     onDragEnd(finalPos);
     onDragComplete?.(finalPos);
-    forceRender((n) => n + 1);
   }, [onDragEnd, onDragComplete]);
 
   useFrame((state) => {
