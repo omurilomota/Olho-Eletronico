@@ -1,6 +1,6 @@
-# Guia Gitflow para IA — Olho Eletronico
+# Guia Gitflow + GitHub — Olho Eletronico
 
-Este documento orienta assistentes de IA (e desenvolvedores humanos) a usarem Gitflow de forma etica e profissional neste projeto.
+Este documento orienta assistentes de IA (e desenvolvedores humanos) a usarem Gitflow e GitHub de forma etica e profissional neste projeto.
 
 ## Regra de Ouro
 
@@ -9,7 +9,7 @@ Este documento orienta assistentes de IA (e desenvolvedores humanos) a usarem Gi
 ## Estrutura de Branches
 
 ```
-main          ← release estavel, protegida
+main          ← release estavel, protegida no GitHub
   └── develop ← integracao de features
         ├── feat/nome-da-feature
         ├── fix/nome-do-fix
@@ -100,6 +100,54 @@ git push origin develop
 git branch -d release/v1.x.x
 ```
 
+---
+
+## Protecao de Branches no GitHub
+
+As branches `main` e `develop` estao protegidas via **Rulesets** no GitHub. Isso significa que certas acoes sao bloqueadas direto no servidor.
+
+### Regras Ativadas
+
+| Regra | O que faz | Branches afetadas |
+|-------|-----------|-------------------|
+| **Block force pushes** | Impede `git push --force` | `main`, `develop` |
+| **Restrict deletions** | Impede deletar branch via GitHub | `main`, `develop` |
+| **Require pull request** | Exige PR com 1 approval antes de merge | `main`, `develop` |
+
+### Como Funciona na Pratica
+
+1. **Nao e possivel commite direto** em `main` ou `develop` via GitHub
+2. **Toda alteracao** precisa de Pull Request com 1 approval
+3. **Force push e bloqueado** — nao da pra reescrever historico
+4. **Deletion e bloqueada** — branches so sao deletadas localmente
+
+### Fluxo Correto (com protecao)
+
+```
+1. Criar branch feat/* ou fix/* a partir de develop
+2. Implementar e commitar
+3. Push para origin
+4. Abrir Pull Request no GitHub (target: develop)
+5. Aguardar 1 approval
+6. Merge via GitHub (squash ou merge commit)
+7. Branch automaticamente deletada ou deletar manualmente
+```
+
+### O que Nao Fazer
+
+| Acao | Por que e bloqueada |
+|------|---------------------|
+| `git push origin main` | Branch protegida, precisa de PR |
+| `git push --force` | Force push bloqueado |
+| `git branch -d main` | Deletion restrita |
+| Commit direto no develop | Precisa de PR + approval |
+
+### Nota sobre Repositorios Privados
+
+> Regrasets so sao enforced em repositorios **GitHub Team** ou superior. Em contas Free/Person, as regras funcionam apenas como configuracao visual. Para protecao real, considere GitHub Team ou Pro.
+
+---
+
 ## Convencoes de Commit (Gitmoji)
 
 | Emoji | Tipo | Quando usar |
@@ -134,7 +182,7 @@ Exemplos:
 ### O que FAZER
 
 1. **Sempre criar branch** antes de qualquer modificacao
-2. **CommitAtomico** — uma logica por commit
+2. **Commit Atomico** — uma logica por commit
 3. **Verificar build** antes de commitar: `npm run build`
 4. **Verificar testes** antes de commitar: `npm run test`
 5. **Merge com --no-ff** para manter historico claro
@@ -175,11 +223,11 @@ Usuario: "adicione um botao de exportar relatorio"
 5. npm run test   → OK
 6. git add .
 7. git commit -m "✨ feat(icc): adiciona botao de exportar relatorio"
-8. git checkout develop
-9. git merge --no-ff feat/export-relatorio
-10. git push origin develop
-11. git branch -d feat/export-relatorio
-12. Informar ao usuario que esta pronto no develop
+8. git push origin feat/export-relatorio
+9. Abrir PR no GitHub (feat/export-relatorio → develop)
+10. Aguardar approval
+11. Merge via GitHub
+12. Deletar branch local: git branch -d feat/export-relatorio
 ```
 
 ## Conflitos de Merge

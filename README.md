@@ -224,7 +224,7 @@ Cobertos: fluxo de login, SAOT Lab, ICC Command Center.
 
 ## Contribuindo
 
-Consulte [GITFLOW.md](./GITFLOW.md) para o guia completo de branching strategy e commits.
+Consulte [GITHUB.md](./GITHUB.md) para o guia completo de branching strategy, commits e protecao de branches.
 
 ### Convencoes de Commit
 
