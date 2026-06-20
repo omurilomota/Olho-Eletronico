@@ -79,12 +79,12 @@ export default function SAOTLab() {
 
   const handleDragMove = useCallback(
     (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
-      if (!isAdmin) return;
+      if (isConnected && !isAdmin) return;
       if (target === 'attacker') setAttacker(pos);
       else if (target === 'defender') setDefender(pos);
       else if (target === 'goalkeeper') setGoalkeeper(pos);
     },
-    [isAdmin, setAttacker, setDefender, setGoalkeeper],
+    [isConnected, isAdmin, setAttacker, setDefender, setGoalkeeper],
   );
 
   const handleDragComplete = useCallback(
@@ -156,7 +156,7 @@ export default function SAOTLab() {
             label={t('saot.attacker')}
             onDragEnd={handleDragEndAttacker}
             onDragComplete={handleDragCompleteAttacker}
-            highlighted={result.isOffside && showOffsideLine}
+            highlighted={editMode || (result.isOffside && showOffsideLine)}
             animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
             facingAngle={attackerAngle}
           />
@@ -167,6 +167,7 @@ export default function SAOTLab() {
             label={t('saot.defender')}
             onDragEnd={handleDragEndDefender}
             onDragComplete={handleDragCompleteDefender}
+            highlighted={editMode}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
             facingAngle={defenderAngle}
           />
@@ -177,6 +178,7 @@ export default function SAOTLab() {
             label={t('saot.goalkeeper')}
             onDragEnd={handleDragEndGoalkeeper}
             onDragComplete={handleDragCompleteGoalkeeper}
+            highlighted={editMode}
           />
 
           <Ball
