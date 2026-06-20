@@ -1,4 +1,4 @@
-import { useRef, useEffect, memo, useCallback } from 'react';
+import { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { Group, Mesh, Material } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -37,17 +37,28 @@ const Player = memo(function Player({
   const leftArmRef = useRef<Group>(null);
   const rightArmRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
-  const lastPosRef = useRef<Position>(position);
+  const startPosRef = useRef<Position>(position);
+  const [dragOffset, setDragOffset] = useState({ x: 0, z: 0 });
+
   const handleDrag = useDragPlayer((pos) => {
-    lastPosRef.current = pos;
-    onDragEnd(pos);
+    const dx = pos.x - startPosRef.current.x;
+    const dz = pos.z - startPosRef.current.z;
+    setDragOffset({ x: dx, z: dz });
   });
 
-  const handleDragStart = useCallback(() => {}, []);
+  const handleDragStart = useCallback(() => {
+    startPosRef.current = { ...position };
+  }, [position]);
 
   const handleDragComplete = useCallback(() => {
-    onDragComplete?.(lastPosRef.current);
-  }, [onDragComplete]);
+    const finalPos = {
+      x: startPosRef.current.x + dragOffset.x,
+      z: startPosRef.current.z + dragOffset.z,
+    };
+    setDragOffset({ x: 0, z: 0 });
+    onDragEnd(finalPos);
+    onDragComplete?.(finalPos);
+  }, [dragOffset, onDragEnd, onDragComplete]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -137,7 +148,7 @@ const Player = memo(function Player({
       onDragEnd={handleDragComplete}
       autoTransform={false}
     >
-      <group ref={groupRef} position={[position.x, 0, position.z]}>
+      <group ref={groupRef} position={[position.x + dragOffset.x, 0, position.z + dragOffset.z]}>
 
         {/* Pernas */}
         <group ref={leftLegRef} position={[-0.12, 0.2, 0]}>
