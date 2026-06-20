@@ -51,6 +51,7 @@
     "options": "Opciones",
     "shadows": "Sombras",
     "offside_line": "Linea de fuera de juego",
+    "edit_mode": "Modo edicion",
     "reset_positions": "Reiniciar posiciones",
     "playbook_title": "Libro de Jugadas — Simulador de Pases",
     "playbook_hint": "Elige una jugada para simular diferentes situaciones de fuera de juego.",

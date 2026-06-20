@@ -51,6 +51,7 @@
     "options": "Options",
     "shadows": "Shadows",
     "offside_line": "Offside line",
+    "edit_mode": "Edit mode",
     "reset_positions": "Reset positions",
     "playbook_title": "Playbook — Pass Simulator",
     "playbook_hint": "Choose a play to simulate different offside situations.",

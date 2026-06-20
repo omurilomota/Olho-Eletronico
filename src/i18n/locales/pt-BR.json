@@ -51,6 +51,7 @@
     "options": "Opcoes",
     "shadows": "Sombras",
     "offside_line": "Linha de impedimento",
+    "edit_mode": "Modo edicao",
     "reset_positions": "Resetar posicoes",
     "playbook_title": "Playbook — Simulador de Passes",
     "playbook_hint": "Escolha um play para simular diferentes situacoes de impedimento.",

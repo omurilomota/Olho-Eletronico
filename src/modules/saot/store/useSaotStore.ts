@@ -77,6 +77,7 @@ export interface SAOTState {
   cameraPreset: CameraPreset;
   showShadows: boolean;
   showOffsideLine: boolean;
+  editMode: boolean;
   activeScenario: ScenarioType;
   setAttacker: (pos: Position) => void;
   setDefender: (pos: Position) => void;
@@ -84,6 +85,7 @@ export interface SAOTState {
   setCameraPreset: (preset: CameraPreset) => void;
   toggleShadows: () => void;
   toggleOffsideLine: () => void;
+  toggleEditMode: () => void;
   loadScenario: (type: ScenarioType) => void;
   reset: () => void;
 }
@@ -95,6 +97,7 @@ const defaultState = {
   cameraPreset: 'broadcast' as CameraPreset,
   showShadows: true,
   showOffsideLine: false,
+  editMode: false,
   activeScenario: 'custom' as ScenarioType,
 };
 
@@ -106,6 +109,7 @@ export const useSaotStore = create<SAOTState>((set) => ({
   setCameraPreset: (preset) => set({ cameraPreset: preset }),
   toggleShadows: () => set((s) => ({ showShadows: !s.showShadows })),
   toggleOffsideLine: () => set((s) => ({ showOffsideLine: !s.showOffsideLine })),
+  toggleEditMode: () => set((s) => ({ editMode: !s.editMode })),
   loadScenario: (type) => {
     if (type === 'custom') {
       set(defaultState);
