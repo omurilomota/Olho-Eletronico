@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 import NotificationBell from '../../modules/notifications/components/NotificationBell';
 import SessionBar from '../../modules/multiplayer/components/SessionBar';
+import MultiplayerProvider from '../../modules/multiplayer/components/MultiplayerProvider';
 
 type Props = {
   children: ReactNode;
@@ -88,7 +89,9 @@ export default function Layout({ children, activeTab, onTabChange }: Props) {
       </header>
 
       <main className="flex-1 relative overflow-hidden">
-        {children}
+        <MultiplayerProvider>
+          {children}
+        </MultiplayerProvider>
       </main>
 
       <footer className="glass border-t border-surface-700/50 px-4 py-2 flex items-center justify-between text-xs text-surface-200/40">
