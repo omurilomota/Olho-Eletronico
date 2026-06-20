@@ -41,6 +41,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
+  const generationRef = useRef(0);
 
   useEffect(() => {
     if (!session) {
@@ -48,7 +49,19 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
       return;
     }
 
-    const supabase = getSupabase();
+    const gen = ++generationRef.current;
+
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch (e) {
+      useMultiplayerStore.setState({
+        isConnected: false,
+        connectionError: e instanceof Error ? e.message : 'Falha ao inicializar Supabase.',
+      });
+      return;
+    }
+
     const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
     const channel = supabase.channel(channelName, {
       config: { broadcast: { self: false } },
@@ -56,6 +69,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
 
     channel
       .on('presence', { event: 'sync' }, () => {
+        if (generationRef.current !== gen) return;
         const state = channel.presenceState();
         const seen = new Set<string>();
         const all: Participant[] = [];
@@ -73,6 +87,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         setParticipants(all);
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
+        if (generationRef.current !== gen) return;
         for (const p of newPresences) {
           if (p && typeof p === 'object' && 'id' in p) {
             addParticipant(p as unknown as Participant);
@@ -80,6 +95,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         }
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        if (generationRef.current !== gen) return;
         for (const p of leftPresences) {
           if (p && typeof p === 'object' && 'id' in p) {
             removeParticipant((p as unknown as Participant).id);
@@ -87,18 +103,23 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         }
       })
       .on('broadcast', { event: CURSOR_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onCursor?.(payload as CursorPayload);
       })
       .on('broadcast', { event: SCENARIO_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onScenario?.(payload as ScenarioPayload);
       })
       .on('broadcast', { event: PLAYBOOK_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onPlaybook?.(payload as PlaybookPayload);
       })
       .on('broadcast', { event: PLAYER_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onPlayer?.(payload as PlayerPayload);
       })
       .subscribe(async (status) => {
+        if (generationRef.current !== gen) return;
         if (status === 'SUBSCRIBED') {
           const me = session.participants[0];
           if (me) {
@@ -110,12 +131,47 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
               cursor: me.cursor,
             });
           }
+          useMultiplayerStore.setState({ isConnected: true, connectionError: null });
+        } else if (status === 'CHANNEL_ERROR') {
+          useMultiplayerStore.setState({ isConnected: false, connectionError: 'Falha ao conectar com o servidor.' });
+        } else if (status === 'TIMED_OUT') {
+          useMultiplayerStore.setState({ isConnected: false, connectionError: 'Tempo esgotado. Verifique sua conexao.' });
+        } else if (status === 'CLOSED') {
+          useMultiplayerStore.setState({ isConnected: false });
         }
       });
 
     channelRef.current = channel;
 
+    let joinTimeout: ReturnType<typeof setTimeout> | null = null;
+    const role = session.participants[0]?.role;
+    if (role === 'viewer') {
+      joinTimeout = setTimeout(() => {
+        if (generationRef.current !== gen) return;
+        const current = useMultiplayerStore.getState();
+        if (current.session && current.session.participants.length <= 1) {
+          useMultiplayerStore.setState({
+            isConnected: false,
+            connectionError: 'Sessao nao encontrada ou criador offline.',
+          });
+        }
+      }, 5000);
+    } else if (role === 'admin') {
+      joinTimeout = setTimeout(() => {
+        if (generationRef.current !== gen) return;
+        const current = useMultiplayerStore.getState();
+        if (current.session && !current.isConnected && !current.connectionError) {
+          useMultiplayerStore.setState({
+            isConnected: false,
+            connectionError: 'Nao foi possivel conectar ao canal. Verifique sua conexao.',
+          });
+        }
+      }, 8000);
+    }
+
     return () => {
+      generationRef.current++;
+      if (joinTimeout) clearTimeout(joinTimeout);
       supabase.removeChannel(channel);
       channelRef.current = null;
     };

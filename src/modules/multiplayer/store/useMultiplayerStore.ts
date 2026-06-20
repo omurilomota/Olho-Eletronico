@@ -25,13 +25,13 @@ export interface Session {
 interface MultiplayerState {
   session: Session | null;
   isConnected: boolean;
-  channelName: string | null;
+  connectionError: string | null;
   createSession: (name: string, userName: string) => void;
   joinSession: (sessionId: string, userName: string) => void;
   leaveSession: () => void;
   setSession: (session: Session | null) => void;
   setConnected: (connected: boolean) => void;
-  setChannelName: (name: string | null) => void;
+  setConnectionError: (error: string | null) => void;
   updateCursor: (x: number, z: number) => void;
   setParticipants: (participants: Participant[]) => void;
   addParticipant: (p: Participant) => void;
@@ -41,7 +41,7 @@ interface MultiplayerState {
 export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   session: null,
   isConnected: false,
-  channelName: null,
+  connectionError: null,
 
   createSession: (name, userName) => {
     const userId = generateId();
@@ -59,7 +59,7 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       ],
       createdAt: new Date(),
     };
-    set({ session, isConnected: true });
+    set({ session, connectionError: null });
   },
 
   joinSession: (sessionId, userName) => {
@@ -79,14 +79,14 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       ],
       createdAt: new Date(),
     };
-    set({ session, isConnected: true });
+    set({ session, connectionError: null });
   },
 
-  leaveSession: () => set({ session: null, isConnected: false, channelName: null }),
+  leaveSession: () => set({ session: null, isConnected: false, connectionError: null }),
 
   setSession: (session) => set({ session }),
   setConnected: (connected) => set({ isConnected: connected }),
-  setChannelName: (name) => set({ channelName: name }),
+  setConnectionError: (error) => set({ connectionError: error }),
 
   updateCursor: (x, z) => {
     const session = get().session;

@@ -260,7 +260,9 @@
       "session_created": "Sesion creada!",
       "share_id": "Comparte este ID para que otros se unan",
       "copy_id": "Copiar ID",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "connecting": "Conectando...",
+      "connection_timeout": "Tiempo de conexion agotado. Verifica tu conexion e intenta de nuevo."
     },
     "ticker": {
       "title": "Operaciones en Vivo",

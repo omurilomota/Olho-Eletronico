@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
 import SessionModal from './SessionModal';
@@ -8,6 +8,8 @@ export default function SessionBar() {
   const { session, isConnected, leaveSession } = useMultiplayerStore();
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const handleCloseModal = useCallback(() => setShowModal(false), []);
 
   const handleCopyId = async () => {
     if (!session) return;
@@ -73,7 +75,7 @@ export default function SessionBar() {
         </svg>
         <span className="text-xs text-surface-200/50">{t('icc.multiplayer.connect')}</span>
       </button>
-      {showModal && <SessionModal onClose={() => setShowModal(false)} />}
+      {showModal && <SessionModal onClose={handleCloseModal} />}
     </>
   );
 }
