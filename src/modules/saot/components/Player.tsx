@@ -38,27 +38,38 @@ const Player = memo(function Player({
   const rightArmRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
   const startPosRef = useRef<Position>(position);
-  const [dragOffset, setDragOffset] = useState({ x: 0, z: 0 });
+  const dragOffsetRef = useRef({ x: 0, z: 0 });
+  const [, forceRender] = useState(0);
 
   const handleDrag = useDragPlayer((pos) => {
     const dx = pos.x - startPosRef.current.x;
     const dz = pos.z - startPosRef.current.z;
-    setDragOffset({ x: dx, z: dz });
+    dragOffsetRef.current = { x: dx, z: dz };
+    if (groupRef.current) {
+      groupRef.current.position.x = startPosRef.current.x + dx;
+      groupRef.current.position.z = startPosRef.current.z + dz;
+    }
   });
 
   const handleDragStart = useCallback(() => {
-    startPosRef.current = { ...position };
+    const currentPos = groupRef.current
+      ? { x: groupRef.current.position.x, z: groupRef.current.position.z }
+      : position;
+    startPosRef.current = { ...currentPos };
+    dragOffsetRef.current = { x: 0, z: 0 };
   }, [position]);
 
   const handleDragComplete = useCallback(() => {
+    const offset = dragOffsetRef.current;
     const finalPos = {
-      x: startPosRef.current.x + dragOffset.x,
-      z: startPosRef.current.z + dragOffset.z,
+      x: startPosRef.current.x + offset.x,
+      z: startPosRef.current.z + offset.z,
     };
-    setDragOffset({ x: 0, z: 0 });
+    dragOffsetRef.current = { x: 0, z: 0 };
     onDragEnd(finalPos);
     onDragComplete?.(finalPos);
-  }, [dragOffset, onDragEnd, onDragComplete]);
+    forceRender((n) => n + 1);
+  }, [onDragEnd, onDragComplete]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -148,7 +159,7 @@ const Player = memo(function Player({
       onDragEnd={handleDragComplete}
       autoTransform={false}
     >
-      <group ref={groupRef} position={[position.x + dragOffset.x, 0, position.z + dragOffset.z]}>
+      <group ref={groupRef} position={[position.x, 0, position.z]}>
 
         {/* Pernas */}
         <group ref={leftLegRef} position={[-0.12, 0.2, 0]}>
