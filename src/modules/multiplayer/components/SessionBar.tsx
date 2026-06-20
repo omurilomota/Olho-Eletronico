@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
 import SessionModal from './SessionModal';
@@ -8,17 +8,23 @@ export default function SessionBar() {
   const { session, isConnected, leaveSession } = useMultiplayerStore();
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const handleCopyId = async () => {
     if (!session) return;
     try {
       await navigator.clipboard.writeText(session.id);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     } catch {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // clipboard write failed silently
     }
+    setCopied(true);
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   if (isConnected && session) {

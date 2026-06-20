@@ -35,6 +35,7 @@ const PRESETS: Record<CameraPreset, { position: THREE.Vector3; target: THREE.Vec
 };
 
 export default function CameraController({ preset, followBall = false, ballPosition }: CameraControllerProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
   const targetPos = useRef(new THREE.Vector3());

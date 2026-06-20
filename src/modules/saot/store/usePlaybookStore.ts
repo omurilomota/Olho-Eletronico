@@ -153,7 +153,6 @@ interface PlaybookState {
   plays: Play[];
   currentPlayId: string | null;
   currentStep: number;
-  isPlaying: boolean;
   selectPlay: (id: string) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -165,8 +164,7 @@ export const usePlaybookStore = create<PlaybookState>((set, get) => ({
   plays: PLAYS,
   currentPlayId: null,
   currentStep: 0,
-  isPlaying: false,
-  selectPlay: (id) => set({ currentPlayId: id, currentStep: 0, isPlaying: false }),
+  selectPlay: (id) => set({ currentPlayId: id, currentStep: 0 }),
   nextStep: () => {
     const { currentPlayId, currentStep } = get();
     const play = PLAYS.find((p) => p.id === currentPlayId);
@@ -180,6 +178,6 @@ export const usePlaybookStore = create<PlaybookState>((set, get) => ({
       set({ currentStep: currentStep - 1 });
     }
   },
-  resetPlay: () => set({ currentStep: 0, isPlaying: false }),
-  clearPlay: () => set({ currentPlayId: null, currentStep: 0, isPlaying: false }),
+  resetPlay: () => set({ currentStep: 0 }),
+  clearPlay: () => set({ currentPlayId: null, currentStep: 0 }),
 }));
