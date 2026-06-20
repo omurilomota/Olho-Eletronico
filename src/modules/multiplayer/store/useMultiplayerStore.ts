@@ -24,14 +24,16 @@ export interface Session {
 
 interface MultiplayerState {
   session: Session | null;
+  localUserId: string | null;
   isConnected: boolean;
   connectionError: string | null;
+  channelName: string | null;
   createSession: (name: string, userName: string) => void;
   joinSession: (sessionId: string, userName: string) => void;
   leaveSession: () => void;
   setSession: (session: Session | null) => void;
   setConnected: (connected: boolean) => void;
-  setConnectionError: (error: string | null) => void;
+  setChannelName: (name: string | null) => void;
   updateCursor: (x: number, z: number) => void;
   setParticipants: (participants: Participant[]) => void;
   addParticipant: (p: Participant) => void;
@@ -40,8 +42,10 @@ interface MultiplayerState {
 
 export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   session: null,
+  localUserId: null,
   isConnected: false,
   connectionError: null,
+  channelName: null,
 
   createSession: (name, userName) => {
     const userId = generateId();
@@ -59,7 +63,7 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       ],
       createdAt: new Date(),
     };
-    set({ session, connectionError: null });
+    set({ session, localUserId: userId, isConnected: true });
   },
 
   joinSession: (sessionId, userName) => {
@@ -79,25 +83,24 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       ],
       createdAt: new Date(),
     };
-    set({ session, connectionError: null });
+    set({ session, localUserId: userId, isConnected: true });
   },
 
-  leaveSession: () => set({ session: null, isConnected: false, connectionError: null }),
+  leaveSession: () => set({ session: null, localUserId: null, isConnected: false, channelName: null }),
 
   setSession: (session) => set({ session }),
   setConnected: (connected) => set({ isConnected: connected }),
-  setConnectionError: (error) => set({ connectionError: error }),
+  setChannelName: (name) => set({ channelName: name }),
 
   updateCursor: (x, z) => {
     const session = get().session;
-    if (!session) return;
-    const me = session.participants.find((p) => p.role === 'admin');
-    if (!me) return;
+    const localUserId = get().localUserId;
+    if (!session || !localUserId) return;
     set({
       session: {
         ...session,
         participants: session.participants.map((p) =>
-          p.id === me.id ? { ...p, cursor: { x, z } } : p,
+          p.id === localUserId ? { ...p, cursor: { x, z } } : p,
         ),
       },
     });
