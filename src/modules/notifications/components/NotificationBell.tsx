@@ -6,7 +6,8 @@ import NotificationPanel from './NotificationPanel';
 
 export default function NotificationBell() {
   const { t } = useTranslation();
-  const { unreadCount, addNotification } = useNotificationStore();
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const addNotification = useNotificationStore((s) => s.addNotification);
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 

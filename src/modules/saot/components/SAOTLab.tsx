@@ -33,12 +33,14 @@ export default function SAOTLab() {
   const me = localUserId ? session.find((p) => p.id === localUserId) : null;
   const isAdmin = me?.role === 'admin';
 
-  const {
-    attacker, defender, goalkeeper,
-    cameraPreset,
-    showOffsideLine,
-    setAttacker, setDefender, setGoalkeeper,
-  } = useSaotStore();
+  const attacker = useSaotStore((s) => s.attacker);
+  const defender = useSaotStore((s) => s.defender);
+  const goalkeeper = useSaotStore((s) => s.goalkeeper);
+  const cameraPreset = useSaotStore((s) => s.cameraPreset);
+  const showOffsideLine = useSaotStore((s) => s.showOffsideLine);
+  const setAttacker = useSaotStore((s) => s.setAttacker);
+  const setDefender = useSaotStore((s) => s.setDefender);
+  const setGoalkeeper = useSaotStore((s) => s.setGoalkeeper);
 
   const simulation = useSimulation({
     attackerStart: attacker,
@@ -151,7 +153,6 @@ export default function SAOTLab() {
             color="#ef4444"
             secondaryColor="#ffffff"
             label={t('saot.attacker')}
-            number={9}
             onDragEnd={handleDragEndAttacker}
             onDragComplete={handleDragCompleteAttacker}
             highlighted={result.isOffside && showOffsideLine}
@@ -163,7 +164,6 @@ export default function SAOTLab() {
             color="#3b82f6"
             secondaryColor="#1e3a5f"
             label={t('saot.defender')}
-            number={4}
             onDragEnd={handleDragEndDefender}
             onDragComplete={handleDragCompleteDefender}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
@@ -174,7 +174,6 @@ export default function SAOTLab() {
             color="#eab308"
             secondaryColor="#1a1a1a"
             label={t('saot.goalkeeper')}
-            number={1}
             onDragEnd={handleDragEndGoalkeeper}
             onDragComplete={handleDragCompleteGoalkeeper}
           />

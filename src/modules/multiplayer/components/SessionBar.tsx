@@ -5,7 +5,9 @@ import SessionModal from './SessionModal';
 
 export default function SessionBar() {
   const { t } = useTranslation();
-  const { session, isConnected, leaveSession } = useMultiplayerStore();
+  const session = useMultiplayerStore((s) => s.session);
+  const isConnected = useMultiplayerStore((s) => s.isConnected);
+  const leaveSession = useMultiplayerStore((s) => s.leaveSession);
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

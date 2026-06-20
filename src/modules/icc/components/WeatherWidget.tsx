@@ -105,17 +105,17 @@ export default function WeatherWidget() {
           {t('icc.weather.title')}
         </h3>
         <div className="flex gap-1 bg-surface-900/50 rounded-lg p-0.5">
-          {tabs.map((t) => (
+          {tabs.map((tabItem) => (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
+              key={tabItem.id}
+              onClick={() => setTab(tabItem.id)}
               className={`px-2 py-1 rounded-md text-[10px] font-medium transition-all ${
-                tab === t.id
+                tab === tabItem.id
                   ? 'bg-brand-600 text-white'
                   : 'text-surface-200/50 hover:text-surface-200/70'
               }`}
             >
-              {t.label}
+              {tabItem.label}
             </button>
           ))}
         </div>

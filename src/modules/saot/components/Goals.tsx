@@ -35,9 +35,8 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
     />
   );
 
-  // Rede traseira: plano em X fixo (netDirection * GOAL_DEPTH do centro do gol)
   const backNetGeom = useMemo(() => {
-    const points: THREE.Vector3[] = [];
+    const points: number[] = [];
     const indices: number[] = [];
     const cols = 20;
     const rows = 10;
@@ -47,7 +46,7 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
       for (let j = 0; j <= rows; j++) {
         const z = (i / cols) * GOAL_WIDTH - HALF_WIDTH;
         const y = 0.1 + (j / rows) * (CROSSBAR_HEIGHT - 0.1);
-        points.push(new THREE.Vector3(backX, y, z));
+        points.push(backX, y, z);
       }
     }
 
@@ -62,15 +61,14 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
     }
 
     const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.Float32BufferAttribute(points.flatMap(p => [p.x, p.y, p.z]), 3));
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
     geom.setIndex(indices);
     geom.computeVertexNormals();
     return geom;
   }, [netDirection]);
 
-  // Rede lateral: plano em Z fixo
-  const sideNetGeom = useMemo(() => {
-    const points: THREE.Vector3[] = [];
+  const sideNetNeg = useMemo(() => {
+    const points: number[] = [];
     const indices: number[] = [];
     const cols = 6;
     const rows = 10;
@@ -79,7 +77,7 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
       for (let j = 0; j <= rows; j++) {
         const x = (i / cols) * netDirection * GOAL_DEPTH;
         const y = 0.1 + (j / rows) * (CROSSBAR_HEIGHT - 0.1);
-        points.push(new THREE.Vector3(x, y, 0));
+        points.push(x, y, 0);
       }
     }
 
@@ -94,7 +92,7 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
     }
 
     const geom = new THREE.BufferGeometry();
-    geom.setAttribute('position', new THREE.Float32BufferAttribute(points.flatMap(p => [p.x, p.y, p.z]), 3));
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
     geom.setIndex(indices);
     geom.computeVertexNormals();
     return geom;
@@ -102,48 +100,40 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
 
   return (
     <group position={[x, 0, 0]}>
-      {/* Trave esquerda (em Z) */}
       <mesh position={[0, CROSSBAR_HEIGHT / 2, -HALF_WIDTH]} castShadow>
         <cylinderGeometry args={[POST_RADIUS, POST_RADIUS, CROSSBAR_HEIGHT, 12]} />
         {postMaterial}
       </mesh>
 
-      {/* Trave direita (em Z) */}
       <mesh position={[0, CROSSBAR_HEIGHT / 2, HALF_WIDTH]} castShadow>
         <cylinderGeometry args={[POST_RADIUS, POST_RADIUS, CROSSBAR_HEIGHT, 12]} />
         {postMaterial}
       </mesh>
 
-      {/* Travessao */}
       <mesh position={[0, CROSSBAR_HEIGHT, 0]} castShadow>
         <boxGeometry args={[POST_RADIUS * 2, POST_RADIUS * 2, GOAL_WIDTH]} />
         {postMaterial}
       </mesh>
 
-      {/* Viga superior lateral esquerda */}
       <mesh position={[netDirection * GOAL_DEPTH / 2, CROSSBAR_HEIGHT, -HALF_WIDTH]} castShadow>
         <boxGeometry args={[GOAL_DEPTH, POST_RADIUS * 2, POST_RADIUS * 2]} />
         {postMaterial}
       </mesh>
 
-      {/* Viga superior lateral direita */}
       <mesh position={[netDirection * GOAL_DEPTH / 2, CROSSBAR_HEIGHT, HALF_WIDTH]} castShadow>
         <boxGeometry args={[GOAL_DEPTH, POST_RADIUS * 2, POST_RADIUS * 2]} />
         {postMaterial}
       </mesh>
 
-      {/* Rede traseira */}
       <mesh geometry={backNetGeom}>
         {netMaterial}
       </mesh>
 
-      {/* Rede lateral z negativo */}
-      <mesh position={[0, 0, -HALF_WIDTH]} geometry={sideNetGeom.clone()}>
+      <mesh position={[0, 0, -HALF_WIDTH]} geometry={sideNetNeg}>
         {netMaterial}
       </mesh>
 
-      {/* Rede lateral z positivo */}
-      <mesh position={[0, 0, HALF_WIDTH]} geometry={sideNetGeom.clone()}>
+      <mesh position={[0, 0, HALF_WIDTH]} geometry={sideNetNeg}>
         {netMaterial}
       </mesh>
     </group>
@@ -153,7 +143,6 @@ function Goal({ x, netDirection }: { x: number; netDirection: 1 | -1 }) {
 export default function Goals() {
   return (
     <group>
-      {/* Grama sob o gol esquerdo */}
       <GoalGrass x={-16.5} direction={-1} />
       <Goal x={-16.5} netDirection={-1} />
 

@@ -4,8 +4,16 @@ import { useSaotStore } from '../store/useSaotStore';
 
 export default function PlaybookMode() {
   const { t } = useTranslation();
-  const { plays, currentPlayId, currentStep, selectPlay, nextStep, prevStep, resetPlay, clearPlay } = usePlaybookStore();
-  const { setAttacker, setDefender } = useSaotStore();
+  const plays = usePlaybookStore((s) => s.plays);
+  const currentPlayId = usePlaybookStore((s) => s.currentPlayId);
+  const currentStep = usePlaybookStore((s) => s.currentStep);
+  const selectPlay = usePlaybookStore((s) => s.selectPlay);
+  const nextStep = usePlaybookStore((s) => s.nextStep);
+  const prevStep = usePlaybookStore((s) => s.prevStep);
+  const resetPlay = usePlaybookStore((s) => s.resetPlay);
+  const clearPlay = usePlaybookStore((s) => s.clearPlay);
+  const setAttacker = useSaotStore((s) => s.setAttacker);
+  const setDefender = useSaotStore((s) => s.setDefender);
 
   const currentPlay = plays.find((p) => p.id === currentPlayId);
   const currentStepData = currentPlay?.steps[currentStep];
