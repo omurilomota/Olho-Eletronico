@@ -16,23 +16,21 @@ import RemoteCursor from './RemoteCursor';
 import DataOverlay from '../../../shared/components/DataOverlay';
 import { calculateOffside } from '../services/OffsideCalculator';
 import { useMultiplayerStore } from '../../multiplayer/store/useMultiplayerStore';
-import { useRealtimeSync, type ScenarioPayload, type PlayerPayload } from '../../multiplayer/services/useRealtimeSync';
+import { useMultiplayer } from '../../multiplayer/components/MultiplayerProvider';
 import { useState, useCallback, useRef } from 'react';
-
-interface RemoteCursorData {
-  userId: string;
-  name: string;
-  color: string;
-  x: number;
-  z: number;
-}
 
 export default function SAOTLab() {
   const { t } = useTranslation();
   const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
-  const { session } = useMultiplayerStore();
-  const [remoteCursors, setRemoteCursors] = useState<RemoteCursorData[]>([]);
-  const me = session?.participants[0];
+  const multiplayer = useMultiplayer();
+  const localUserId = useMultiplayerStore((s) => s.localUserId);
+  const session = multiplayer?.session ?? [];
+  const isConnected = multiplayer?.isConnected ?? false;
+  const remoteCursors = multiplayer?.remoteCursors ?? [];
+  const sendCursor = multiplayer?.sendCursor;
+  const sendPlayer = multiplayer?.sendPlayer;
+
+  const me = localUserId ? session.find((p) => p.id === localUserId) : null;
   const isAdmin = me?.role === 'admin';
 
   const {
@@ -74,58 +72,25 @@ export default function SAOTLab() {
       )
     : 0;
 
-  const handleRemoteCursor = useCallback((userId: string, x: number, z: number) => {
-    setRemoteCursors((prev) => {
-      const existing = prev.find((c) => c.userId === userId);
-      if (existing) {
-        return prev.map((c) => (c.userId === userId ? { ...c, x, z } : c));
-      }
-      const cursorSession = useMultiplayerStore.getState().session;
-      const participant = cursorSession?.participants.find((p) => p.id === userId);
-      if (!participant) return prev;
-      return [...prev, { userId, name: participant.name, color: participant.color, x, z }];
-    });
-  }, []);
-
-  const handleRemoteScenario = useCallback((payload: ScenarioPayload) => {
-    const { setAttacker: sA, setDefender: sD, setGoalkeeper: sG, loadScenario } = useSaotStore.getState();
-    sA(payload.attacker);
-    sD(payload.defender);
-    sG(payload.goalkeeper);
-    loadScenario(payload.activeScenario);
-  }, []);
-
-  const handleRemotePlayer = useCallback((payload: PlayerPayload) => {
-    const store = useSaotStore.getState();
-    if (payload.target === 'attacker') store.setAttacker(payload.position);
-    else if (payload.target === 'defender') store.setDefender(payload.position);
-    else if (payload.target === 'goalkeeper') store.setGoalkeeper(payload.position);
-  }, []);
-
-  const { sendCursor, sendPlayer } = useRealtimeSync({
-    onRemoteCursor: handleRemoteCursor,
-    onRemoteScenario: handleRemoteScenario,
-    onRemotePlayer: handleRemotePlayer,
-  });
-
   const lastCursorBroadcast = useRef(0);
 
   const handleDragEnd = useCallback(
     (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
+      if (!isAdmin) return;
       if (target === 'attacker') setAttacker(pos);
       else if (target === 'defender') setDefender(pos);
       else if (target === 'goalkeeper') setGoalkeeper(pos);
 
-      if (session) {
+      if (isConnected && sendPlayer) {
         sendPlayer({ target, position: pos });
       }
     },
-    [session, sendPlayer, setAttacker, setDefender, setGoalkeeper],
+    [isAdmin, isConnected, sendPlayer, setAttacker, setDefender, setGoalkeeper],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!session || !isAdmin) return;
+      if (!isConnected || !isAdmin || !sendCursor) return;
       const now = Date.now();
       if (now - lastCursorBroadcast.current < 100) return;
       lastCursorBroadcast.current = now;
@@ -134,7 +99,7 @@ export default function SAOTLab() {
       const z = ((e.clientY - rect.top) / rect.height) * 22 - 11;
       sendCursor(x, z);
     },
-    [session, isAdmin, sendCursor],
+    [isConnected, isAdmin, sendCursor],
   );
 
   return (
