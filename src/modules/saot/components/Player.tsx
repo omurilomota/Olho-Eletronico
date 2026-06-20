@@ -1,5 +1,6 @@
 import { useRef, useEffect, memo, useCallback } from 'react';
-import { Group, Mesh, Material, Vector3, Quaternion } from 'three';
+import { Group, Mesh, Material } from 'three';
+import type { Matrix4 } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { DragControls } from '@react-three/drei';
@@ -19,9 +20,7 @@ interface PlayerProps {
   facingAngle?: number;
 }
 
-const _parentPos = new Vector3();
-const _parentQuat = new Quaternion();
-const _parentScale = new Vector3();
+const _tmpVec = { x: 0, y: 0, z: 0 };
 
 const Player = memo(function Player({
   position,
@@ -43,26 +42,25 @@ const Player = memo(function Player({
   const positionRef = useRef(position);
   positionRef.current = position;
 
-  const handleDrag = useCallback(() => {}, []);
-
-  const handleDragStart = useCallback(() => {
-    if (groupRef.current?.parent) {
-      groupRef.current.parent.position.set(0, 0, 0);
-      groupRef.current.parent.updateMatrix();
-    }
+  const handleDrag = useCallback((localMatrix: Matrix4) => {
+    const parent = groupRef.current?.parent;
+    if (!parent) return;
+    _tmpVec.x = localMatrix.elements[12];
+    _tmpVec.z = localMatrix.elements[14];
+    parent.position.x = _tmpVec.x;
+    parent.position.z = _tmpVec.z;
   }, []);
+
+  const handleDragStart = useCallback(() => {}, []);
 
   const handleDragComplete = useCallback(() => {
     const parent = groupRef.current?.parent;
     if (!parent) return;
-    parent.matrixWorld.decompose(_parentPos, _parentQuat, _parentScale);
     const finalPos: Position = {
-      x: _parentPos.x + positionRef.current.x,
-      z: _parentPos.z + positionRef.current.z,
+      x: parent.position.x + positionRef.current.x,
+      z: parent.position.z + positionRef.current.z,
     };
     parent.position.set(0, 0, 0);
-    parent.matrix.identity();
-    parent.updateMatrixWorld(true);
     onDragEnd(finalPos);
     onDragComplete?.(finalPos);
   }, [onDragEnd, onDragComplete]);
