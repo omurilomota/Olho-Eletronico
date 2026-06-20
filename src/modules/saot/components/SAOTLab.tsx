@@ -74,18 +74,48 @@ export default function SAOTLab() {
 
   const lastCursorBroadcast = useRef(0);
 
-  const handleDragEnd = useCallback(
+  const handleDragMove = useCallback(
     (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
       if (!isAdmin) return;
       if (target === 'attacker') setAttacker(pos);
       else if (target === 'defender') setDefender(pos);
       else if (target === 'goalkeeper') setGoalkeeper(pos);
-
-      if (isConnected && sendPlayer) {
-        sendPlayer({ target, position: pos });
-      }
     },
-    [isAdmin, isConnected, sendPlayer, setAttacker, setDefender, setGoalkeeper],
+    [isAdmin, setAttacker, setDefender, setGoalkeeper],
+  );
+
+  const handleDragComplete = useCallback(
+    (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
+      if (!isAdmin || !isConnected || !sendPlayer) return;
+      sendPlayer({ target, position: pos });
+    },
+    [isAdmin, isConnected, sendPlayer],
+  );
+
+  const handleDragEndAttacker = useCallback(
+    (pos: { x: number; z: number }) => handleDragMove('attacker', pos),
+    [handleDragMove],
+  );
+  const handleDragEndDefender = useCallback(
+    (pos: { x: number; z: number }) => handleDragMove('defender', pos),
+    [handleDragMove],
+  );
+  const handleDragEndGoalkeeper = useCallback(
+    (pos: { x: number; z: number }) => handleDragMove('goalkeeper', pos),
+    [handleDragMove],
+  );
+
+  const handleDragCompleteAttacker = useCallback(
+    (pos: { x: number; z: number }) => handleDragComplete('attacker', pos),
+    [handleDragComplete],
+  );
+  const handleDragCompleteDefender = useCallback(
+    (pos: { x: number; z: number }) => handleDragComplete('defender', pos),
+    [handleDragComplete],
+  );
+  const handleDragCompleteGoalkeeper = useCallback(
+    (pos: { x: number; z: number }) => handleDragComplete('goalkeeper', pos),
+    [handleDragComplete],
   );
 
   const handlePointerMove = useCallback(
@@ -122,7 +152,8 @@ export default function SAOTLab() {
             secondaryColor="#ffffff"
             label={t('saot.attacker')}
             number={9}
-            onDragEnd={(pos) => handleDragEnd('attacker', pos)}
+            onDragEnd={handleDragEndAttacker}
+            onDragComplete={handleDragCompleteAttacker}
             highlighted={result.isOffside && showOffsideLine}
             animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
             facingAngle={attackerAngle}
@@ -133,7 +164,8 @@ export default function SAOTLab() {
             secondaryColor="#1e3a5f"
             label={t('saot.defender')}
             number={4}
-            onDragEnd={(pos) => handleDragEnd('defender', pos)}
+            onDragEnd={handleDragEndDefender}
+            onDragComplete={handleDragCompleteDefender}
             animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
             facingAngle={defenderAngle}
           />
@@ -143,7 +175,8 @@ export default function SAOTLab() {
             secondaryColor="#1a1a1a"
             label={t('saot.goalkeeper')}
             number={1}
-            onDragEnd={(pos) => handleDragEnd('goalkeeper', pos)}
+            onDragEnd={handleDragEndGoalkeeper}
+            onDragComplete={handleDragCompleteGoalkeeper}
           />
 
           <Ball

@@ -79,6 +79,7 @@ export default function CameraController({ preset, followBall = false, ballPosit
   return (
     <OrbitControls
       ref={controlsRef}
+      makeDefault
       enableDamping
       dampingFactor={0.1}
       minDistance={5}
