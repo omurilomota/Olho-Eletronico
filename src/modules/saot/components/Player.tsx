@@ -1,4 +1,4 @@
-import { useRef, useEffect, memo } from 'react';
+import { useRef, useEffect, memo, useCallback } from 'react';
 import { Group, Mesh, Material } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -15,6 +15,7 @@ interface PlayerProps {
   label: string;
   number: number;
   onDragEnd: (pos: Position) => void;
+  onDragComplete?: (pos: Position) => void;
   highlighted?: boolean;
   animationState?: AnimationState;
   facingAngle?: number;
@@ -26,6 +27,7 @@ const Player = memo(function Player({
   secondaryColor,
   label,
   onDragEnd,
+  onDragComplete,
   highlighted = false,
   animationState = 'idle',
   facingAngle = 0,
@@ -36,7 +38,17 @@ const Player = memo(function Player({
   const leftArmRef = useRef<Group>(null);
   const rightArmRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
-  const handleDrag = useDragPlayer(onDragEnd);
+  const lastPosRef = useRef<Position>(position);
+  const handleDrag = useDragPlayer((pos) => {
+    lastPosRef.current = pos;
+    onDragEnd(pos);
+  });
+
+  const handleDragStart = useCallback(() => {}, []);
+
+  const handleDragComplete = useCallback(() => {
+    onDragComplete?.(lastPosRef.current);
+  }, [onDragComplete]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -58,7 +70,6 @@ const Player = memo(function Player({
         leftLegRef.current.rotation.x = Math.sin(t * speed) * 0.5;
         rightLegRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.5;
       } else if (animationState === 'kicking') {
-        // Kicking: right leg swings forward
         const kickPhase = (t * 2) % 1;
         if (kickPhase < 0.3) {
           rightLegRef.current.rotation.x = -kickPhase * 3;
@@ -69,7 +80,6 @@ const Player = memo(function Player({
         }
         leftLegRef.current.rotation.x = Math.sin(t * speed) * 0.15;
       } else {
-        // Idle
         leftLegRef.current.rotation.x *= 0.9;
         rightLegRef.current.rotation.x *= 0.9;
       }
@@ -81,11 +91,9 @@ const Player = memo(function Player({
         leftArmRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.4;
         rightArmRef.current.rotation.x = Math.sin(t * speed) * 0.4;
       } else if (animationState === 'kicking') {
-        // Balance: left arm forward when right leg kicks
         leftArmRef.current.rotation.x = Math.sin(t * speed) * 0.6;
         rightArmRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.3;
       } else {
-        // Idle: slight natural swing
         leftArmRef.current.rotation.x = Math.sin(t * 0.5) * 0.05;
         rightArmRef.current.rotation.x = Math.sin(t * 0.5 + Math.PI) * 0.05;
       }
@@ -124,7 +132,12 @@ const Player = memo(function Player({
   const shoeColor = '#1a1a1a';
 
   return (
-    <DragControls onDrag={handleDrag} autoTransform={false}>
+    <DragControls
+      onDrag={handleDrag}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragComplete}
+      autoTransform={false}
+    >
       <group ref={groupRef} position={[position.x, 0, position.z]}>
 
         {/* Pernas */}
