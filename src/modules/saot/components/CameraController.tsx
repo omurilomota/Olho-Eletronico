@@ -9,6 +9,7 @@ interface CameraControllerProps {
   preset: CameraPreset;
   followBall?: boolean;
   ballPosition?: [number, number, number];
+  enabled?: boolean;
 }
 
 const PRESETS: Record<CameraPreset, { position: THREE.Vector3; target: THREE.Vector3 }> = {
@@ -34,7 +35,8 @@ const PRESETS: Record<CameraPreset, { position: THREE.Vector3; target: THREE.Vec
   },
 };
 
-export default function CameraController({ preset, followBall = false, ballPosition }: CameraControllerProps) {
+export default function CameraController({ preset, followBall = false, ballPosition, enabled = true }: CameraControllerProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const controlsRef = useRef<any>(null);
   const { camera } = useThree();
   const targetPos = useRef(new THREE.Vector3());
@@ -78,6 +80,8 @@ export default function CameraController({ preset, followBall = false, ballPosit
   return (
     <OrbitControls
       ref={controlsRef}
+      makeDefault
+      enabled={enabled}
       enableDamping
       dampingFactor={0.1}
       minDistance={5}

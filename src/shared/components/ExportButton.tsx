@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePDF, type ReportData } from '../services/reportGenerator';
 
@@ -10,13 +10,20 @@ export default function ExportButton({ data }: ExportButtonProps) {
   const { t } = useTranslation();
   const [isExporting, setIsExporting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
   const handleExport = useCallback(async () => {
     setIsExporting(true);
     try {
       await generatePDF({ ...data, timestamp: new Date() });
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2000);
+      timeoutRef.current = setTimeout(() => setShowSuccess(false), 2000);
     } catch (err) {
       console.error('PDF export error:', err);
     } finally {

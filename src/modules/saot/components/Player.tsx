@@ -1,10 +1,10 @@
-import { useRef, useEffect, memo } from 'react';
+import { useRef, useEffect, memo, useCallback } from 'react';
 import { Group, Mesh, Material } from 'three';
+import type { Matrix4 } from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { DragControls } from '@react-three/drei';
 import type { Position } from '../store/useSaotStore';
-import { useDragPlayer } from '../hooks/useDragPlayer';
 
 export type AnimationState = 'idle' | 'running' | 'kicking';
 
@@ -13,12 +13,14 @@ interface PlayerProps {
   color: string;
   secondaryColor: string;
   label: string;
-  number: number;
   onDragEnd: (pos: Position) => void;
+  onDragComplete?: (pos: Position) => void;
   highlighted?: boolean;
   animationState?: AnimationState;
   facingAngle?: number;
 }
+
+const _tmpVec = { x: 0, y: 0, z: 0 };
 
 const Player = memo(function Player({
   position,
@@ -26,6 +28,7 @@ const Player = memo(function Player({
   secondaryColor,
   label,
   onDragEnd,
+  onDragComplete,
   highlighted = false,
   animationState = 'idle',
   facingAngle = 0,
@@ -36,7 +39,31 @@ const Player = memo(function Player({
   const leftArmRef = useRef<Group>(null);
   const rightArmRef = useRef<Group>(null);
   const torsoRef = useRef<Group>(null);
-  const handleDrag = useDragPlayer(onDragEnd);
+  const positionRef = useRef(position);
+  positionRef.current = position;
+
+  const handleDrag = useCallback((localMatrix: Matrix4) => {
+    const parent = groupRef.current?.parent;
+    if (!parent) return;
+    _tmpVec.x = localMatrix.elements[12];
+    _tmpVec.z = localMatrix.elements[14];
+    parent.position.x = _tmpVec.x;
+    parent.position.z = _tmpVec.z;
+  }, []);
+
+  const handleDragStart = useCallback(() => {}, []);
+
+  const handleDragComplete = useCallback(() => {
+    const parent = groupRef.current?.parent;
+    if (!parent) return;
+    const finalPos: Position = {
+      x: parent.position.x + positionRef.current.x,
+      z: parent.position.z + positionRef.current.z,
+    };
+    parent.position.set(0, 0, 0);
+    onDragEnd(finalPos);
+    onDragComplete?.(finalPos);
+  }, [onDragEnd, onDragComplete]);
 
   useFrame((state) => {
     if (!groupRef.current) return;
@@ -58,7 +85,6 @@ const Player = memo(function Player({
         leftLegRef.current.rotation.x = Math.sin(t * speed) * 0.5;
         rightLegRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.5;
       } else if (animationState === 'kicking') {
-        // Kicking: right leg swings forward
         const kickPhase = (t * 2) % 1;
         if (kickPhase < 0.3) {
           rightLegRef.current.rotation.x = -kickPhase * 3;
@@ -69,7 +95,6 @@ const Player = memo(function Player({
         }
         leftLegRef.current.rotation.x = Math.sin(t * speed) * 0.15;
       } else {
-        // Idle
         leftLegRef.current.rotation.x *= 0.9;
         rightLegRef.current.rotation.x *= 0.9;
       }
@@ -81,11 +106,9 @@ const Player = memo(function Player({
         leftArmRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.4;
         rightArmRef.current.rotation.x = Math.sin(t * speed) * 0.4;
       } else if (animationState === 'kicking') {
-        // Balance: left arm forward when right leg kicks
         leftArmRef.current.rotation.x = Math.sin(t * speed) * 0.6;
         rightArmRef.current.rotation.x = Math.sin(t * speed + Math.PI) * 0.3;
       } else {
-        // Idle: slight natural swing
         leftArmRef.current.rotation.x = Math.sin(t * 0.5) * 0.05;
         rightArmRef.current.rotation.x = Math.sin(t * 0.5 + Math.PI) * 0.05;
       }
@@ -124,7 +147,12 @@ const Player = memo(function Player({
   const shoeColor = '#1a1a1a';
 
   return (
-    <DragControls onDrag={handleDrag} autoTransform={false}>
+    <DragControls
+      onDrag={handleDrag}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragComplete}
+      autoTransform={false}
+    >
       <group ref={groupRef} position={[position.x, 0, position.z]}>
 
         {/* Pernas */}

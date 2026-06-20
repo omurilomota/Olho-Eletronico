@@ -51,6 +51,7 @@
     "options": "Opciones",
     "shadows": "Sombras",
     "offside_line": "Linea de fuera de juego",
+    "edit_mode": "Modo edicion",
     "reset_positions": "Reiniciar posiciones",
     "playbook_title": "Libro de Jugadas — Simulador de Pases",
     "playbook_hint": "Elige una jugada para simular diferentes situaciones de fuera de juego.",
@@ -260,7 +261,9 @@
       "session_created": "Sesion creada!",
       "share_id": "Comparte este ID para que otros se unan",
       "copy_id": "Copiar ID",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "connecting": "Conectando...",
+      "connection_timeout": "Tiempo de conexion agotado. Verifica tu conexion e intenta de nuevo."
     },
     "ticker": {
       "title": "Operaciones en Vivo",

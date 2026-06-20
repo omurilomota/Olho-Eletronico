@@ -94,7 +94,7 @@ src/
 
 ## 5. Gitflow — Obrigatorio
 
-Consulte `GITFLOW.md` para o guia completo.
+Consulte `GITHUB.md` para o guia completo.
 
 ### Resumo das Regras
 

@@ -9,14 +9,15 @@ interface RemoteCursorProps {
   name: string;
 }
 
+const _target = new THREE.Vector3();
+
 export default function RemoteCursor({ position, color, name }: RemoteCursorProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const targetRef = useRef(new THREE.Vector3(position.x, 0.5, position.z));
 
   useFrame(() => {
     if (!groupRef.current) return;
-    targetRef.current.set(position.x, 0.5, position.z);
-    groupRef.current.position.lerp(targetRef.current, 0.15);
+    _target.set(position.x, 0.5, position.z);
+    groupRef.current.position.lerp(_target, 0.15);
   });
 
   return (

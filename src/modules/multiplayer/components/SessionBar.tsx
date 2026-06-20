@@ -1,24 +1,34 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
 import SessionModal from './SessionModal';
 
 export default function SessionBar() {
   const { t } = useTranslation();
-  const { session, isConnected, leaveSession } = useMultiplayerStore();
+  const session = useMultiplayerStore((s) => s.session);
+  const isConnected = useMultiplayerStore((s) => s.isConnected);
+  const leaveSession = useMultiplayerStore((s) => s.leaveSession);
   const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleCloseModal = useCallback(() => setShowModal(false), []);
 
   const handleCopyId = async () => {
     if (!session) return;
     try {
       await navigator.clipboard.writeText(session.id);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     } catch {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      // clipboard write failed silently
     }
+    setCopied(true);
+    timeoutRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   if (isConnected && session) {
@@ -73,7 +83,7 @@ export default function SessionBar() {
         </svg>
         <span className="text-xs text-surface-200/50">{t('icc.multiplayer.connect')}</span>
       </button>
-      {showModal && <SessionModal onClose={() => setShowModal(false)} />}
+      {showModal && <SessionModal onClose={handleCloseModal} />}
     </>
   );
 }

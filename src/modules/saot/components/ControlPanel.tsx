@@ -41,13 +41,18 @@ const SCENARIO_LIST: { id: ScenarioType; icon: string }[] = [
 
 export default function ControlPanel({ simulation, result }: ControlPanelProps) {
   const { t } = useTranslation();
-  const {
-    goalkeeper, activeScenario,
-    cameraPreset, setCameraPreset,
-    showShadows, toggleShadows,
-    showOffsideLine, toggleOffsideLine,
-    loadScenario, reset,
-  } = useSaotStore();
+  const goalkeeper = useSaotStore((s) => s.goalkeeper);
+  const activeScenario = useSaotStore((s) => s.activeScenario);
+  const cameraPreset = useSaotStore((s) => s.cameraPreset);
+  const setCameraPreset = useSaotStore((s) => s.setCameraPreset);
+  const showShadows = useSaotStore((s) => s.showShadows);
+  const toggleShadows = useSaotStore((s) => s.toggleShadows);
+  const showOffsideLine = useSaotStore((s) => s.showOffsideLine);
+  const toggleOffsideLine = useSaotStore((s) => s.toggleOffsideLine);
+  const editMode = useSaotStore((s) => s.editMode);
+  const toggleEditMode = useSaotStore((s) => s.toggleEditMode);
+  const loadScenario = useSaotStore((s) => s.loadScenario);
+  const reset = useSaotStore((s) => s.reset);
 
   const CAMERA_PRESETS: { id: CameraPreset; label: string; icon: string }[] = [
     { id: 'broadcast', label: t('saot.camera_presets.broadcast'), icon: '\uD83C\uDFAC' },
@@ -183,6 +188,7 @@ export default function ControlPanel({ simulation, result }: ControlPanelProps) 
         <div className="space-y-2">
           <Toggle label={t('saot.shadows')} enabled={showShadows} onToggle={toggleShadows} />
           <Toggle label={t('saot.offside_line')} enabled={showOffsideLine} onToggle={toggleOffsideLine} />
+          <Toggle label={t('saot.edit_mode')} enabled={editMode} onToggle={toggleEditMode} />
           <button onClick={reset} className="w-full px-3 py-2 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
             {t('saot.reset_positions')}
           </button>
