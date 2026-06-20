@@ -1,9 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-/**
- * Frame individual da animacao de simulacao.
- * Contem posicoes e estados de animacao de todos os elementos para um instante t.
- */
 interface SimulationFrame {
   time: number;
   ballPosition: [number, number, number];
@@ -15,15 +11,6 @@ interface SimulationFrame {
   goalkeeperAnim: 'idle' | 'running' | 'kicking';
 }
 
-/**
- * Opcoes de configuracao da simulacao.
- * @property duration - Duracao total em ms (default: 3000ms = 3s)
- * @property attackerStart - Posicao inicial do atacante
- * @property defenderStart - Posicao inicial do defensor
- * @property goalkeeperStart - Posicao inicial do goleiro
- * @property ballStart - Posicao inicial da bola [x, y, z]
- * @property ballEnd - Posicao final da bola [x, y, z]
- */
 interface UseSimulationOptions {
   duration?: number;
   attackerStart: { x: number; z: number };
@@ -33,23 +20,84 @@ interface UseSimulationOptions {
   ballEnd: [number, number, number];
 }
 
-/**
- * Hook de simulacao de jogada de futebol.
- *
- * Timeline da animacao (3 segundos default):
- * - 0% - 10%: goleiro chuta a bola
- * - 10% - 70%: atacante e defensor correm
- * - 70% - 85%: atacante chuta a bola
- * - 85% - 100%: todos em posicao final (idle)
- *
- * Easing: quadratic ease-in-out para movimento natural.
- *
- * @param options - Configuracao da simulacao (posicoes iniciais, duracao)
- * @returns Estado e controles da simulacao (play, pause, reset, seek, etc.)
- */
+function createInitialFrame(
+  ballStart: [number, number, number],
+  attackerStart: { x: number; z: number },
+  defenderStart: { x: number; z: number },
+  goalkeeperStart: { x: number; z: number },
+): SimulationFrame {
+  return {
+    time: 0,
+    ballPosition: [...ballStart],
+    attackerPosition: { ...attackerStart },
+    defenderPosition: { ...defenderStart },
+    goalkeeperPosition: { ...goalkeeperStart },
+    attackerAnim: 'idle',
+    defenderAnim: 'idle',
+    goalkeeperAnim: 'idle',
+  };
+}
+
+function computeFrame(
+  t: number,
+  duration: number,
+  bS: [number, number, number],
+  bE: [number, number, number],
+  aS: { x: number; z: number },
+  dS: { x: number; z: number },
+  gS: { x: number; z: number },
+  out: SimulationFrame,
+): void {
+  const normalizedT = Math.min(t / duration, 1);
+
+  const eased = normalizedT < 0.5
+    ? 2 * normalizedT * normalizedT
+    : 1 - Math.pow(-2 * normalizedT + 2, 2) / 2;
+
+  out.time = t;
+  out.ballPosition[0] = bS[0] + (bE[0] - bS[0]) * eased;
+  out.ballPosition[1] = bS[1] + Math.sin(eased * Math.PI) * 2;
+  out.ballPosition[2] = bS[2] + (bE[2] - bS[2]) * eased;
+
+  const attackerRun = eased * 3;
+  out.attackerPosition.x = aS.x + attackerRun;
+  out.attackerPosition.z = aS.z;
+
+  const defenderRun = eased * 1.5;
+  out.defenderPosition.x = dS.x + defenderRun;
+  out.defenderPosition.z = dS.z;
+
+  out.goalkeeperPosition.x = gS.x;
+  out.goalkeeperPosition.z = gS.z;
+
+  if (normalizedT > 0 && normalizedT < 0.1) {
+    out.goalkeeperAnim = 'kicking';
+    out.attackerAnim = 'idle';
+    out.defenderAnim = 'idle';
+  } else if (normalizedT >= 0.1 && normalizedT < 0.7) {
+    out.goalkeeperAnim = 'idle';
+    out.attackerAnim = 'running';
+    out.defenderAnim = 'running';
+  } else if (normalizedT >= 0.7 && normalizedT < 0.85) {
+    out.goalkeeperAnim = 'idle';
+    out.attackerAnim = 'kicking';
+    out.defenderAnim = 'running';
+  } else if (normalizedT >= 0.85) {
+    out.goalkeeperAnim = 'idle';
+    out.attackerAnim = 'idle';
+    out.defenderAnim = 'idle';
+  } else {
+    out.goalkeeperAnim = 'idle';
+    out.attackerAnim = 'idle';
+    out.defenderAnim = 'idle';
+  }
+}
+
+const INITIAL_FRAME = createInitialFrame([0, 0, 0], { x: 0, z: 0 }, { x: 0, z: 0 }, { x: 0, z: 0 });
+
 export function useSimulation(options: UseSimulationOptions) {
   const {
-    duration = 3000, // 3 segundos para a jogada completa
+    duration = 3000,
     attackerStart,
     defenderStart,
     goalkeeperStart,
@@ -70,158 +118,99 @@ export function useSimulation(options: UseSimulationOptions) {
   ballEndRef.current = ballEnd;
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [playbackState, setPlaybackState] = useState({ progress: 0, currentTime: 0 });
   const [speed, setSpeed] = useState(1);
-  const [currentFrame, setCurrentFrame] = useState<SimulationFrame>({
-    time: 0,
-    ballPosition: ballStart,
-    attackerPosition: attackerStart,
-    defenderPosition: defenderStart,
-    goalkeeperPosition: goalkeeperStart,
-    attackerAnim: 'idle',
-    defenderAnim: 'idle',
-    goalkeeperAnim: 'idle',
-  });
+
+  const frameBufferRef = useRef<SimulationFrame>(INITIAL_FRAME);
+  const [currentFrame, setCurrentFrame] = useState<SimulationFrame>(INITIAL_FRAME);
 
   const animRef = useRef<number>(0);
   const startTimeRef = useRef(0);
   const pausedTimeRef = useRef(0);
+  const frameCountRef = useRef(0);
+  const progressRef = useRef(0);
+  const isPlayingRef = useRef(false);
 
-  const generateFrame = useCallback(
-    (t: number): SimulationFrame => {
-      const normalizedT = Math.min(t / duration, 1);
-
-      // Quadratic ease-in-out: acelera no inicio, desacelera no fim
-      const eased = normalizedT < 0.5
-        ? 2 * normalizedT * normalizedT
-        : 1 - Math.pow(-2 * normalizedT + 2, 2) / 2;
-
-      const bS = ballStartRef.current;
-      const bE = ballEndRef.current;
-      const aS = attackerStartRef.current;
-      const dS = defenderStartRef.current;
-      const gS = goalkeeperStartRef.current;
-
-      // Bola: vai do goleiro ate o atacante com arco de 2m de altura
-      const ballX = bS[0] + (bE[0] - bS[0]) * eased;
-      const ballY = bS[1] + Math.sin(eased * Math.PI) * 2; // arco de 2m
-      const ballZ = bS[2] + (bE[2] - bS[2]) * eased;
-
-      // Atacante: corre 3m para frente na mesma linha lateral
-      const attackerRun = eased * 3;
-      const attackerX = aS.x + attackerRun;
-      const attackerZ = aS.z;
-
-      // Defensor: corre 1.5m (metade da velocidade do atacante)
-      const defenderRun = eased * 1.5; // 1.5 metros de distancia de corrida
-      const defenderX = dS.x + defenderRun;
-      const defenderZ = dS.z;
-
-      // Goleiro: fica na posicao e chuta a bola no inicio
-      const goalkeeperX = gS.x;
-      const goalkeeperZ = gS.z;
-
-      let attackerAnim: 'idle' | 'running' | 'kicking' = 'idle';
-      let defenderAnim: 'idle' | 'running' = 'idle';
-      let goalkeeperAnim: 'idle' | 'running' | 'kicking' = 'idle';
-
-      // Fases da animacao:
-      // 0% - 10%: goleiro chuta a bola
-      // 10% - 70%: ambos correm (atacante vai na bola, defensor acompanha)
-      // 70% - 85%: atacante chuta a bola
-      // 85% - 100%: todos em posicao final (idle)
-      if (normalizedT > 0 && normalizedT < 0.1) {
-        goalkeeperAnim = 'kicking';
-        attackerAnim = 'idle';
-        defenderAnim = 'idle';
-      } else if (normalizedT >= 0.1 && normalizedT < 0.7) {
-        goalkeeperAnim = 'idle';
-        attackerAnim = 'running';
-        defenderAnim = 'running';
-      } else if (normalizedT >= 0.7 && normalizedT < 0.85) {
-        goalkeeperAnim = 'idle';
-        attackerAnim = 'kicking';
-        defenderAnim = 'running';
-      } else if (normalizedT >= 0.85) {
-        goalkeeperAnim = 'idle';
-        attackerAnim = 'idle';
-        defenderAnim = 'idle';
-      }
-
-      return {
-        time: t,
-        ballPosition: [ballX, ballY, ballZ],
-        attackerPosition: { x: attackerX, z: attackerZ },
-        defenderPosition: { x: defenderX, z: defenderZ },
-        goalkeeperPosition: { x: goalkeeperX, z: goalkeeperZ },
-        attackerAnim,
-        defenderAnim,
-        goalkeeperAnim,
-      };
-    },
-    [duration],
-  );
+  isPlayingRef.current = isPlaying;
+  progressRef.current = playbackState.progress;
 
   const animate = useCallback(() => {
-    const elapsed = (performance.now() - startTimeRef.current) * speed;
+    const now = performance.now();
+    const elapsed = (now - startTimeRef.current) * speed;
     const t = Math.min(elapsed, duration);
 
-    setCurrentTime(t);
-    setProgress(t / duration);
-    setCurrentFrame(generateFrame(t));
+    computeFrame(
+      t,
+      duration,
+      ballStartRef.current,
+      ballEndRef.current,
+      attackerStartRef.current,
+      defenderStartRef.current,
+      goalkeeperStartRef.current,
+      frameBufferRef.current,
+    );
+
+    frameCountRef.current++;
+    if (frameCountRef.current % 2 === 0) {
+      setPlaybackState({ progress: t / duration, currentTime: t });
+      setCurrentFrame({ ...frameBufferRef.current });
+    }
 
     if (t < duration) {
       animRef.current = requestAnimationFrame(animate);
     } else {
+      setPlaybackState({ progress: 1, currentTime: duration });
+      setCurrentFrame({ ...frameBufferRef.current });
       setIsPlaying(false);
     }
-  }, [duration, speed, generateFrame]);
+  }, [duration, speed]);
 
   const play = useCallback(() => {
-    if (progress >= 1) {
+    if (progressRef.current >= 1) {
       startTimeRef.current = performance.now();
-      setProgress(0);
-      setCurrentTime(0);
+      setPlaybackState({ progress: 0, currentTime: 0 });
     } else {
       startTimeRef.current = performance.now() - pausedTimeRef.current;
     }
+    frameCountRef.current = 0;
     setIsPlaying(true);
     animRef.current = requestAnimationFrame(animate);
-  }, [animate, progress]);
+  }, [animate]);
 
   const pause = useCallback(() => {
     setIsPlaying(false);
-    pausedTimeRef.current = currentTime;
+    pausedTimeRef.current = playbackState.currentTime;
     if (animRef.current) cancelAnimationFrame(animRef.current);
-  }, [currentTime]);
+  }, [playbackState.currentTime]);
 
   const reset = useCallback(() => {
     setIsPlaying(false);
-    setProgress(0);
-    setCurrentTime(0);
-    setCurrentFrame({
-      time: 0,
-      ballPosition: ballStartRef.current,
-      attackerPosition: attackerStartRef.current,
-      defenderPosition: defenderStartRef.current,
-      goalkeeperPosition: goalkeeperStartRef.current,
-      attackerAnim: 'idle',
-      defenderAnim: 'idle',
-      goalkeeperAnim: 'idle',
-    });
+    setPlaybackState({ progress: 0, currentTime: 0 });
+    setCurrentFrame(createInitialFrame(
+      ballStartRef.current,
+      attackerStartRef.current,
+      defenderStartRef.current,
+      goalkeeperStartRef.current,
+    ));
     if (animRef.current) cancelAnimationFrame(animRef.current);
   }, []);
 
   const seek = useCallback(
     (t: number) => {
       const clampedT = Math.max(0, Math.min(t, duration));
-      setCurrentTime(clampedT);
-      setProgress(clampedT / duration);
-      setCurrentFrame(generateFrame(clampedT));
+      const frame = createInitialFrame(
+        ballStartRef.current,
+        attackerStartRef.current,
+        defenderStartRef.current,
+        goalkeeperStartRef.current,
+      );
+      computeFrame(clampedT, duration, ballStartRef.current, ballEndRef.current,
+        attackerStartRef.current, defenderStartRef.current, goalkeeperStartRef.current, frame);
+      setPlaybackState({ progress: clampedT / duration, currentTime: clampedT });
+      setCurrentFrame(frame);
       pausedTimeRef.current = clampedT;
     },
-    [duration, generateFrame],
+    [duration],
   );
 
   useEffect(() => {
@@ -232,8 +221,8 @@ export function useSimulation(options: UseSimulationOptions) {
 
   return {
     isPlaying,
-    progress,
-    currentTime,
+    progress: playbackState.progress,
+    currentTime: playbackState.currentTime,
     duration,
     speed,
     currentFrame,

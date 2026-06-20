@@ -38,6 +38,7 @@ export default function SAOTLab() {
   const goalkeeper = useSaotStore((s) => s.goalkeeper);
   const cameraPreset = useSaotStore((s) => s.cameraPreset);
   const showOffsideLine = useSaotStore((s) => s.showOffsideLine);
+  const editMode = useSaotStore((s) => s.editMode);
   const setAttacker = useSaotStore((s) => s.setAttacker);
   const setDefender = useSaotStore((s) => s.setDefender);
   const setGoalkeeper = useSaotStore((s) => s.setGoalkeeper);
@@ -206,6 +207,7 @@ export default function SAOTLab() {
             preset={cameraPreset}
             followBall={isSimulating}
             ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
+            enabled={!editMode}
           />
         </Canvas>
       </div>
