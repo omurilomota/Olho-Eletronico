@@ -41,12 +41,15 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
   const callbacksRef = useRef(callbacks);
   callbacksRef.current = callbacks;
+  const generationRef = useRef(0);
 
   useEffect(() => {
     if (!session) {
       channelRef.current = null;
       return;
     }
+
+    const gen = ++generationRef.current;
 
     let supabase;
     try {
@@ -66,6 +69,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
 
     channel
       .on('presence', { event: 'sync' }, () => {
+        if (generationRef.current !== gen) return;
         const state = channel.presenceState();
         const seen = new Set<string>();
         const all: Participant[] = [];
@@ -83,6 +87,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         setParticipants(all);
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
+        if (generationRef.current !== gen) return;
         for (const p of newPresences) {
           if (p && typeof p === 'object' && 'id' in p) {
             addParticipant(p as unknown as Participant);
@@ -90,6 +95,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         }
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        if (generationRef.current !== gen) return;
         for (const p of leftPresences) {
           if (p && typeof p === 'object' && 'id' in p) {
             removeParticipant((p as unknown as Participant).id);
@@ -97,18 +103,23 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
         }
       })
       .on('broadcast', { event: CURSOR_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onCursor?.(payload as CursorPayload);
       })
       .on('broadcast', { event: SCENARIO_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onScenario?.(payload as ScenarioPayload);
       })
       .on('broadcast', { event: PLAYBOOK_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onPlaybook?.(payload as PlaybookPayload);
       })
       .on('broadcast', { event: PLAYER_EVENT }, ({ payload }) => {
+        if (generationRef.current !== gen) return;
         callbacksRef.current?.onPlayer?.(payload as PlayerPayload);
       })
       .subscribe(async (status) => {
+        if (generationRef.current !== gen) return;
         if (status === 'SUBSCRIBED') {
           const me = session.participants[0];
           if (me) {
@@ -136,6 +147,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
     const role = session.participants[0]?.role;
     if (role === 'viewer') {
       joinTimeout = setTimeout(() => {
+        if (generationRef.current !== gen) return;
         const current = useMultiplayerStore.getState();
         if (current.session && current.session.participants.length <= 1) {
           useMultiplayerStore.setState({
@@ -146,6 +158,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
       }, 5000);
     } else if (role === 'admin') {
       joinTimeout = setTimeout(() => {
+        if (generationRef.current !== gen) return;
         const current = useMultiplayerStore.getState();
         if (current.session && !current.isConnected && !current.connectionError) {
           useMultiplayerStore.setState({
@@ -157,6 +170,7 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
     }
 
     return () => {
+      generationRef.current++;
       if (joinTimeout) clearTimeout(joinTimeout);
       supabase.removeChannel(channel);
       channelRef.current = null;

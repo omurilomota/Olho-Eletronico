@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
 
@@ -17,25 +17,22 @@ export default function SessionModal({ onClose }: Props) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
   const [connecting, setConnecting] = useState(false);
+
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   const connectingRef = useRef(false);
+  const closedRef = useRef(false);
 
-  const handleCreate = () => {
-    if (!sessionName.trim() || !userName.trim()) return;
-    setError('');
-    setConnecting(true);
-    connectingRef.current = true;
-    createSession(sessionName.trim(), userName.trim());
-    const id = useMultiplayerStore.getState().session?.id;
-    if (id) setCreatedId(id);
-  };
+  const doClose = useCallback(() => {
+    if (closedRef.current) return;
+    closedRef.current = true;
+    onCloseRef.current();
+  }, []);
 
-  const handleJoin = () => {
-    if (!sessionId.trim() || !userName.trim()) return;
-    setError('');
-    setConnecting(true);
-    connectingRef.current = true;
-    joinSession(sessionId.trim().toUpperCase(), userName.trim());
-  };
+  useEffect(() => {
+    closedRef.current = false;
+  }, []);
 
   useEffect(() => {
     if (!connectingRef.current) return;
@@ -43,16 +40,16 @@ export default function SessionModal({ onClose }: Props) {
       connectingRef.current = false;
       setConnecting(false);
       if (createdId) {
-        setTimeout(onClose, 1200);
+        setTimeout(doClose, 1200);
       } else {
-        onClose();
+        doClose();
       }
     } else if (connectionError) {
       connectingRef.current = false;
       setConnecting(false);
       setError(connectionError);
     }
-  }, [isConnected, connectionError, createdId, onClose]);
+  }, [isConnected, connectionError, createdId, doClose]);
 
   useEffect(() => {
     if (!connectingRef.current) return;
@@ -65,6 +62,26 @@ export default function SessionModal({ onClose }: Props) {
     }, 10000);
     return () => clearTimeout(timeout);
   }, [connecting, t]);
+
+  const handleCreate = () => {
+    if (!sessionName.trim() || !userName.trim()) return;
+    setError('');
+    closedRef.current = false;
+    setConnecting(true);
+    connectingRef.current = true;
+    createSession(sessionName.trim(), userName.trim());
+    const id = useMultiplayerStore.getState().session?.id;
+    if (id) setCreatedId(id);
+  };
+
+  const handleJoin = () => {
+    if (!sessionId.trim() || !userName.trim()) return;
+    setError('');
+    closedRef.current = false;
+    setConnecting(true);
+    connectingRef.current = true;
+    joinSession(sessionId.trim().toUpperCase(), userName.trim());
+  };
 
   const handleCopyId = async () => {
     if (!createdId) return;
@@ -84,7 +101,7 @@ export default function SessionModal({ onClose }: Props) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface-700/50">
           <h2 className="text-sm font-semibold text-surface-200/80">{t('icc.multiplayer.title')}</h2>
           {!connecting && (
-            <button onClick={onClose} className="text-surface-200/40 hover:text-surface-200/70">
+            <button onClick={doClose} className="text-surface-200/40 hover:text-surface-200/70">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
