@@ -261,7 +261,8 @@
       "share_id": "Share this ID for others to join",
       "copy_id": "Copy ID",
       "copied": "Copied!",
-      "connecting": "Connecting..."
+      "connecting": "Connecting...",
+      "connection_timeout": "Connection timed out. Check your connection and try again."
     },
     "ticker": {
       "title": "Live Operations",

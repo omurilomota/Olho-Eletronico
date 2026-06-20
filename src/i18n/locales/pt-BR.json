@@ -261,7 +261,9 @@
       "share_id": "Compartilhe este ID para outros entrarem",
       "copy_id": "Copiar ID",
       "copied": "Copiado!",
-      "connecting": "Conectando..."
+      "connecting": "Conectando...",
+      "connection_timeout": "Tempo esgotado ao conectar. Verifique sua conexao e tente novamente.",
+      "connection_failed": "Nao foi possivel conectar ao canal. Verifique sua conexao."
     },
     "ticker": {
       "title": "Operacoes ao Vivo",

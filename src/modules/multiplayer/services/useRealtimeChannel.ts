@@ -48,7 +48,17 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
       return;
     }
 
-    const supabase = getSupabase();
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch (e) {
+      useMultiplayerStore.setState({
+        isConnected: false,
+        connectionError: e instanceof Error ? e.message : 'Falha ao inicializar Supabase.',
+      });
+      return;
+    }
+
     const channelName = `${SESSION_CHANNEL_PREFIX}${session.id}`;
     const channel = supabase.channel(channelName, {
       config: { broadcast: { self: false } },
@@ -123,15 +133,27 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
     channelRef.current = channel;
 
     let joinTimeout: ReturnType<typeof setTimeout> | null = null;
-    if (session.participants[0]?.role === 'viewer') {
+    const role = session.participants[0]?.role;
+    if (role === 'viewer') {
       joinTimeout = setTimeout(() => {
         const current = useMultiplayerStore.getState();
-        if (current.session && current.session.participants.length <= 1 && current.isConnected) {
+        if (current.session && current.session.participants.length <= 1) {
           useMultiplayerStore.setState({
+            isConnected: false,
             connectionError: 'Sessao nao encontrada ou criador offline.',
           });
         }
       }, 5000);
+    } else if (role === 'admin') {
+      joinTimeout = setTimeout(() => {
+        const current = useMultiplayerStore.getState();
+        if (current.session && !current.isConnected && !current.connectionError) {
+          useMultiplayerStore.setState({
+            isConnected: false,
+            connectionError: 'Nao foi possivel conectar ao canal. Verifique sua conexao.',
+          });
+        }
+      }, 8000);
     }
 
     return () => {
