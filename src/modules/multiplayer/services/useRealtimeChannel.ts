@@ -110,12 +110,32 @@ export function useRealtimeChannel(callbacks?: RealtimeCallbacks) {
               cursor: me.cursor,
             });
           }
+          useMultiplayerStore.setState({ isConnected: true, connectionError: null });
+        } else if (status === 'CHANNEL_ERROR') {
+          useMultiplayerStore.setState({ isConnected: false, connectionError: 'Falha ao conectar com o servidor.' });
+        } else if (status === 'TIMED_OUT') {
+          useMultiplayerStore.setState({ isConnected: false, connectionError: 'Tempo esgotado. Verifique sua conexao.' });
+        } else if (status === 'CLOSED') {
+          useMultiplayerStore.setState({ isConnected: false });
         }
       });
 
     channelRef.current = channel;
 
+    let joinTimeout: ReturnType<typeof setTimeout> | null = null;
+    if (session.participants[0]?.role === 'viewer') {
+      joinTimeout = setTimeout(() => {
+        const current = useMultiplayerStore.getState();
+        if (current.session && current.session.participants.length <= 1 && current.isConnected) {
+          useMultiplayerStore.setState({
+            connectionError: 'Sessao nao encontrada ou criador offline.',
+          });
+        }
+      }, 5000);
+    }
+
     return () => {
+      if (joinTimeout) clearTimeout(joinTimeout);
       supabase.removeChannel(channel);
       channelRef.current = null;
     };

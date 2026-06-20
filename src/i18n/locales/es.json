@@ -260,7 +260,8 @@
       "session_created": "Sesion creada!",
       "share_id": "Comparte este ID para que otros se unan",
       "copy_id": "Copiar ID",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "connecting": "Conectando..."
     },
     "ticker": {
       "title": "Operaciones en Vivo",

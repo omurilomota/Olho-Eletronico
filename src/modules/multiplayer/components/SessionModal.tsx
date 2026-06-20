@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMultiplayerStore } from '../store/useMultiplayerStore';
 
@@ -8,7 +8,7 @@ interface Props {
 
 export default function SessionModal({ onClose }: Props) {
   const { t } = useTranslation();
-  const { createSession, joinSession } = useMultiplayerStore();
+  const { createSession, joinSession, isConnected, connectionError } = useMultiplayerStore();
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [sessionName, setSessionName] = useState('');
   const [sessionId, setSessionId] = useState('');
@@ -16,6 +16,7 @@ export default function SessionModal({ onClose }: Props) {
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [joining, setJoining] = useState(false);
 
   const handleCreate = () => {
     if (!sessionName.trim() || !userName.trim()) return;
@@ -27,9 +28,20 @@ export default function SessionModal({ onClose }: Props) {
   const handleJoin = () => {
     if (!sessionId.trim() || !userName.trim()) return;
     setError('');
+    setJoining(true);
     joinSession(sessionId.trim().toUpperCase(), userName.trim());
-    onClose();
   };
+
+  useEffect(() => {
+    if (!joining) return;
+    if (isConnected) {
+      setJoining(false);
+      onClose();
+    } else if (connectionError) {
+      setJoining(false);
+      setError(connectionError);
+    }
+  }, [joining, isConnected, connectionError, onClose]);
 
   const handleCopyId = async () => {
     if (!createdId) return;
@@ -146,11 +158,16 @@ export default function SessionModal({ onClose }: Props) {
                 onClick={mode === 'create' ? handleCreate : handleJoin}
                 disabled={
                   !userName.trim() ||
-                  (mode === 'create' ? !sessionName.trim() : !sessionId.trim())
+                  (mode === 'create' ? !sessionName.trim() : !sessionId.trim()) ||
+                  joining
                 }
                 className="w-full py-2.5 rounded-lg font-semibold text-sm bg-emerald-600 hover:bg-emerald-700 disabled:bg-surface-700 disabled:text-surface-200/30 text-white transition-colors"
               >
-                {mode === 'create' ? t('icc.multiplayer.create') : t('icc.multiplayer.join')}
+                {joining
+                  ? t('icc.multiplayer.connecting', 'Conectando...')
+                  : mode === 'create'
+                    ? t('icc.multiplayer.create')
+                    : t('icc.multiplayer.join')}
               </button>
             </>
           )}

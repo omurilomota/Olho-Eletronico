@@ -260,7 +260,8 @@
       "session_created": "Sessao criada!",
       "share_id": "Compartilhe este ID para outros entrarem",
       "copy_id": "Copiar ID",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "connecting": "Conectando..."
     },
     "ticker": {
       "title": "Operacoes ao Vivo",

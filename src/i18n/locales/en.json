@@ -260,7 +260,8 @@
       "session_created": "Session created!",
       "share_id": "Share this ID for others to join",
       "copy_id": "Copy ID",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "connecting": "Connecting..."
     },
     "ticker": {
       "title": "Live Operations",

@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
 import { useTranslation } from 'react-i18next';
 import { useSaotStore } from '../store/useSaotStore';
+import { usePlaybookStore } from '../store/usePlaybookStore';
 import { useSimulation } from '../hooks/useSimulation';
 import Pitch from './Pitch';
 import Goals from './Goals';
@@ -17,7 +18,7 @@ import DataOverlay from '../../../shared/components/DataOverlay';
 import { calculateOffside } from '../services/OffsideCalculator';
 import { useMultiplayerStore } from '../../multiplayer/store/useMultiplayerStore';
 import { useRealtimeSync, type ScenarioPayload, type PlayerPayload } from '../../multiplayer/services/useRealtimeSync';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface RemoteCursorData {
   userId: string;
@@ -35,8 +36,15 @@ export default function SAOTLab() {
   const me = session?.participants[0];
   const isAdmin = me?.role === 'admin';
 
+  useEffect(() => {
+    if (!session) return;
+    const participantIds = new Set(session.participants.map((p) => p.id));
+    setRemoteCursors((prev) => prev.filter((c) => participantIds.has(c.userId)));
+  }, [session?.participants]);
+
   const {
     attacker, defender, goalkeeper,
+    activeScenario,
     cameraPreset,
     showOffsideLine,
     setAttacker, setDefender, setGoalkeeper,
@@ -102,11 +110,27 @@ export default function SAOTLab() {
     else if (payload.target === 'goalkeeper') store.setGoalkeeper(payload.position);
   }, []);
 
-  const { sendCursor, sendPlayer } = useRealtimeSync({
+  const { sendCursor, sendPlayer, sendScenario, sendPlaybook } = useRealtimeSync({
     onRemoteCursor: handleRemoteCursor,
     onRemoteScenario: handleRemoteScenario,
     onRemotePlayer: handleRemotePlayer,
   });
+
+  const lastActiveScenario = useRef(activeScenario);
+  useEffect(() => {
+    if (!session || lastActiveScenario.current === activeScenario) return;
+    lastActiveScenario.current = activeScenario;
+    sendScenario({ attacker, defender, goalkeeper, activeScenario });
+  }, [activeScenario, session, attacker, defender, goalkeeper, sendScenario]);
+
+  const { currentPlayId, currentStep } = usePlaybookStore();
+  const lastPlayRef = useRef({ playId: currentPlayId, step: currentStep });
+  useEffect(() => {
+    if (!session) return;
+    if (lastPlayRef.current.playId === currentPlayId && lastPlayRef.current.step === currentStep) return;
+    lastPlayRef.current = { playId: currentPlayId, step: currentStep };
+    sendPlaybook({ playId: currentPlayId, step: currentStep });
+  }, [currentPlayId, currentStep, session, sendPlaybook]);
 
   const lastCursorBroadcast = useRef(0);
 
