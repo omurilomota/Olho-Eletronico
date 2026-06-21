@@ -79,6 +79,7 @@ export interface SAOTState {
   showOffsideLine: boolean;
   editMode: boolean;
   activeScenario: ScenarioType;
+  isDragging: string | null;
   setAttacker: (pos: Position) => void;
   setDefender: (pos: Position) => void;
   setGoalkeeper: (pos: Position) => void;
@@ -87,6 +88,7 @@ export interface SAOTState {
   toggleOffsideLine: () => void;
   toggleEditMode: () => void;
   loadScenario: (type: ScenarioType) => void;
+  setDragging: (userId: string | null) => void;
   reset: () => void;
 }
 
@@ -99,6 +101,7 @@ const defaultState = {
   showOffsideLine: false,
   editMode: false,
   activeScenario: 'custom' as ScenarioType,
+  isDragging: null as string | null,
 };
 
 export const useSaotStore = create<SAOTState>((set) => ({
@@ -123,5 +126,6 @@ export const useSaotStore = create<SAOTState>((set) => ({
       activeScenario: type,
     });
   },
+  setDragging: (userId) => set({ isDragging: userId }),
   reset: () => set(defaultState),
 }));

@@ -66,24 +66,38 @@ export default function SessionModal({ onClose }: Props) {
     return () => clearTimeout(timeout);
   }, [connecting, t]);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!sessionName.trim() || !userName.trim()) return;
     setError('');
     closedRef.current = false;
     setConnecting(true);
     connectingRef.current = true;
-    createSession(sessionName.trim(), userName.trim());
-    const id = useMultiplayerStore.getState().session?.id;
+    await createSession(sessionName.trim(), userName.trim());
+    const state = useMultiplayerStore.getState();
+    if (state.connectionError) {
+      connectingRef.current = false;
+      setConnecting(false);
+      setError(state.connectionError);
+      return;
+    }
+    const id = state.session?.id;
     if (id) setCreatedId(id);
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (!sessionId.trim() || !userName.trim()) return;
     setError('');
     closedRef.current = false;
     setConnecting(true);
     connectingRef.current = true;
-    joinSession(sessionId.trim().toUpperCase(), userName.trim());
+    await joinSession(sessionId.trim().toUpperCase(), userName.trim());
+    const state = useMultiplayerStore.getState();
+    if (state.connectionError) {
+      connectingRef.current = false;
+      setConnecting(false);
+      setError(state.connectionError);
+      return;
+    }
   };
 
   const handleCopyId = async () => {

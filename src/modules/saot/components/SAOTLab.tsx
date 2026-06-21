@@ -16,32 +16,29 @@ import RemoteCursor from './RemoteCursor';
 import DataOverlay from '../../../shared/components/DataOverlay';
 import { calculateOffside } from '../services/OffsideCalculator';
 import { useMultiplayerStore } from '../../multiplayer/store/useMultiplayerStore';
-import { useMultiplayer } from '../../multiplayer/components/MultiplayerProvider';
-import { useState, useCallback, useRef } from 'react';
+import { useMultiplayer, type RemoteCursorData } from '../../multiplayer/components/MultiplayerProvider';
+import { useState, useCallback, useRef, memo, useMemo } from 'react';
 
-export default function SAOTLab() {
+interface SceneCallbacks {
+  onDragStart: () => void;
+  onDragEndAttacker: (pos: { x: number; z: number }) => void;
+  onDragEndDefender: (pos: { x: number; z: number }) => void;
+  onDragEndGoalkeeper: (pos: { x: number; z: number }) => void;
+  onDragCompleteAttacker: (pos: { x: number; z: number }) => void;
+  onDragCompleteDefender: (pos: { x: number; z: number }) => void;
+  onDragCompleteGoalkeeper: (pos: { x: number; z: number }) => void;
+}
+
+const Scene3D = memo(function Scene3D({ callbacks }: { callbacks: SceneCallbacks }) {
   const { t } = useTranslation();
-  const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
-  const multiplayer = useMultiplayer();
-  const localUserId = useMultiplayerStore((s) => s.localUserId);
-  const session = multiplayer?.session ?? [];
-  const isConnected = multiplayer?.isConnected ?? false;
-  const remoteCursors = multiplayer?.remoteCursors ?? [];
-  const sendCursor = multiplayer?.sendCursor;
-  const sendPlayer = multiplayer?.sendPlayer;
-
-  const me = localUserId ? session.find((p) => p.id === localUserId) : null;
-  const isAdmin = me?.role === 'admin';
-
   const attacker = useSaotStore((s) => s.attacker);
   const defender = useSaotStore((s) => s.defender);
   const goalkeeper = useSaotStore((s) => s.goalkeeper);
   const cameraPreset = useSaotStore((s) => s.cameraPreset);
   const showOffsideLine = useSaotStore((s) => s.showOffsideLine);
   const editMode = useSaotStore((s) => s.editMode);
-  const setAttacker = useSaotStore((s) => s.setAttacker);
-  const setDefender = useSaotStore((s) => s.setDefender);
-  const setGoalkeeper = useSaotStore((s) => s.setGoalkeeper);
+  const ctx = useMultiplayer();
+  const remoteCursors = ctx?.remoteCursors ?? [];
 
   const simulation = useSimulation({
     attackerStart: attacker,
@@ -56,8 +53,6 @@ export default function SAOTLab() {
     simulation.currentFrame.defenderPosition,
     goalkeeper,
   );
-
-  const offsideLineX = defender.x;
 
   const isSimulating = simulation.progress > 0 && simulation.progress < 1;
 
@@ -75,25 +70,149 @@ export default function SAOTLab() {
       )
     : 0;
 
+  return (
+    <Canvas
+      shadows
+      camera={{ position: [0, 12, 18], fov: 50 }}
+      className="w-full h-full"
+    >
+      <Environment />
+      <Pitch />
+      <Goals />
+      <Stadium />
+
+      <Player
+        position={isSimulating ? simulation.currentFrame.attackerPosition : attacker}
+        color="#ef4444"
+        secondaryColor="#ffffff"
+        label={t('saot.attacker')}
+        onDragEnd={callbacks.onDragEndAttacker}
+        onDragStart={callbacks.onDragStart}
+        onDragComplete={callbacks.onDragCompleteAttacker}
+        highlighted={editMode || (result.isOffside && showOffsideLine)}
+        animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
+        facingAngle={attackerAngle}
+      />
+      <Player
+        position={isSimulating ? simulation.currentFrame.defenderPosition : defender}
+        color="#3b82f6"
+        secondaryColor="#1e3a5f"
+        label={t('saot.defender')}
+        onDragEnd={callbacks.onDragEndDefender}
+        onDragStart={callbacks.onDragStart}
+        onDragComplete={callbacks.onDragCompleteDefender}
+        highlighted={editMode}
+        animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
+        facingAngle={defenderAngle}
+      />
+      <Player
+        position={{ x: goalkeeper.x, z: goalkeeper.z }}
+        color="#eab308"
+        secondaryColor="#1a1a1a"
+        label={t('saot.goalkeeper')}
+        onDragEnd={callbacks.onDragEndGoalkeeper}
+        onDragStart={callbacks.onDragStart}
+        onDragComplete={callbacks.onDragCompleteGoalkeeper}
+        highlighted={editMode}
+      />
+
+      <Ball
+        position={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
+        spinning={isSimulating}
+      />
+
+      {showOffsideLine && (
+        <OffsideLine
+          defenderX={defender.x}
+          attackerX={isSimulating ? simulation.currentFrame.attackerPosition.x : attacker.x}
+          isOffside={result.isOffside}
+          marginCm={result.marginCm}
+          visible={simulation.progress > 0}
+        />
+      )}
+
+      {remoteCursors.map((cursor: RemoteCursorData) => (
+        <RemoteCursor
+          key={cursor.userId}
+          position={{ x: cursor.x, z: cursor.z }}
+          color={cursor.color}
+          name={cursor.name}
+        />
+      ))}
+
+      <CameraController
+        preset={cameraPreset}
+        followBall={isSimulating}
+        ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
+        enabled={!editMode}
+      />
+    </Canvas>
+  );
+});
+
+export default function SAOTLab() {
+  const [activePanel, setActivePanel] = useState<'controls' | 'playbook'>('controls');
+  const multiplayer = useMultiplayer();
+  const localUserId = useMultiplayerStore((s) => s.localUserId);
+  const session = multiplayer?.session ?? [];
+  const isConnected = multiplayer?.isConnected ?? false;
+  const sendCursor = multiplayer?.sendCursor;
+  const sendPlayer = multiplayer?.sendPlayer;
+  const sendDrag = multiplayer?.sendDrag;
+
+  const me = localUserId ? session.find((p) => p.id === localUserId) : null;
+  const isAdmin = me?.role === 'admin';
+
+  const attacker = useSaotStore((s) => s.attacker);
+  const defender = useSaotStore((s) => s.defender);
+  const goalkeeper = useSaotStore((s) => s.goalkeeper);
+  const setAttacker = useSaotStore((s) => s.setAttacker);
+  const setDefender = useSaotStore((s) => s.setDefender);
+  const setGoalkeeper = useSaotStore((s) => s.setGoalkeeper);
+  const setDragging = useSaotStore((s) => s.setDragging);
+
+  const simulation = useSimulation({
+    attackerStart: attacker,
+    defenderStart: defender,
+    goalkeeperStart: { x: goalkeeper.x, z: goalkeeper.z },
+    ballStart: [-15, 0.2, 0],
+    ballEnd: [attacker.x + 3.5, 0.2, attacker.z],
+  });
+
+  const result = calculateOffside(
+    simulation.currentFrame.attackerPosition,
+    simulation.currentFrame.defenderPosition,
+    goalkeeper,
+  );
+
   const lastCursorBroadcast = useRef(0);
 
   const handleDragMove = useCallback(
     (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
-      if (isConnected && !isAdmin) return;
       if (target === 'attacker') setAttacker(pos);
       else if (target === 'defender') setDefender(pos);
       else if (target === 'goalkeeper') setGoalkeeper(pos);
     },
-    [isConnected, isAdmin, setAttacker, setDefender, setGoalkeeper],
+    [setAttacker, setDefender, setGoalkeeper],
   );
 
   const handleDragComplete = useCallback(
     (target: 'attacker' | 'defender' | 'goalkeeper', pos: { x: number; z: number }) => {
-      if (!isAdmin || !isConnected || !sendPlayer) return;
-      sendPlayer({ target, position: pos });
+      if (isConnected) {
+        sendPlayer?.({ target, position: pos });
+        sendDrag?.('end');
+      }
+      setDragging(null);
     },
-    [isAdmin, isConnected, sendPlayer],
+    [isConnected, sendPlayer, sendDrag, setDragging],
   );
+
+  const handlePlayerDragStart = useCallback(() => {
+    if (isConnected && localUserId) {
+      setDragging(localUserId);
+      sendDrag?.('start');
+    }
+  }, [isConnected, localUserId, setDragging, sendDrag]);
 
   const handleDragEndAttacker = useCallback(
     (pos: { x: number; z: number }) => handleDragMove('attacker', pos),
@@ -121,6 +240,16 @@ export default function SAOTLab() {
     [handleDragComplete],
   );
 
+  const sceneCallbacks = useMemo(() => ({
+    onDragStart: handlePlayerDragStart,
+    onDragEndAttacker: handleDragEndAttacker,
+    onDragEndDefender: handleDragEndDefender,
+    onDragEndGoalkeeper: handleDragEndGoalkeeper,
+    onDragCompleteAttacker: handleDragCompleteAttacker,
+    onDragCompleteDefender: handleDragCompleteDefender,
+    onDragCompleteGoalkeeper: handleDragCompleteGoalkeeper,
+  }), [handlePlayerDragStart, handleDragEndAttacker, handleDragEndDefender, handleDragEndGoalkeeper, handleDragCompleteAttacker, handleDragCompleteDefender, handleDragCompleteGoalkeeper]);
+
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (!isConnected || !isAdmin || !sendCursor) return;
@@ -139,79 +268,7 @@ export default function SAOTLab() {
     <div className="h-[calc(100vh-7rem)] flex">
       <div className="flex-1 relative" onPointerMove={handlePointerMove}>
         <DataOverlay />
-        <Canvas
-          shadows
-          camera={{ position: [0, 12, 18], fov: 50 }}
-          className="w-full h-full"
-        >
-          <Environment />
-          <Pitch />
-          <Goals />
-          <Stadium />
-
-          <Player
-            position={isSimulating ? simulation.currentFrame.attackerPosition : attacker}
-            color="#ef4444"
-            secondaryColor="#ffffff"
-            label={t('saot.attacker')}
-            onDragEnd={handleDragEndAttacker}
-            onDragComplete={handleDragCompleteAttacker}
-            highlighted={editMode || (result.isOffside && showOffsideLine)}
-            animationState={isSimulating ? simulation.currentFrame.attackerAnim : 'idle'}
-            facingAngle={attackerAngle}
-          />
-          <Player
-            position={isSimulating ? simulation.currentFrame.defenderPosition : defender}
-            color="#3b82f6"
-            secondaryColor="#1e3a5f"
-            label={t('saot.defender')}
-            onDragEnd={handleDragEndDefender}
-            onDragComplete={handleDragCompleteDefender}
-            highlighted={editMode}
-            animationState={isSimulating ? simulation.currentFrame.defenderAnim : 'idle'}
-            facingAngle={defenderAngle}
-          />
-          <Player
-            position={{ x: goalkeeper.x, z: goalkeeper.z }}
-            color="#eab308"
-            secondaryColor="#1a1a1a"
-            label={t('saot.goalkeeper')}
-            onDragEnd={handleDragEndGoalkeeper}
-            onDragComplete={handleDragCompleteGoalkeeper}
-            highlighted={editMode}
-          />
-
-          <Ball
-            position={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
-            spinning={isSimulating}
-          />
-
-          {showOffsideLine && (
-            <OffsideLine
-              defenderX={offsideLineX}
-              attackerX={isSimulating ? simulation.currentFrame.attackerPosition.x : attacker.x}
-              isOffside={result.isOffside}
-              marginCm={result.marginCm}
-              visible={simulation.progress > 0}
-            />
-          )}
-
-          {remoteCursors.map((cursor) => (
-            <RemoteCursor
-              key={cursor.userId}
-              position={{ x: cursor.x, z: cursor.z }}
-              color={cursor.color}
-              name={cursor.name}
-            />
-          ))}
-
-          <CameraController
-            preset={cameraPreset}
-            followBall={isSimulating}
-            ballPosition={isSimulating ? simulation.currentFrame.ballPosition : [-15, 0.2, 0]}
-            enabled={!editMode}
-          />
-        </Canvas>
+        <Scene3D callbacks={sceneCallbacks} />
       </div>
 
       <div className="w-72 border-l border-surface-700/50 glass flex flex-col">
@@ -224,7 +281,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            {t('saot.controls', 'Controles')}
+            {'Controles'}
           </button>
           <button
             onClick={() => setActivePanel('playbook')}
@@ -234,7 +291,7 @@ export default function SAOTLab() {
                 : 'text-surface-200/50 hover:text-surface-200/70'
             }`}
           >
-            {t('saot.playbook', 'Playbook')}
+            {'Playbook'}
           </button>
         </div>
 

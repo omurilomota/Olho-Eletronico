@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { dbCreateSession, dbGetSession, dbDeleteSession } from '../services/supabaseClient';
 
 const COLORS = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
 
@@ -28,12 +29,13 @@ interface MultiplayerState {
   isConnected: boolean;
   connectionError: string | null;
   channelName: string | null;
-  createSession: (name: string, userName: string) => void;
-  joinSession: (sessionId: string, userName: string) => void;
-  leaveSession: () => void;
+  createSession: (name: string, userName: string) => Promise<void>;
+  joinSession: (sessionId: string, userName: string) => Promise<void>;
+  leaveSession: () => Promise<void>;
   setSession: (session: Session | null) => void;
   setConnected: (connected: boolean) => void;
   setChannelName: (name: string | null) => void;
+  setConnectionError: (error: string | null) => void;
   updateCursor: (x: number, z: number) => void;
   setParticipants: (participants: Participant[]) => void;
   addParticipant: (p: Participant) => void;
@@ -47,10 +49,18 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
   connectionError: null,
   channelName: null,
 
-  createSession: (name, userName) => {
+  createSession: async (name, userName) => {
     const userId = generateId();
+    const sessionId = generateId();
+
+    const { error } = await dbCreateSession(sessionId, name, userName);
+    if (error) {
+      set({ connectionError: 'Falha ao criar sessao no servidor.' });
+      return;
+    }
+
     const session: Session = {
-      id: generateId(),
+      id: sessionId,
       name,
       createdBy: userName,
       participants: [
@@ -63,16 +73,22 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
       ],
       createdAt: new Date(),
     };
-    set({ session, localUserId: userId, isConnected: true });
+    set({ session, localUserId: userId, connectionError: null });
   },
 
-  joinSession: (sessionId, userName) => {
+  joinSession: async (sessionId, userName) => {
+    const { data, error } = await dbGetSession(sessionId);
+    if (error || !data) {
+      set({ connectionError: 'Sessao nao encontrada. Verifique o ID.' });
+      return;
+    }
+
     const userId = generateId();
     const participantCount = get().session?.participants.length ?? 0;
     const session: Session = {
-      id: sessionId,
-      name: `Session ${sessionId}`,
-      createdBy: 'Remote',
+      id: data.id,
+      name: data.name,
+      createdBy: data.created_by,
       participants: [
         {
           id: userId,
@@ -81,16 +97,26 @@ export const useMultiplayerStore = create<MultiplayerState>((set, get) => ({
           role: 'viewer',
         },
       ],
-      createdAt: new Date(),
+      createdAt: new Date(data.created_at),
     };
-    set({ session, localUserId: userId, isConnected: true });
+    set({ session, localUserId: userId, connectionError: null });
   },
 
-  leaveSession: () => set({ session: null, localUserId: null, isConnected: false, channelName: null }),
+  leaveSession: async () => {
+    const { session, localUserId } = get();
+    if (session && localUserId) {
+      const me = session.participants.find((p) => p.id === localUserId);
+      if (me?.role === 'admin') {
+        await dbDeleteSession(session.id).catch(() => {});
+      }
+    }
+    set({ session: null, localUserId: null, isConnected: false, channelName: null, connectionError: null });
+  },
 
   setSession: (session) => set({ session }),
   setConnected: (connected) => set({ isConnected: connected }),
   setChannelName: (name) => set({ channelName: name }),
+  setConnectionError: (error) => set({ connectionError: error }),
 
   updateCursor: (x, z) => {
     const session = get().session;

@@ -14,6 +14,7 @@ interface PlayerProps {
   secondaryColor: string;
   label: string;
   onDragEnd: (pos: Position) => void;
+  onDragStart?: () => void;
   onDragComplete?: (pos: Position) => void;
   highlighted?: boolean;
   animationState?: AnimationState;
@@ -28,6 +29,7 @@ const Player = memo(function Player({
   secondaryColor,
   label,
   onDragEnd,
+  onDragStart,
   onDragComplete,
   highlighted = false,
   animationState = 'idle',
@@ -51,7 +53,9 @@ const Player = memo(function Player({
     parent.position.z = _tmpVec.z;
   }, []);
 
-  const handleDragStart = useCallback(() => {}, []);
+  const handleDragStart = useCallback(() => {
+    onDragStart?.();
+  }, [onDragStart]);
 
   const handleDragComplete = useCallback(() => {
     const parent = groupRef.current?.parent;

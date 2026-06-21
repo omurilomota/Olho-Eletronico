@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useCallback, useRef, useState, type ReactNode } from 'react';
-import { getSupabase, SESSION_CHANNEL_PREFIX, CURSOR_EVENT, SCENARIO_EVENT, PLAYBOOK_EVENT, PLAYER_EVENT } from '../services/supabaseClient';
+import { getSupabase, SESSION_CHANNEL_PREFIX, CURSOR_EVENT, SCENARIO_EVENT, PLAYBOOK_EVENT, PLAYER_EVENT, DRAG_EVENT } from '../services/supabaseClient';
 import { useMultiplayerStore, type Participant } from '../store/useMultiplayerStore';
 import { useSaotStore, type ScenarioType, type Position } from '../../saot/store/useSaotStore';
 import { usePlaybookStore } from '../../saot/store/usePlaybookStore';
@@ -38,19 +38,24 @@ interface MultiplayerContextValue {
   sendPlayer: (payload: PlayerPayload) => void;
   sendScenario: (payload: ScenarioPayload) => void;
   sendPlaybook: (payload: PlaybookPayload) => void;
+  sendDrag: (action: 'start' | 'end') => void;
 }
 
 const MultiplayerContext = createContext<MultiplayerContextValue | null>(null);
 
-export function useMultiplayer() {
-  return useContext(MultiplayerContext);
+export function useMultiplayer(): MultiplayerContextValue | null;
+export function useMultiplayer<T>(selector: (value: MultiplayerContextValue) => T): T;
+export function useMultiplayer<T>(selector?: (value: MultiplayerContextValue) => T): T | MultiplayerContextValue | null {
+  const ctx = useContext(MultiplayerContext);
+  if (selector && ctx) return selector(ctx);
+  return ctx;
 }
 
 const MAX_RETRIES = 3;
 const BASE_DELAY = 1000;
 
 export default function MultiplayerProvider({ children }: { children: ReactNode }) {
-  const { session, isConnected, connectionError } = useMultiplayerStore();
+  const { session } = useMultiplayerStore();
   const setParticipants = useMultiplayerStore((s) => s.setParticipants);
 
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabase>['channel']> | null>(null);
@@ -60,6 +65,9 @@ export default function MultiplayerProvider({ children }: { children: ReactNode 
   const [remoteCursors, setRemoteCursors] = useState<RemoteCursorData[]>([]);
   const remoteCursorsRef = useRef(setRemoteCursors);
   remoteCursorsRef.current = setRemoteCursors;
+
+  const isConnected = useMultiplayerStore((s) => s.isConnected);
+  const connectionError = useMultiplayerStore((s) => s.connectionError);
 
   useEffect(() => {
     if (!session) {
@@ -87,10 +95,7 @@ export default function MultiplayerProvider({ children }: { children: ReactNode 
 
     async function handleReconnect(oldChannel: Channel) {
       if (generationRef.current !== gen) return;
-      if (retryCountRef.current >= MAX_RETRIES) {
-        useMultiplayerStore.setState({ isConnected: false, connectionError: 'Conexao perdida.' });
-        return;
-      }
+      if (retryCountRef.current >= MAX_RETRIES) return;
       retryCountRef.current++;
       const delay = BASE_DELAY * Math.pow(2, retryCountRef.current - 1);
       retryRef.current = setTimeout(async () => {
@@ -164,6 +169,13 @@ export default function MultiplayerProvider({ children }: { children: ReactNode 
           if (data.target === 'attacker') saotStore.setAttacker(data.position);
           else if (data.target === 'defender') saotStore.setDefender(data.position);
           else if (data.target === 'goalkeeper') saotStore.setGoalkeeper(data.position);
+        })
+        .on('broadcast', { event: DRAG_EVENT }, ({ payload }: { payload: unknown }) => {
+          if (generationRef.current !== gen) return;
+          const data = payload as { action: 'start' | 'end'; userId: string };
+          const meId = useMultiplayerStore.getState().localUserId;
+          if (data.userId === meId) return;
+          useSaotStore.getState().setDragging(data.action === 'start' ? data.userId : null);
         })
         .on('broadcast', { event: SCENARIO_EVENT }, ({ payload }: { payload: unknown }) => {
           if (generationRef.current !== gen) return;
@@ -262,6 +274,13 @@ export default function MultiplayerProvider({ children }: { children: ReactNode 
     channelRef.current.send({ type: 'broadcast', event: PLAYBOOK_EVENT, payload }).catch(() => {});
   }, []);
 
+  const sendDrag = useCallback(async (action: 'start' | 'end') => {
+    if (!channelRef.current) return;
+    const meId = useMultiplayerStore.getState().localUserId;
+    if (!meId) return;
+    channelRef.current.send({ type: 'broadcast', event: DRAG_EVENT, payload: { action, userId: meId } }).catch(() => {});
+  }, []);
+
   const contextValue: MultiplayerContextValue = {
     session: session?.participants ?? [],
     isConnected,
@@ -271,6 +290,7 @@ export default function MultiplayerProvider({ children }: { children: ReactNode 
     sendPlayer,
     sendScenario,
     sendPlaybook,
+    sendDrag,
   };
 
   return (
