@@ -15,11 +15,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const envUser = import.meta.env.VITE_DEMO_USER;
-    const envPass = import.meta.env.VITE_DEMO_PASS;
-    const validUser = envUser || 'funcionario';
-    const validPass = envPass || 'func123';
-    if (username === validUser && password === validPass) {
+    if (username === 'funcionario' && password === 'func123') {
       onLogin();
     } else {
       setError(true);
